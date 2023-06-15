@@ -12,10 +12,6 @@ public class CustomResponseUtil {
 
     private static final Logger log = LoggerFactory.getLogger(CustomResponseUtil.class);
 
-    /**
-     * 401은 인증이 안된 것
-     * 403은 권한이 없는 것
-     */
     public static void unAuthentication(HttpServletResponse response, String msg) {
         try {
             ObjectMapper om = new ObjectMapper();
