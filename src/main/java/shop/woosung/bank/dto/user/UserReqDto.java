@@ -7,15 +7,29 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.woosung.bank.domain.user.User;
 import shop.woosung.bank.domain.user.UserEnum;
 
+import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
+
 public class UserReqDto {
 
-    @ToString
+
     @Getter
-    @Setter
-    public static class SignUpReqDto {
+    public static class LoginReqDto {
         private String username;
         private String password;
+    }
+
+
+    @Getter @Setter
+    public static class JoinReqDto {
+        // NotEmpty 이런거 걸어놓고 잘동작하려면
+        @NotEmpty // null이거나, 공백일 수 없다.
+        private String username;
+        @NotEmpty
+        private String password;
+        @NotEmpty
         private String email;
+        @NotEmpty
         private String fullname;
 
         public User toEntity(BCryptPasswordEncoder passwordEncoder) {
@@ -25,6 +39,8 @@ public class UserReqDto {
                     .email(email)
                     .fullname(fullname)
                     .role(UserEnum.CUSTOMER)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
                     .build();
         }
     }

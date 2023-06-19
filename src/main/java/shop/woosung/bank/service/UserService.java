@@ -26,13 +26,13 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserResDto.SignUpResDto signUp(UserReqDto.SignUpReqDto signUpReqDto) {
+    public UserResDto.JoinResDto join(UserReqDto.JoinReqDto signUpReqDto) {
         Optional<User> user = userRepository.findByUsername(signUpReqDto.getUsername());
         if(user.isPresent()) {
             throw new CustomApiException("동일한 username이 존재합니다.");
         }
         User userPS = userRepository.save(signUpReqDto.toEntity(passwordEncoder));
 
-        return new UserResDto.SignUpResDto(userPS);
+        return new UserResDto.JoinResDto(userPS);
     }
 }

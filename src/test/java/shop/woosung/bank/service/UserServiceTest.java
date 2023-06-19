@@ -35,7 +35,7 @@ class UserServiceTest extends DummyUserObject {
     @Test
     void 회원가입_test() throws Exception {
         // given
-        UserReqDto.SignUpReqDto signUpReqDto =  new UserReqDto.SignUpReqDto();
+        UserReqDto.JoinReqDto signUpReqDto =  new UserReqDto.JoinReqDto();
         signUpReqDto.setUsername("user1");
         signUpReqDto.setPassword("1234");
         signUpReqDto.setEmail("test@naver.com");
@@ -47,7 +47,7 @@ class UserServiceTest extends DummyUserObject {
         when(userRepository.save(any())).thenReturn(mockUser);
 
         // when
-        UserResDto.SignUpResDto signUpResDto = userService.signUp(signUpReqDto);
+        UserResDto.JoinResDto signUpResDto = userService.join(signUpReqDto);
 
         // then
         assertThat(signUpResDto.getId()).isEqualTo(1L);
