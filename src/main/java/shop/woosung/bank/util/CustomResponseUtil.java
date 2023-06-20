@@ -7,7 +7,6 @@ import shop.woosung.bank.dto.ResponseDto;
 
 import javax.servlet.http.HttpServletResponse;
 
-
 public class CustomResponseUtil {
 
     private static final Logger log = LoggerFactory.getLogger(CustomResponseUtil.class);
