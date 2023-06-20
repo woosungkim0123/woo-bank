@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import shop.woosung.bank.dto.ResponseDto;
 import shop.woosung.bank.handler.ex.CustomApiException;
+import shop.woosung.bank.handler.ex.CustomValidationException;
 
 @RestControllerAdvice
 public class CustomExceptionHandler {
@@ -21,4 +22,9 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(new ResponseDto<>(-1, e.getMessage(), null), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(CustomValidationException.class)
+    public ResponseEntity<?> validationApiException(CustomValidationException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(new ResponseDto<>(-1, e.getMessage(), e.getErrorMap()), HttpStatus.BAD_REQUEST);
+    }
 }
