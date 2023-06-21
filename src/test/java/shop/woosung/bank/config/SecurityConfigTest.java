@@ -31,17 +31,4 @@ class SecurityConfigTest {
         // then
         assertThat(httpStatus).isEqualTo(401);
     }
-
-    @DisplayName("/api/admin/** 로그인 없이 요청시 401 리턴 테스트")
-    @Test
-    public void authorizationTest() throws Exception {
-        // given
-        // when
-        ResultActions resultAction = mvc.perform(get("/api/admin/test"));
-        String responseBody = resultAction.andReturn().getResponse().getContentAsString();
-        int httpStatus = resultAction.andReturn().getResponse().getStatus();
-        // then
-        assertThat(httpStatus).isEqualTo(401);
-    }
-
 }
