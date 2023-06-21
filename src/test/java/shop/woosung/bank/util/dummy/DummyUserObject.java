@@ -16,6 +16,8 @@ public class DummyUserObject {
                 .email(email)
                 .fullname(fullname)
                 .role(role)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
