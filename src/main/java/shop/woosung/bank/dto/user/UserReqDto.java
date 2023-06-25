@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class UserReqDto {
 
 
-    @Getter
+    @Getter @Setter
     public static class LoginReqDto {
         private String username;
         private String password;
