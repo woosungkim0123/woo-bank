@@ -9,6 +9,7 @@ import shop.woosung.bank.util.CustomDateUtil;
 @Getter @Setter
 public class UserResDto {
 
+    @Getter @Setter
     public static class LoginResDto {
         private Long id;
         private String username;

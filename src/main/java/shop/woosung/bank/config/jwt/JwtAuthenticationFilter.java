@@ -39,7 +39,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginReqDto.getUsername(), loginReqDto.getPassword());
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
             return authentication;
         } catch(Exception e) {
             throw new InternalAuthenticationServiceException(e.getMessage());
@@ -56,7 +55,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         LoginUser loginUser = (LoginUser) authResult.getPrincipal();
         String jwtToken = JwtProcess.create(loginUser);
         response.addHeader(JwtVO.HEADER, jwtToken);
-
         LoginResDto loginResDto = new LoginResDto(loginUser.getUser());
         CustomResponseUtil.success(response, loginResDto);
     }
