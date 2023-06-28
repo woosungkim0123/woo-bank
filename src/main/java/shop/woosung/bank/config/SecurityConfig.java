@@ -4,19 +4,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.woosung.bank.config.jwt.JwtAuthenticationFilter;
+import shop.woosung.bank.config.jwt.JwtAuthorizationFilter;
 import shop.woosung.bank.domain.user.UserEnum;
 
 import shop.woosung.bank.util.CustomResponseUtil;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 public class SecurityConfig {
@@ -41,10 +50,10 @@ public class SecurityConfig {
 
         http.apply(new CustomSecurityFilterManager());
 
+
         http.exceptionHandling()
-                .authenticationEntryPoint((request, response, authenticationException) -> {
-                    CustomResponseUtil.unAuthentication(response, "로그인을 진행해주세요");
-                });
+                .authenticationEntryPoint((req, res, e) -> CustomResponseUtil.fail(res, "로그인을 진행 해주세요", HttpStatus.UNAUTHORIZED))
+                .accessDeniedHandler((req, res, e) -> CustomResponseUtil.fail(res, "권한이 없습니다", HttpStatus.FORBIDDEN));
 
         http.authorizeHttpRequests()
                 .antMatchers("/api/s/**").authenticated()
@@ -72,6 +81,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
             getBuilder().addFilter(new JwtAuthenticationFilter(authenticationManager));
+            getBuilder().addFilter(new JwtAuthorizationFilter(authenticationManager));
             super.configure(http);
         }
     }
