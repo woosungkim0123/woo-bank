@@ -2,6 +2,7 @@ package shop.woosung.bank.config.jwt;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,7 +39,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             LoginReqDto loginReqDto = om.readValue(request.getInputStream(), LoginReqDto.class);
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginReqDto.getUsername(), loginReqDto.getPassword());
+
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
             return authentication;
         } catch(Exception e) {
             throw new InternalAuthenticationServiceException(e.getMessage());
@@ -47,7 +50,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        CustomResponseUtil.unAuthentication(response, "로그인 실패");
+        CustomResponseUtil.fail(response, "로그인 실패", HttpStatus.UNAUTHORIZED);
     }
 
     @Override
