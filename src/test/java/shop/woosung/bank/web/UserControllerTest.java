@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static shop.woosung.bank.dto.user.UserReqDto.*;
 
+@Transactional
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class UserControllerTest extends DummyUserObject {
@@ -30,7 +32,7 @@ class UserControllerTest extends DummyUserObject {
 
     @BeforeEach
     public void setUp() {
-        dataSetting();
+        userRepository.save(newUser("test1", "1234", "test1@naver.com", "테스터일", UserEnum.CUSTOMER));
     }
 
     @Test
@@ -74,7 +76,4 @@ class UserControllerTest extends DummyUserObject {
         resultActions.andExpect(status().isBadRequest());
     }
 
-    private void dataSetting() {
-        userRepository.save(newUser("test1", "1234", "test1@naver.com", "테스터일", UserEnum.CUSTOMER));
-    }
 }
