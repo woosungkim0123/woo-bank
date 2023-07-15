@@ -13,10 +13,10 @@ public class AccountResDto {
         private Long number;
         private Long balance;
 
-        public AccountRegisterResDto(Account account) {
-            this.id = account.getId();
-            this.number = account.getNumber();
-            this.balance = account.getBalance();
+        public AccountRegisterResDto(Long id, Long number, Long balance) {
+            this.id = id;
+            this.number = number;
+            this.balance = balance;
         }
     }
 }
