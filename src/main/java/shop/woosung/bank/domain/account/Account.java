@@ -30,7 +30,7 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true, nullable = false, length = 4)
+    @Column(unique = true, nullable = false, length = 20)
     private Long number;
     @Column(nullable = false, length = 4)
     private Long password;
