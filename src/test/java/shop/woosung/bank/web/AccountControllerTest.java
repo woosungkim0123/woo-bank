@@ -14,10 +14,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
-import shop.woosung.bank.dto.account.AccountReqDto;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static shop.woosung.bank.dto.account.AccountReqDto.*;
@@ -52,7 +50,6 @@ class AccountControllerTest extends DummyUserObject {
 
         // when
         ResultActions resultActions = mvc.perform(post("/api/s/account").content(requestBody).contentType(MediaType.APPLICATION_JSON));
-        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
 
         // then
         resultActions.andExpect(status().isCreated());
