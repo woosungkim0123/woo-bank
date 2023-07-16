@@ -16,6 +16,7 @@ import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static shop.woosung.bank.dto.account.AccountReqDto.*;
@@ -53,5 +54,16 @@ class AccountControllerTest extends DummyUserObject {
 
         // then
         resultActions.andExpect(status().isCreated());
+    }
+
+    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void findUserAccount_test() throws Exception {
+        // given
+        // when
+        ResultActions resultActions = mvc.perform(get("/api/s/accounts"));
+
+        // then
+        resultActions.andExpect(status().isOk());
     }
 }
