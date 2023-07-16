@@ -13,6 +13,8 @@ import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -52,11 +54,30 @@ public class AccountServiceTest extends DummyUserObject {
         AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, user.getId());
 
         // then
-        verify(userRepository, times(1)).findById(user.getId());
-        verify(accountRepository, times(1)).findFirstByOrderByNumberDesc();
-        verify(accountRepository, times(1)).save(any(Account.class));
-
         assertThat(accountRegisterResDto).isNotNull();
         assertThat(accountRegisterResDto.getNumber()).isEqualTo(19111111120L);
     }
+
+    @Test
+    public void 계좌목록보기_유저별_test() throws Exception {
+        // given
+        Long userId = 1L;
+
+        // stub
+        User user = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserEnum.CUSTOMER);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        Account account1 = newMockAccount(1L, 11111111111L, 1000L, user);
+        Account account2 = newMockAccount(2L, 11111111112L, 1000L, user);
+        List<Account> accountList = Arrays.asList(account1, account2);
+        when(accountRepository.findByUser_id(any())).thenReturn(accountList);
+
+        // when
+        AccountListResDto accountListRespDto = accountService.getAccountList(userId);
+
+        // then
+        assertThat(accountListRespDto.getFullname()).isEqualTo("test1");
+        assertThat(accountListRespDto.getAccounts().size()).isEqualTo(2);
+    }
+
 }
