@@ -1,6 +1,7 @@
 package shop.woosung.bank.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.user.User;
 import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
 import java.util.Arrays;
@@ -80,4 +82,22 @@ public class AccountServiceTest extends DummyUserObject {
         assertThat(accountListRespDto.getAccounts().size()).isEqualTo(2);
     }
 
+    @Test
+    public void deleteAccountFailNotUser() throws Exception {
+        // given
+        Long number = 11111111111L;
+        Long userId = 2L;
+
+
+        User user = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserEnum.CUSTOMER);
+        Account account = newMockAccount(1L, number, 1000L, user);
+        when(accountRepository.findByNumber(number)).thenReturn(Optional.of(account));
+
+        // when
+        // then
+        Assertions.assertThatThrownBy(() -> accountService.deleteAccount(number, userId))
+                .isInstanceOf(CustomApiException.class)
+                .hasMessageContaining("계좌 소유자가 아닙니다.");
+
+    }
 }
