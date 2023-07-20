@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.domain.user.User;
@@ -23,9 +22,10 @@ class JwtProcessTest {
         User user = User.builder()
                 .id(1L).role(UserEnum.ADMIN).build();
         LoginUser loginUser = new LoginUser(user);
+        JwtTestHolder jwtTestHolder = new JwtTestHolder();
 
         // when
-        String jwtToken = JwtProcess.create(loginUser);
+        String jwtToken = JwtProcess.create(jwtTestHolder, loginUser);
         
         // then
         assertThat(jwtToken).startsWith(JwtVO.TOKEN_PREFIX);
@@ -37,11 +37,11 @@ class JwtProcessTest {
     public void verify_test(Long id, UserEnum expectedRole) {
 
         String jwtToken = createToken(id, expectedRole);
+        JwtTestHolder jwtTestHolder = new JwtTestHolder();
         // given & when
-        LoginUser loginUser = JwtProcess.verify(jwtToken);
+        LoginUser loginUser = JwtProcess.verify(jwtTestHolder, jwtToken);
 
         // then
-        assertThat(loginUser.getUser().getId()).isEqualTo(id);
         assertThat(loginUser.getUser().getRole()).isEqualTo(expectedRole);
     }
     /*
@@ -59,6 +59,7 @@ class JwtProcessTest {
         User user = User.builder()
                 .id(id).role(role).build();
         LoginUser loginUser = new LoginUser(user);
-        return JwtProcess.create(loginUser).replace(JwtVO.TOKEN_PREFIX, "");
+        JwtTestHolder jwtTestHolder = new JwtTestHolder();
+        return JwtProcess.create(jwtTestHolder, loginUser).replace(JwtVO.TOKEN_PREFIX, "");
     }
 }

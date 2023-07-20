@@ -112,7 +112,8 @@ class JwtAuthorizationFilterTest {
     private static String getCorrectToken(UserEnum userEnum) {
         User user = User.builder().id(1L).role(userEnum).build();
         LoginUser loginUser = new LoginUser(user);
-        return JwtProcess.create(loginUser);
+        JwtSystemHolder jwtSystemHolder = new JwtSystemHolder();
+        return JwtProcess.create(jwtSystemHolder, loginUser);
     }
 
     private static String getWrongToken() {
