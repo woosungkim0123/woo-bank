@@ -1,36 +1,32 @@
 package shop.woosung.bank.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.woosung.bank.config.jwt.JwtAuthenticationFilter;
 import shop.woosung.bank.config.jwt.JwtAuthorizationFilter;
+import shop.woosung.bank.config.jwt.JwtHolder;
 import shop.woosung.bank.domain.user.UserEnum;
 
 import shop.woosung.bank.util.CustomResponseUtil;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final JwtHolder jwtHolder;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -80,8 +76,8 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
-            getBuilder().addFilter(new JwtAuthenticationFilter(authenticationManager));
-            getBuilder().addFilter(new JwtAuthorizationFilter(authenticationManager));
+            getBuilder().addFilter(new JwtAuthenticationFilter(jwtHolder, authenticationManager));
+            getBuilder().addFilter(new JwtAuthorizationFilter(jwtHolder, authenticationManager));
             super.configure(http);
         }
     }

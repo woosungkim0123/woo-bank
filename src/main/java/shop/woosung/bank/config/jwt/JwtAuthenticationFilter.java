@@ -25,10 +25,12 @@ import static shop.woosung.bank.dto.user.UserResDto.*;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
+    private JwtHolder jwtHolder;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(JwtHolder jwtHolder, AuthenticationManager authenticationManager) {
         super(authenticationManager);
         setFilterProcessesUrl("/api/login");
+        this.jwtHolder = jwtHolder;
         this.authenticationManager = authenticationManager;
     }
 
@@ -56,7 +58,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         LoginUser loginUser = (LoginUser) authResult.getPrincipal();
-        String jwtToken = JwtProcess.create(loginUser);
+        String jwtToken = JwtProcess.create(jwtHolder, loginUser);
         response.addHeader(JwtVO.HEADER, jwtToken);
         LoginResDto loginResDto = new LoginResDto(loginUser.getUser());
         CustomResponseUtil.success(response, loginResDto);
