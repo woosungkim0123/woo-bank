@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.account.repository.AccountRepository;
+import shop.woosung.bank.domain.transaction.Transaction;
+import shop.woosung.bank.domain.transaction.TransactionEnum;
+import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.domain.user.User;
 import shop.woosung.bank.domain.user.repository.UserRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
@@ -22,6 +25,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
 
 
     public AccountListResDto getAccountList(Long userId) {
@@ -49,6 +53,30 @@ public class AccountService {
         accountPS.checkOwner(userId);
 
         accountRepository.deleteById(accountPS.getId());
+    }
+
+    @Transactional
+    public AccountDepositResDto depositAccount(AccountDepositReqDto accountDepositReqDto) { // ATM -> 누군가의 계좌
+        Account depositAccountPS = accountRepository.findByNumber(accountDepositReqDto.getNumber())
+                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
+
+        depositAccountPS.deposit(accountDepositReqDto.getAmount());
+
+        Transaction transaction = Transaction.builder()
+                        .depositAccount(depositAccountPS)
+                        .withdrawAccount(null)
+                        .depositAccountBalance(depositAccountPS.getBalance())
+                        .withdrawAccountBalance(null)
+                        .amount(accountDepositReqDto.getAmount())
+                        .gubun(TransactionEnum.DEPOSIT)
+                        .sender("ATM")
+                        .receiver(accountDepositReqDto.getNumber() + "")
+                        .tel(accountDepositReqDto.getTel())
+                        .build();
+
+        Transaction transactionPS = transactionRepository.save(transaction);
+
+        return new AccountDepositResDto(depositAccountPS, transactionPS);
     }
 
 
