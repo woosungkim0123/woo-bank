@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.account.repository.AccountRepository;
+import shop.woosung.bank.domain.transaction.Transaction;
+import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.domain.user.User;
 import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
@@ -36,6 +38,8 @@ public class AccountServiceTest extends DummyUserObject {
 
     @Mock
     private AccountRepository accountRepository;
+    @Mock
+    private TransactionRepository transactionRepository;
 
     @Test
     public void registerAccount() throws JsonProcessingException {
@@ -99,5 +103,31 @@ public class AccountServiceTest extends DummyUserObject {
                 .isInstanceOf(CustomApiException.class)
                 .hasMessageContaining("계좌 소유자가 아닙니다.");
 
+    }
+    @Test
+    public void depositAccountTest() {
+        // given
+        AccountDepositReqDto accountDepositReqDto = new AccountDepositReqDto();
+        accountDepositReqDto.setNumber(11111111111L);
+        accountDepositReqDto.setAmount(100L);
+        accountDepositReqDto.setType("DEPOSIT");
+        accountDepositReqDto.setTel("01012341234");
+
+        // stub
+        User user = newMockUser(1L, "test", "1234", "test@teest.com", "test", UserEnum.CUSTOMER);
+        Account account1 = newMockAccount(1L, 11111111111L, 1000L, user);
+        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(account1));
+
+        // stub
+        Account account2 = newMockAccount(1L, 11111111111L, 1000L, user);
+        Transaction transaction = newMockDepositTransaction(1L, account2);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        // when
+        AccountDepositResDto accountDepositResDto = accountService.depositAccount(accountDepositReqDto);
+
+        // then
+        Long depositAccountBalance = accountDepositResDto.getTransaction().getDepositAccountBalance();
+        System.out.println("depositAccountBalance = " + depositAccountBalance);
+        System.out.println(account1.getBalance());
     }
 }
