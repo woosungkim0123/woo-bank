@@ -126,6 +126,7 @@ public class AccountServiceTest extends DummyUserObject {
         AccountDepositResDto accountDepositResDto = accountService.depositAccount(accountDepositReqDto);
 
         // then
-        assertThat(accountDepositResDto.getTransaction().getDepositAccountBalance()).isEqualTo(1100L);
+        assertThat(account1.getBalance()).isEqualTo(1100L);
+
     }
 }
