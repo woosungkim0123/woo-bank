@@ -3,8 +3,7 @@ package shop.woosung.bank.dto.account;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 public class AccountReqDto {
     @Getter @Setter
@@ -13,4 +12,21 @@ public class AccountReqDto {
         @Digits(integer = 4, fraction = 4)
         private Long password;
     }
+
+    @Getter @Setter
+    public static class AccountDepositReqDto {
+        @NotNull
+        @Digits(integer = 20, fraction = 20)
+        private Long number;
+        @Positive
+        @NotNull
+        private Long amount;
+        @Pattern(regexp = "^(DEPOSIT|WITHDRAW)$")
+        @NotEmpty
+        private String type;
+        @Pattern(regexp = "^[0-9]{11}")
+        @NotEmpty
+        private String tel;
+    }
+
 }

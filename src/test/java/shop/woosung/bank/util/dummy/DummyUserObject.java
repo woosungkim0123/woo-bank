@@ -2,12 +2,32 @@ package shop.woosung.bank.util.dummy;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.woosung.bank.domain.account.Account;
+import shop.woosung.bank.domain.transaction.Transaction;
+import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.domain.user.User;
 import shop.woosung.bank.domain.user.UserEnum;
 
 import java.time.LocalDateTime;
 
 public class DummyUserObject {
+
+    protected Transaction newMockDepositTransaction(Long id, Account account) {
+        account.deposit(100L);
+        return Transaction.builder()
+                .id(id)
+                .depositAccount(account)
+                .withdrawAccount(null)
+                .depositAccountBalance(account.getBalance())
+                .withdrawAccountBalance(null)
+                .amount(100L)
+                .gubun(TransactionEnum.DEPOSIT)
+                .sender("ATM")
+                .receiver(account.getNumber() + "")
+                .tel("01012341234")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
 
     protected User newUser(String username, String password, String email, String fullname, UserEnum role) {
         String encodingPassword = new BCryptPasswordEncoder().encode(password);

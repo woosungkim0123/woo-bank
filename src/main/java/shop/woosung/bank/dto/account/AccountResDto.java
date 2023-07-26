@@ -1,9 +1,12 @@
 package shop.woosung.bank.dto.account;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import shop.woosung.bank.domain.account.Account;
+import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.user.User;
+import shop.woosung.bank.util.CustomDateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +50,43 @@ public class AccountResDto {
                 this.id = account.getId();
                 this.number = account.getNumber();
                 this.balance = account.getBalance();
+            }
+        }
+    }
+
+    @Getter @Setter
+    public static class AccountDepositResDto {
+        private Long id;
+        private Long number;
+        private TransactionDto transaction;
+
+        public AccountDepositResDto(Account account, Transaction transaction) {
+            this.id = account.getId();
+            this.number = account.getNumber();
+            this.transaction = new TransactionDto(transaction);
+        }
+
+        @Getter @Setter
+        public class TransactionDto {
+            private Long id;
+            private String gubun;
+            private String sender;
+            private String receiver;
+            private Long amount;
+            @JsonIgnore
+            private Long depositAccountBalance;
+            private String tel;
+            private String createdAt;
+
+            public TransactionDto(Transaction transaction) {
+                this.id = transaction.getId();
+                this.gubun = transaction.getGubun().toString();
+                this.sender = transaction.getSender();
+                this.receiver = transaction.getReceiver();
+                this.amount = transaction.getAmount();
+                this.depositAccountBalance = transaction.getDepositAccountBalance();
+                this.tel = transaction.getTel();
+                this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
             }
         }
     }

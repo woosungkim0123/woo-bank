@@ -68,4 +68,7 @@ public class Account {
         }
     }
 
+    public void deposit(Long amount) {
+        this.balance = this.balance + amount;
+    }
 }
