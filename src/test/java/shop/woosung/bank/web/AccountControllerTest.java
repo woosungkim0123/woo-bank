@@ -1,5 +1,6 @@
 package shop.woosung.bank.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static shop.woosung.bank.dto.account.AccountReqDto.*;
 
@@ -93,5 +95,25 @@ class AccountControllerTest extends DummyUserObject {
 
         // then
         assertThat(accountRepository.findByNumber(accountNumber)).isEmpty();
+    }
+    @Test
+    public void depositAccount_test() throws Exception {
+        // given
+        AccountDepositReqDto accountDepositReqDto = new AccountDepositReqDto();
+        accountDepositReqDto.setNumber(11111111111L);
+        accountDepositReqDto.setAmount(100L);
+        accountDepositReqDto.setType("DEPOSIT");
+        accountDepositReqDto.setTel("01012341234");
+        String requestBody = om.writeValueAsString(accountDepositReqDto);
+
+        // when
+        ResultActions resultActions = mvc.perform(post("/api/account/deposit")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isCreated());
+        resultActions.andExpect(jsonPath("$.data.number").value(11111111111L));
+        resultActions.andExpect(jsonPath("$.data.transaction.amount").value(100L));
     }
 }
