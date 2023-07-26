@@ -100,6 +100,43 @@ public class AccountService {
         return new AccountRegisterResDto(newAccount.getId(), newAccountNumber, newAccount.getBalance());
     }
 
+    @Transactional
+    public AccountWithdrawResDto withdraw(AccountWithdrawReqDto accountWithdrawReqDto, Long userId) {
+        Account withdrawAccount = accountRepository.findByNumber(accountWithdrawReqDto.getNumber())
+                .orElseThrow(
+                        () -> new CustomApiException("계좌를 찾을 수 없습니다.")
+                );
+
+        // 출금 소유자 확인
+        withdrawAccount.checkOwner(userId);
+
+        // 비밀번호 확인
+        withdrawAccount.checkSamePassword(accountWithdrawReqDto.getPassword());
+
+        // 잔액 확인
+        withdrawAccount.checkBalance(accountWithdrawReqDto.getAmount());
+
+        // 출금하기
+        withdrawAccount.withdraw(accountWithdrawReqDto.getAmount());
+
+
+        // 거래내역 남기기
+        // 내 계좌 -> ATM 출금
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .amount(accountWithdrawReqDto.getAmount())
+                .gubun(TransactionEnum.WITHDRAW)
+                .sender(accountWithdrawReqDto.getNumber() + "")
+                .receiver("ATM")
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+
+        // DTO 응답
+        return new AccountWithdrawResDto(withdrawAccount, savedTransaction);
+    }
 
 
 }
