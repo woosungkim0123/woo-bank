@@ -129,4 +129,31 @@ public class AccountServiceTest extends DummyUserObject {
         assertThat(account1.getBalance()).isEqualTo(1100L);
 
     }
+
+    @Test
+    public void withdrawAccountTest() {
+        // given
+        AccountWithdrawReqDto accountWithdrawReqDto = new AccountWithdrawReqDto();
+        accountWithdrawReqDto.setNumber(11111111111L);
+        accountWithdrawReqDto.setPassword(1234L);
+        accountWithdrawReqDto.setAmount(100L);
+        accountWithdrawReqDto.setType("WITHDRAW");
+
+        User user = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserEnum.CUSTOMER);
+        Account account = newMockAccount(1L, 11111111111L, 1000L, user);
+
+        // stub
+        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(account));
+
+        // stub
+        Account account2 = newMockAccount(1L, 11111111111L, 1000L, user);
+        Transaction transaction = newMockWithdrawTransaction(1L, account2);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        // when
+        AccountWithdrawResDto accountWithdrawResDto = accountService.withdraw(accountWithdrawReqDto, 1L);
+        // then
+        assertThat(accountWithdrawResDto.getNumber()).isEqualTo(11111111111L);
+        assertThat(accountWithdrawResDto.getBalance()).isEqualTo(900L);
+
+    }
 }
