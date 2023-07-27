@@ -72,7 +72,7 @@ public class Account {
         this.balance = this.balance + amount;
     }
     public void checkSamePassword(Long password) {
-        if(this.password.equals(password)) {
+        if(!this.password.equals(password)) {
             throw new CustomApiException("비밀번호가 일치하지 않습니다.");
         }
     }
