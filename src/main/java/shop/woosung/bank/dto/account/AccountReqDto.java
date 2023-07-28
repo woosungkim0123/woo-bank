@@ -29,4 +29,20 @@ public class AccountReqDto {
         private String tel;
     }
 
+    @Getter @Setter
+    public static class AccountWithdrawReqDto {
+        @NotNull
+        @Digits(integer = 20, fraction = 20)
+        private Long number;
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long password;
+        @Positive
+        @NotNull
+        private Long amount;
+        @Pattern(regexp = "^(DEPOSIT|WITHDRAW)$")
+        @NotEmpty
+        private String type;
+    }
+
 }

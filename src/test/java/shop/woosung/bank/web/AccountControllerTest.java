@@ -116,4 +116,26 @@ class AccountControllerTest extends DummyUserObject {
         resultActions.andExpect(jsonPath("$.data.number").value(11111111111L));
         resultActions.andExpect(jsonPath("$.data.transaction.amount").value(100L));
     }
+
+    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void withdrawAccount_test() throws Exception {
+        // given
+        AccountWithdrawReqDto accountWithdrawReqDto = new AccountWithdrawReqDto();
+        accountWithdrawReqDto.setNumber(11111111111L);
+        accountWithdrawReqDto.setPassword(1234L);
+        accountWithdrawReqDto.setAmount(100L);
+        accountWithdrawReqDto.setType("WITHDRAW");
+        String requestBody = om.writeValueAsString(accountWithdrawReqDto);
+        System.out.println("requestBody = " + requestBody);
+        // when
+        ResultActions resultActions = mvc.perform(post("/api/s/account/withdraw")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("$.data.number").value(11111111111L));
+        resultActions.andExpect(jsonPath("$.data.balance").value(900L));
+    }
 }

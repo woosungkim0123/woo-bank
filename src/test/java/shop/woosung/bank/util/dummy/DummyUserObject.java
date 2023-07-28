@@ -29,6 +29,20 @@ public class DummyUserObject {
                 .build();
     }
 
+    protected Transaction newMockWithdrawTransaction(Long id, Account account) {
+        account.withdraw(100L);
+        return Transaction.builder()
+                .id(id)
+                .withdrawAccount(account)
+                .withdrawAccountBalance(account.getBalance())
+                .amount(100L)
+                .gubun(TransactionEnum.WITHDRAW)
+                .receiver("ATM")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
     protected User newUser(String username, String password, String email, String fullname, UserEnum role) {
         String encodingPassword = new BCryptPasswordEncoder().encode(password);
         return User.builder()
