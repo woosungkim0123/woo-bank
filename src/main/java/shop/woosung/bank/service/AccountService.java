@@ -139,4 +139,51 @@ public class AccountService {
     }
 
 
+    @Transactional
+    public AccountTransferResDto transfer(AccountTransferReqDto accountTransferReqDto, Long userId) {
+
+        // 출금 계좌와 입금계좌가 동일하면 안됨
+        if(accountTransferReqDto.getWithdrawNumber().longValue() == accountTransferReqDto.getDepositNumber().longValue()) {
+            throw new CustomApiException("입출금계좌가 동일할 수 없습니다.");
+        }
+
+        Account withdrawAccount = accountRepository.findByNumber(accountTransferReqDto.getWithdrawNumber())
+                .orElseThrow(
+                        () -> new CustomApiException("출금계좌를 찾을 수 없습니다."));
+
+        Account depositAccount = accountRepository.findByNumber(accountTransferReqDto.getDepositNumber())
+                .orElseThrow(
+                        () -> new CustomApiException("출금계좌를 찾을 수 없습니다."));
+
+        // 출금 소유자 확인
+        withdrawAccount.checkOwner(userId);
+
+        // 비밀번호 확인
+        withdrawAccount.checkSamePassword(accountTransferReqDto.getWithdrawPassword());
+
+        // 잔액 확인
+        withdrawAccount.checkBalance(accountTransferReqDto.getAmount());
+
+        // 이체하기
+        withdrawAccount.withdraw(accountTransferReqDto.getAmount());
+        depositAccount.deposit(accountTransferReqDto.getAmount());
+
+        // 거래내역 남기기
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(depositAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(depositAccount.getBalance())
+                .amount(accountTransferReqDto.getAmount())
+                .gubun(TransactionEnum.TRANSFER)
+                .sender(accountTransferReqDto.getWithdrawNumber() + "")
+                .receiver(accountTransferReqDto.getDepositNumber() + "")
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // DTO 응답
+        return new AccountTransferResDto(withdrawAccount, savedTransaction);
+    }
+
 }
