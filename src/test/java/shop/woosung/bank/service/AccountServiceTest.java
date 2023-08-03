@@ -154,6 +154,36 @@ public class AccountServiceTest extends DummyUserObject {
         // then
         assertThat(accountWithdrawResDto.getNumber()).isEqualTo(11111111111L);
         assertThat(accountWithdrawResDto.getBalance()).isEqualTo(900L);
+    }
 
+
+    @Test
+    public void 계좌이체_test() {
+        // given
+        Long userId = 1L;
+        AccountTransferReqDto accountTransferReqDto = new AccountTransferReqDto();
+        accountTransferReqDto.setWithdrawNumber(11111111111L);
+        accountTransferReqDto.setDepositNumber(11111111112L);
+        accountTransferReqDto.setAmount(100L);
+        accountTransferReqDto.setWithdrawPassword(1234L);
+        accountTransferReqDto.setType("TRANSFER");
+
+        User user = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserEnum.CUSTOMER);
+        Account withdrawAccount = newMockAccount(1L, 11111111111L, 1000L, user);
+        when(accountRepository.findByNumber(11111111111L)).thenReturn(Optional.of(withdrawAccount));
+
+        Account depositAccount = newMockAccount(2L, 11111111112L, 1000L, user);
+        when(accountRepository.findByNumber(11111111112L)).thenReturn(Optional.of(depositAccount));
+
+        Transaction transaction = newMockTransferTransaction(1L, withdrawAccount, depositAccount);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+
+        // when
+        AccountTransferResDto transfer = accountService.transfer(accountTransferReqDto, userId);
+
+        // then
+
+        assertThat(transfer.getTransaction().getDepositAccountBalance()).isEqualTo(1100L);
+        assertThat(transfer.getBalance()).isEqualTo(900L);
     }
 }
