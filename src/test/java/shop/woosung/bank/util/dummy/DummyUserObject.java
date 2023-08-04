@@ -11,6 +11,23 @@ import java.time.LocalDateTime;
 
 public class DummyUserObject {
 
+    protected Transaction newMockTransferTransaction(Long id, Account withdrawAccount, Account depositAccount) {
+        depositAccount.deposit(100L);
+        return Transaction.builder()
+                .id(id)
+                .depositAccount(depositAccount)
+                .withdrawAccount(withdrawAccount)
+                .depositAccountBalance(depositAccount.getBalance())
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .amount(100L)
+                .gubun(TransactionEnum.TRANSFER)
+                .sender(withdrawAccount.getNumber() + "")
+                .receiver(depositAccount.getNumber() + "")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
     protected Transaction newMockDepositTransaction(Long id, Account account) {
         account.deposit(100L);
         return Transaction.builder()

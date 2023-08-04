@@ -45,4 +45,22 @@ public class AccountReqDto {
         private String type;
     }
 
+    @Getter @Setter
+    public static class AccountTransferReqDto {
+        @NotNull
+        @Digits(integer = 20, fraction = 20)
+        private Long withdrawNumber;
+        @NotNull
+        @Digits(integer = 20, fraction = 20)
+        private Long depositNumber;
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long withdrawPassword;
+        @Positive
+        @NotNull
+        private Long amount;
+        @Pattern(regexp = "TRANSFER")
+        @NotEmpty
+        private String type;
+    }
 }

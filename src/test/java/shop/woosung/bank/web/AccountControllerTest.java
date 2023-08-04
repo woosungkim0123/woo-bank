@@ -17,6 +17,7 @@ import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.user.User;
 import shop.woosung.bank.domain.user.UserEnum;
 import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.dto.account.AccountResDto;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
 import javax.persistence.EntityManager;
@@ -134,8 +135,34 @@ class AccountControllerTest extends DummyUserObject {
                 .contentType(MediaType.APPLICATION_JSON));
 
         // then
-        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(status().isCreated());
         resultActions.andExpect(jsonPath("$.data.number").value(11111111111L));
         resultActions.andExpect(jsonPath("$.data.balance").value(900L));
+    }
+
+
+    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void transferAccount_test() throws Exception {
+        // given
+        AccountTransferReqDto accountTransferReqDto = new AccountTransferReqDto();
+        accountTransferReqDto.setWithdrawNumber(11111111111L);
+        accountTransferReqDto.setDepositNumber(11111111112L);
+        accountTransferReqDto.setAmount(100L);
+        accountTransferReqDto.setWithdrawPassword(1234L);
+        accountTransferReqDto.setType("TRANSFER");
+
+        String requestBody = om.writeValueAsString(accountTransferReqDto);
+        // when
+        ResultActions resultActions = mvc.perform(post("/api/s/account/transfer")
+                .content(requestBody)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isCreated());
+
+        resultActions.andExpect(jsonPath("$.data.number").value(11111111111L));
+        resultActions.andExpect(jsonPath("$.data.balance").value(900L));
+        resultActions.andExpect(jsonPath("$.data.transaction.amount").value(100L));
     }
 }
