@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,6 +31,7 @@ import static shop.woosung.bank.dto.account.AccountReqDto.*;
 
 
 @Sql("classpath:db/teardown.sql")
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class AccountControllerTest extends DummyUserObject {
@@ -164,5 +166,19 @@ class AccountControllerTest extends DummyUserObject {
         resultActions.andExpect(jsonPath("$.data.number").value(11111111111L));
         resultActions.andExpect(jsonPath("$.data.balance").value(900L));
         resultActions.andExpect(jsonPath("$.data.transaction.amount").value(100L));
+    }
+
+    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void findDetailAccount_test() throws Exception {
+        // given
+        Long number = 1111L;
+        String type = "ALL";
+        String page = "0";
+
+        ResultActions resultActions = mvc.perform(get("/api/s/account/" + number).param("type", type).param("page", page));
+
+        // then
+        resultActions.andExpect(status().isOk());
     }
 }

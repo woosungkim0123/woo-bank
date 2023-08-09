@@ -186,4 +186,18 @@ public class AccountService {
         return new AccountTransferResDto(withdrawAccount, savedTransaction);
     }
 
+    @Transactional(readOnly = true)
+    public AccountDetailResDto getAccountDetail(Long number, Long userId, Integer page) {
+        String type = "ALL";
+
+        Account accountPS = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
+
+        accountPS.checkOwner(userId);
+
+        List<Transaction> transactionList = transactionRepository.findTransactionList(accountPS.getId(), type, page);
+
+        // DTO 응답
+        return new AccountDetailResDto(accountPS, transactionList);
+    }
 }
