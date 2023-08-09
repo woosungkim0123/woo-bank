@@ -17,6 +17,7 @@ import shop.woosung.bank.util.dummy.DummyUserObject;
 import javax.persistence.EntityManager;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @ActiveProfiles("test")
@@ -36,9 +37,14 @@ class TransactionRepositoryImplTest extends DummyUserObject {
     public void setUp() {
         autoIncrementReset();
         dataSetting();
+        em.clear();
     }
 
+    /*
+        FETCH를 지우니까 JOIN은 하지만 PROJECTION이 안됨(투영)
+        --> SELECT절에포함을안시킴
 
+     */
 
     @Test
     public void findTransactionList_all_test() {
@@ -47,14 +53,9 @@ class TransactionRepositoryImplTest extends DummyUserObject {
 
         // when
         List<Transaction> transactionList = transactionRepository.findTransactionList(accountId, "ALL", 0);
-        transactionList.forEach((t) -> {
-            System.out.println("t.getId() = " + t.getId());
-            System.out.println("t.getAmount() = " + t.getAmount());
-            System.out.println("t.getWithdrawAccount() = " + t.getWithdrawAccountBalance());
-            System.out.println("t.getDepositAccount() = " + t.getDepositAccountBalance());
-        });
 
         // then
+        assertThat(transactionList.get(3).getDepositAccountBalance()).isEqualTo(800L);
     }
 
 
