@@ -167,4 +167,18 @@ class AccountControllerTest extends DummyUserObject {
         resultActions.andExpect(jsonPath("$.data.balance").value(900L));
         resultActions.andExpect(jsonPath("$.data.transaction.amount").value(100L));
     }
+
+    @WithUserDetails(value = "test1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void findDetailAccount_test() throws Exception {
+        // given
+        Long number = 1111L;
+        String type = "ALL";
+        String page = "0";
+
+        ResultActions resultActions = mvc.perform(get("/api/s/account/" + number).param("type", type).param("page", page));
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
 }
