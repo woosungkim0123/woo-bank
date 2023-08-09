@@ -74,7 +74,7 @@ public class AccountController {
     public ResponseEntity<?> getDetailAccount(@PathVariable Long number,
                                              @RequestParam(value = "page", defaultValue = "0") Integer page,
                                              @AuthenticationPrincipal LoginUser loginUser) {
-        AccountDetailResDto accountDetailResDto = accountService.getAccountDetail(number, loginUser.getUser().getId());
+        AccountDetailResDto accountDetailResDto = accountService.getAccountDetail(number, loginUser.getUser().getId(), page);
 
         return new ResponseEntity<>(new ResponseDto<>(1, "계좌 상세보기 성공", accountDetailResDto), HttpStatus.OK);
     }

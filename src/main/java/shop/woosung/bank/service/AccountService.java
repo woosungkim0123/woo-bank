@@ -187,7 +187,7 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountDetailResDto getAccountDetail(Long number, Long userId) {
+    public AccountDetailResDto getAccountDetail(Long number, Long userId, Integer page) {
         String type = "ALL";
 
         Account accountPS = accountRepository.findByNumber(number)
