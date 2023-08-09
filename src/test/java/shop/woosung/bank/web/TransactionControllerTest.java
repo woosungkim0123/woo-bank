@@ -27,6 +27,8 @@ import javax.persistence.EntityManager;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Sql("classpath:db/teardown.sql")
 @ActiveProfiles("test")
@@ -58,11 +60,13 @@ class TransactionControllerTest extends DummyUserObject {
         String page = "0";
 
         ResultActions resultActions = mvc.perform(get("/api/s/account/" + number + "/transaction").param("type", type).param("page", page));
-        String contentAsString = resultActions.andReturn().getResponse().getContentAsString();
-        System.out.println("contentAsString = " + contentAsString);
-        System.out.println("contentAsString = " + contentAsString);
 
         // then
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("$.data.transactions[0].balance").value(900L));
+        resultActions.andExpect(jsonPath("$.data.transactions[1].balance").value(800L));
+        resultActions.andExpect(jsonPath("$.data.transactions[2].balance").value(700L));
+        resultActions.andExpect(jsonPath("$.data.transactions[3].balance").value(800L));
     }
 
 
