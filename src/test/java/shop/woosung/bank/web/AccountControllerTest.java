@@ -172,7 +172,7 @@ class AccountControllerTest extends DummyUserObject {
     @Test
     public void findDetailAccount_test() throws Exception {
         // given
-        Long number = 1111L;
+        Long number = 11111111111L;
         String type = "ALL";
         String page = "0";
 
