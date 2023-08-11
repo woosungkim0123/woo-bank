@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserTest {
 
     @Test
-    public void 회원가입을_위한_User_객체는_UserCreate를_받아서_만들어_진다() {
+    void 회원가입을_위한_User_객체는_UserCreate를_받아서_만들어_진다() {
         // given
         UserCreate userCreate = UserCreate.builder()
                 .email("test1@test.com")

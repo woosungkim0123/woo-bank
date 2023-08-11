@@ -1,5 +1,6 @@
 package shop.woosung.bank.user.service;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static shop.woosung.bank.user.converter.UserServiceToDomainConverter.userCreateConvert;
 
+@Builder
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
