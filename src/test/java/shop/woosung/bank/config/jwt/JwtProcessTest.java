@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import shop.woosung.bank.config.auth.LoginUser;
+import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.user.UserRole;
 
@@ -19,7 +20,7 @@ class JwtProcessTest {
     @Test
     public void create_test() {
         // given
-        UserEntity userEntity = UserEntity.builder()
+        User userEntity = User.builder()
                 .id(1L).role(UserRole.ADMIN).build();
         LoginUser loginUser = new LoginUser(userEntity);
         JwtTestHolder jwtTestHolder = new JwtTestHolder();
@@ -42,7 +43,7 @@ class JwtProcessTest {
         LoginUser loginUser = JwtProcess.verify(jwtTestHolder, jwtToken);
 
         // then
-        assertThat(loginUser.getUserEntity().getRole()).isEqualTo(expectedRole);
+        assertThat(loginUser.getUser().getRole()).isEqualTo(expectedRole);
     }
     /*
         첫번째 : { no : 1, userEnum : CUSTOMER }
@@ -56,7 +57,7 @@ class JwtProcessTest {
     }
 
     private String createToken(Long id, UserRole role) {
-        UserEntity userEntity = UserEntity.builder()
+        User userEntity = User.builder()
                 .id(id).role(role).build();
         LoginUser loginUser = new LoginUser(userEntity);
         JwtTestHolder jwtTestHolder = new JwtTestHolder();

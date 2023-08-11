@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import shop.woosung.bank.config.auth.LoginUser;
+import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.user.UserRole;
 
@@ -110,8 +111,8 @@ class JwtAuthorizationFilterTest {
     }
 
     private static String getCorrectToken(UserRole userRole) {
-        UserEntity userEntity = UserEntity.builder().id(1L).role(userRole).build();
-        LoginUser loginUser = new LoginUser(userEntity);
+        User user = User.builder().id(1L).role(userRole).build();
+        LoginUser loginUser = new LoginUser(user);
         JwtSystemHolder jwtSystemHolder = new JwtSystemHolder();
         return JwtProcess.create(jwtSystemHolder, loginUser);
     }

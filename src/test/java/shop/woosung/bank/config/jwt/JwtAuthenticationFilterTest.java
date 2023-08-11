@@ -40,7 +40,7 @@ class JwtAuthenticationFilterTest extends DummyUserObject {
 
     @BeforeEach
     public void setUp() {
-       userJpaRepository.save(newUser(correctUsername, correctPassword, "correct@naver.com", "correctFullname", UserRole.CUSTOMER));
+       userJpaRepository.save(newUser(correctUsername, correctPassword, "correct@naver.com",  UserRole.CUSTOMER));
     }
 
     @DisplayName("로그인 성공")

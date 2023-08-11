@@ -76,7 +76,7 @@ public class AccountServiceTest extends DummyUserObject {
         Account account1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
         Account account2 = newMockAccount(2L, 11111111112L, 1000L, userEntity);
         List<Account> accountList = Arrays.asList(account1, account2);
-        when(accountRepository.findByUser_id(any())).thenReturn(accountList);
+        when(accountRepository.findByUserId(any())).thenReturn(accountList);
 
         // when
         AccountListResDto accountListRespDto = accountService.getAccountList(userId);

@@ -50,8 +50,8 @@ class AccountControllerTest extends DummyUserObject {
 
     @BeforeEach
     public void setUp() {
-        UserEntity test1 = userJpaRepository.save(newUser("test1", "1234", "test1@naver.com", "테스터일", UserRole.CUSTOMER));
-        UserEntity test2 = userJpaRepository.save(newUser("test2", "1234", "test2@naver.com", "테스터이", UserRole.CUSTOMER));
+        UserEntity test1 = userJpaRepository.save(newUser("test1", "1234", "test1@naver.com", UserRole.CUSTOMER));
+        UserEntity test2 = userJpaRepository.save(newUser("test2", "1234", "test2@naver.com", UserRole.CUSTOMER));
         accountRepository.save(newAccount(11111111111L, test1));
         accountRepository.save(newAccount(11111111112L, test2));
         em.clear();

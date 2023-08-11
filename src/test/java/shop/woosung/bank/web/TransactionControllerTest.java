@@ -70,10 +70,10 @@ class TransactionControllerTest extends DummyUserObject {
 
 
     private void dataSetting() {
-        UserEntity ssar = userJpaRepository.save(newUser("ssar", "1234","ssar@test.com","쌀", UserRole.CUSTOMER));
-        UserEntity cos = userJpaRepository.save(newUser("cos", "1234", "cos@test.com","코스", UserRole.CUSTOMER));
-        UserEntity love = userJpaRepository.save(newUser("love", "1234", "love@test.com","러브", UserRole.CUSTOMER));
-        UserEntity admin = userJpaRepository.save(newUser("admin", "1234", "admin@test.com","관리자", UserRole.ADMIN));
+        UserEntity ssar = userJpaRepository.save(newUser("ssar", "1234","ssar@test.com", UserRole.CUSTOMER));
+        UserEntity cos = userJpaRepository.save(newUser("cos", "1234", "cos@test.com",UserRole.CUSTOMER));
+        UserEntity love = userJpaRepository.save(newUser("love", "1234", "love@test.com", UserRole.CUSTOMER));
+        UserEntity admin = userJpaRepository.save(newUser("admin", "1234", "admin@test.com", UserRole.ADMIN));
 
         Account ssarAccount1 = accountRepository.save(newAccount(1111L, ssar));
         Account cosAccount = accountRepository.save(newAccount(2222L, cos));

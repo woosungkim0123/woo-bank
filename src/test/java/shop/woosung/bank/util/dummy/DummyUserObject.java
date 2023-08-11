@@ -4,8 +4,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
 
 import java.time.LocalDateTime;
 
@@ -60,49 +61,47 @@ public class DummyUserObject {
                 .build();
     }
 
-    protected User newUser(String username, String password, String email, String fullname, UserEnum role) {
+    protected UserEntity newUser(String name, String password, String email, UserRole role) {
         String encodingPassword = new BCryptPasswordEncoder().encode(password);
-        return User.builder()
-                .username(username)
+        return UserEntity.fromModel(User.builder()
+                .name(name)
                 .password(encodingPassword)
                 .email(email)
-                .fullname(fullname)
                 .role(role)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .build();
+                .build());
     }
 
-    protected User newMockUser(Long id, String username, String password, String email, String fullname, UserEnum role) {
+    protected UserEntity newMockUser(Long id, String name, String password, String email, String fullname, UserRole role) {
         String encodingPassword = new BCryptPasswordEncoder().encode(password);
-        return User.builder()
+        return UserEntity.fromModel(User.builder()
                 .id(id)
-                .username(username)
+                .name(name)
                 .password(encodingPassword)
                 .email(email)
-                .fullname(fullname)
                 .role(role)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .build();
+                .build());
     }
 
-    protected Account newAccount(Long number, User user) {
+    protected Account newAccount(Long number, UserEntity userEntity) {
         return Account.builder()
                 .number(number)
                 .password(1234L)
                 .balance(1000L)
-                .user(user)
+                .user(userEntity)
                 .build();
     }
 
-    protected Account newMockAccount(Long id, Long number, Long balance, User user) {
+    protected Account newMockAccount(Long id, Long number, Long balance, UserEntity userEntity) {
         return Account.builder()
                 .id(id)
                 .number(number)
                 .password(1234L)
                 .balance(balance)
-                .user(user)
+                .user(userEntity)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

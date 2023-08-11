@@ -35,7 +35,7 @@ class AccountConcurrencyServiceTest extends DummyUserObject {
             AccountRegisterReqDto accountRegisterReqDto = new AccountRegisterReqDto();
             accountRegisterReqDto.setPassword(1111L + i);
             accountRegisterReqDtos.add(accountRegisterReqDto);
-            UserEntity userEntity = newUser("test" + i, "1234", "test" + i + "@naver.com", "test" + i, UserRole.CUSTOMER);
+            UserEntity userEntity = newUser("test" + i, "1234", "test" + i + "@naver.com",  UserRole.CUSTOMER);
             userEntities.add(userEntity);
         }
         userJpaRepository.saveAll(userEntities);
