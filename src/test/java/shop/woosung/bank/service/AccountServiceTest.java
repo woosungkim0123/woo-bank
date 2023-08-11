@@ -11,9 +11,9 @@ import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
-import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
@@ -34,7 +34,7 @@ public class AccountServiceTest extends DummyUserObject {
     private AccountService accountService;
 
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Mock
     private AccountRepository accountRepository;
@@ -49,15 +49,15 @@ public class AccountServiceTest extends DummyUserObject {
         accountRegisterReqDto.setPassword(1234L);
 
         // stub
-        User user = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserEnum.CUSTOMER);
-        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        UserEntity userEntity = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserRole.CUSTOMER);
+        when(userJpaRepository.findById(any())).thenReturn(Optional.of(userEntity));
         when(accountRepository.findFirstByOrderByNumberDesc()).thenReturn(Optional.of(Account.builder().number(LAST_ACCOUNT_NUMBER).build()));
 
-        Account testAccount = newMockAccount(1L, LAST_ACCOUNT_NUMBER + 1, 1234L, user);
+        Account testAccount = newMockAccount(1L, LAST_ACCOUNT_NUMBER + 1, 1234L, userEntity);
         when(accountRepository.save(any())).thenReturn(testAccount);
 
         // when
-        AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, user.getId());
+        AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, userEntity.getId());
 
         // then
         assertThat(accountRegisterResDto).isNotNull();
@@ -70,11 +70,11 @@ public class AccountServiceTest extends DummyUserObject {
         Long userId = 1L;
 
         // stub
-        User user = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserEnum.CUSTOMER);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        UserEntity userEntity = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserRole.CUSTOMER);
+        when(userJpaRepository.findById(userId)).thenReturn(Optional.of(userEntity));
 
-        Account account1 = newMockAccount(1L, 11111111111L, 1000L, user);
-        Account account2 = newMockAccount(2L, 11111111112L, 1000L, user);
+        Account account1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        Account account2 = newMockAccount(2L, 11111111112L, 1000L, userEntity);
         List<Account> accountList = Arrays.asList(account1, account2);
         when(accountRepository.findByUser_id(any())).thenReturn(accountList);
 
@@ -93,8 +93,8 @@ public class AccountServiceTest extends DummyUserObject {
         Long userId = 2L;
 
 
-        User user = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserEnum.CUSTOMER);
-        Account account = newMockAccount(1L, number, 1000L, user);
+        UserEntity userEntity = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserRole.CUSTOMER);
+        Account account = newMockAccount(1L, number, 1000L, userEntity);
         when(accountRepository.findByNumber(number)).thenReturn(Optional.of(account));
 
         // when
@@ -114,12 +114,12 @@ public class AccountServiceTest extends DummyUserObject {
         accountDepositReqDto.setTel("01012341234");
 
         // stub
-        User user = newMockUser(1L, "test", "1234", "test@teest.com", "test", UserEnum.CUSTOMER);
-        Account account1 = newMockAccount(1L, 11111111111L, 1000L, user);
+        UserEntity userEntity = newMockUser(1L, "test", "1234", "test@teest.com", "test", UserRole.CUSTOMER);
+        Account account1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
         when(accountRepository.findByNumber(any())).thenReturn(Optional.of(account1));
 
         // stub
-        Account account2 = newMockAccount(1L, 11111111111L, 1000L, user);
+        Account account2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
         Transaction transaction = newMockDepositTransaction(1L, account2);
         when(transactionRepository.save(any())).thenReturn(transaction);
         // when
@@ -139,14 +139,14 @@ public class AccountServiceTest extends DummyUserObject {
         accountWithdrawReqDto.setAmount(100L);
         accountWithdrawReqDto.setType("WITHDRAW");
 
-        User user = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserEnum.CUSTOMER);
-        Account account = newMockAccount(1L, 11111111111L, 1000L, user);
+        UserEntity userEntity = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserRole.CUSTOMER);
+        Account account = newMockAccount(1L, 11111111111L, 1000L, userEntity);
 
         // stub
         when(accountRepository.findByNumber(any())).thenReturn(Optional.of(account));
 
         // stub
-        Account account2 = newMockAccount(1L, 11111111111L, 1000L, user);
+        Account account2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
         Transaction transaction = newMockWithdrawTransaction(1L, account2);
         when(transactionRepository.save(any())).thenReturn(transaction);
         // when
@@ -168,11 +168,11 @@ public class AccountServiceTest extends DummyUserObject {
         accountTransferReqDto.setWithdrawPassword(1234L);
         accountTransferReqDto.setType("TRANSFER");
 
-        User user = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserEnum.CUSTOMER);
-        Account withdrawAccount = newMockAccount(1L, 11111111111L, 1000L, user);
+        UserEntity userEntity = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserRole.CUSTOMER);
+        Account withdrawAccount = newMockAccount(1L, 11111111111L, 1000L, userEntity);
         when(accountRepository.findByNumber(11111111111L)).thenReturn(Optional.of(withdrawAccount));
 
-        Account depositAccount = newMockAccount(2L, 11111111112L, 1000L, user);
+        Account depositAccount = newMockAccount(2L, 11111111112L, 1000L, userEntity);
         when(accountRepository.findByNumber(11111111112L)).thenReturn(Optional.of(depositAccount));
 
         Transaction transaction = newMockTransferTransaction(1L, withdrawAccount, depositAccount);

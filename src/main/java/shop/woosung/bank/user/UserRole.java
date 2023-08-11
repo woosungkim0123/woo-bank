@@ -1,11 +1,11 @@
-package shop.woosung.bank.domain.user;
+package shop.woosung.bank.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum UserEnum {
+public enum UserRole {
     ADMIN("관리자"), CUSTOMER("고객");
 
     private String value;

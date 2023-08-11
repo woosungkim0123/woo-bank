@@ -6,8 +6,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
 
 import java.util.stream.Stream;
 
@@ -19,9 +19,9 @@ class JwtProcessTest {
     @Test
     public void create_test() {
         // given
-        User user = User.builder()
-                .id(1L).role(UserEnum.ADMIN).build();
-        LoginUser loginUser = new LoginUser(user);
+        UserEntity userEntity = UserEntity.builder()
+                .id(1L).role(UserRole.ADMIN).build();
+        LoginUser loginUser = new LoginUser(userEntity);
         JwtTestHolder jwtTestHolder = new JwtTestHolder();
 
         // when
@@ -34,7 +34,7 @@ class JwtProcessTest {
     @DisplayName("jwt 검증 성공")
     @ParameterizedTest(name = "{index} - ID : {1}, 역할 : {2}")
     @MethodSource("jwtTokenAndRoleProvider")
-    public void verify_test(Long id, UserEnum expectedRole) {
+    public void verify_test(Long id, UserRole expectedRole) {
 
         String jwtToken = createToken(id, expectedRole);
         JwtTestHolder jwtTestHolder = new JwtTestHolder();
@@ -42,7 +42,7 @@ class JwtProcessTest {
         LoginUser loginUser = JwtProcess.verify(jwtTestHolder, jwtToken);
 
         // then
-        assertThat(loginUser.getUser().getRole()).isEqualTo(expectedRole);
+        assertThat(loginUser.getUserEntity().getRole()).isEqualTo(expectedRole);
     }
     /*
         첫번째 : { no : 1, userEnum : CUSTOMER }
@@ -50,15 +50,15 @@ class JwtProcessTest {
      */
     private static Stream<Arguments> jwtTokenAndRoleProvider() {
         return Stream.of(
-                Arguments.of(1L, UserEnum.CUSTOMER),
-                Arguments.of(1L, UserEnum.ADMIN)
+                Arguments.of(1L, UserRole.CUSTOMER),
+                Arguments.of(1L, UserRole.ADMIN)
         );
     }
 
-    private String createToken(Long id, UserEnum role) {
-        User user = User.builder()
+    private String createToken(Long id, UserRole role) {
+        UserEntity userEntity = UserEntity.builder()
                 .id(id).role(role).build();
-        LoginUser loginUser = new LoginUser(user);
+        LoginUser loginUser = new LoginUser(userEntity);
         JwtTestHolder jwtTestHolder = new JwtTestHolder();
         return JwtProcess.create(jwtTestHolder, loginUser).replace(JwtVO.TOKEN_PREFIX, "");
     }

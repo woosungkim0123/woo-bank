@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,14 +16,13 @@ import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
-import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
 import javax.persistence.EntityManager;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,7 +36,7 @@ class TransactionControllerTest extends DummyUserObject {
 
     @Autowired private MockMvc mvc;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
@@ -72,10 +70,10 @@ class TransactionControllerTest extends DummyUserObject {
 
 
     private void dataSetting() {
-        User ssar = userRepository.save(newUser("ssar", "1234","ssar@test.com","쌀", UserEnum.CUSTOMER));
-        User cos = userRepository.save(newUser("cos", "1234", "cos@test.com","코스", UserEnum.CUSTOMER));
-        User love = userRepository.save(newUser("love", "1234", "love@test.com","러브", UserEnum.CUSTOMER));
-        User admin = userRepository.save(newUser("admin", "1234", "admin@test.com","관리자", UserEnum.ADMIN));
+        UserEntity ssar = userJpaRepository.save(newUser("ssar", "1234","ssar@test.com","쌀", UserRole.CUSTOMER));
+        UserEntity cos = userJpaRepository.save(newUser("cos", "1234", "cos@test.com","코스", UserRole.CUSTOMER));
+        UserEntity love = userJpaRepository.save(newUser("love", "1234", "love@test.com","러브", UserRole.CUSTOMER));
+        UserEntity admin = userJpaRepository.save(newUser("admin", "1234", "admin@test.com","관리자", UserRole.ADMIN));
 
         Account ssarAccount1 = accountRepository.save(newAccount(1111L, ssar));
         Account cosAccount = accountRepository.save(newAccount(2222L, cos));

@@ -1,6 +1,5 @@
 package shop.woosung.bank.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +14,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import shop.woosung.bank.domain.account.repository.AccountRepository;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
-import shop.woosung.bank.domain.user.repository.UserRepository;
-import shop.woosung.bank.dto.account.AccountResDto;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
 import javax.persistence.EntityManager;
@@ -43,7 +41,7 @@ class AccountControllerTest extends DummyUserObject {
     private ObjectMapper om;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
     private AccountRepository accountRepository;
 
@@ -52,8 +50,8 @@ class AccountControllerTest extends DummyUserObject {
 
     @BeforeEach
     public void setUp() {
-        User test1 = userRepository.save(newUser("test1", "1234", "test1@naver.com", "테스터일", UserEnum.CUSTOMER));
-        User test2 = userRepository.save(newUser("test2", "1234", "test2@naver.com", "테스터이", UserEnum.CUSTOMER));
+        UserEntity test1 = userJpaRepository.save(newUser("test1", "1234", "test1@naver.com", "테스터일", UserRole.CUSTOMER));
+        UserEntity test2 = userJpaRepository.save(newUser("test2", "1234", "test2@naver.com", "테스터이", UserRole.CUSTOMER));
         accountRepository.save(newAccount(11111111111L, test1));
         accountRepository.save(newAccount(11111111112L, test2));
         em.clear();

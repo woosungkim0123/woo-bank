@@ -7,7 +7,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.dto.ResponseDto;
-import shop.woosung.bank.dto.transaction.TransactionResponseDto;
 import shop.woosung.bank.dto.transaction.TransactionResponseDto.TransactionResponseListDto;
 import shop.woosung.bank.service.TransactionService;
 

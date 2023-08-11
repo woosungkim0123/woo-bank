@@ -19,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.woosung.bank.domain.user.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.handler.ex.CustomApiException;
 
 @NoArgsConstructor
@@ -39,8 +39,7 @@ public class Account {
     private Long balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-
+    private UserEntity user;
 
     @CreatedDate
     @Column(nullable = false)
@@ -51,8 +50,8 @@ public class Account {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Account(Long id, Long number, Long password, Long balance, User user, LocalDateTime createdAt,
-            LocalDateTime updatedAt) {
+    public Account(Long id, Long number, Long password, Long balance, UserEntity user, LocalDateTime createdAt,
+                   LocalDateTime updatedAt) {
         this.id = id;
         this.number = number;
         this.password = password;

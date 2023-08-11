@@ -3,7 +3,8 @@ package shop.woosung.bank.config.jwt;
 import lombok.extern.slf4j.Slf4j;
 
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.domain.user.User;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
 
 @Slf4j
 public class JwtProcess {

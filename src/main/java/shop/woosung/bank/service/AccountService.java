@@ -8,9 +8,11 @@ import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
+import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
 
@@ -29,10 +31,10 @@ public class AccountService {
 
 
     public AccountListResDto getAccountList(Long userId) {
-        User userPS = findUser(userId);
+        User user = findUser(userId);
 
-        List<Account> accountListPS = accountRepository.findByUser_id(userId);
-        return new AccountListResDto(userPS, accountListPS);
+        List<Account> accountListPS = accountRepository.findByUserId(userId);
+        return new AccountListResDto(user, accountListPS);
     }
 
     /*
@@ -40,9 +42,9 @@ public class AccountService {
         영업점 - 계좌종류 - 보통 무작위로 추출(순서) - 검증번호(복잡하게 더하거나 곱해서 작성)
      */
     public AccountRegisterResDto registerAccount(AccountRegisterReqDto accountRegisterReqDto, Long userId) {
-        User userPS = findUser(userId);
+        User user = findUser(userId);
 
-        return registerNewAccount(userPS, accountRegisterReqDto);
+        return registerNewAccount(user, accountRegisterReqDto);
     }
 
     @Transactional
@@ -95,7 +97,7 @@ public class AccountService {
                 .number(newAccountNumber)
                 .password(accountRegisterReqDto.getPassword())
                 .balance(1000L)
-                .user(user)
+                .user(UserEntity.fromModel(user))
                 .build());
         return new AccountRegisterResDto(newAccount.getId(), newAccountNumber, newAccount.getBalance());
     }
