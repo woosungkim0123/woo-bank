@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
-import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
@@ -25,20 +25,20 @@ class AccountConcurrencyServiceTest extends DummyUserObject {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Test
     public void testConcurrentAccountRegistration() throws InterruptedException {
         List<AccountRegisterReqDto> accountRegisterReqDtos = new ArrayList<>();
-        List<User> users = new ArrayList<>();
+        List<UserEntity> userEntities = new ArrayList<>();
         for(int i = 0; i < 5; i++) {
             AccountRegisterReqDto accountRegisterReqDto = new AccountRegisterReqDto();
             accountRegisterReqDto.setPassword(1111L + i);
             accountRegisterReqDtos.add(accountRegisterReqDto);
-            User user = newUser("test" + i, "1234", "test" + i + "@naver.com", "test" + i, UserEnum.CUSTOMER);
-            users.add(user);
+            UserEntity userEntity = newUser("test" + i, "1234", "test" + i + "@naver.com",  UserRole.CUSTOMER);
+            userEntities.add(userEntity);
         }
-        userRepository.saveAll(users);
+        userJpaRepository.saveAll(userEntities);
 
         final CountDownLatch latch = new CountDownLatch(accountRegisterReqDtos.size());
         List<Long> accountNumbers = Collections.synchronizedList(new ArrayList<>());
@@ -46,11 +46,11 @@ class AccountConcurrencyServiceTest extends DummyUserObject {
         List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < accountRegisterReqDtos.size(); i++) {
             AccountRegisterReqDto accountRegisterReqDto = accountRegisterReqDtos.get(i);
-            User user = users.get(i);
+            UserEntity userEntity = userEntities.get(i);
 
             Thread thread = new Thread(() -> {
                 try {
-                    AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, user.getId());
+                    AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, userEntity.getId());
                     accountNumbers.add(accountRegisterResDto.getNumber());
                 } finally {
                     latch.countDown();

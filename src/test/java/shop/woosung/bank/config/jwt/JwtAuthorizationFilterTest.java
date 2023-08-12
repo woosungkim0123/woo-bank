@@ -13,8 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
 
 import java.util.stream.Stream;
 
@@ -32,9 +33,9 @@ class JwtAuthorizationFilterTest {
     @DisplayName("권한 통과 테스트")
     @ParameterizedTest(name = "로그인이 필요한 요청 => {0}")
     @MethodSource("provideUserEnum")
-    public void authorization_success_test(UserEnum userEnum, String allowUrl) throws Exception {
+    public void authorization_success_test(UserRole userRole, String allowUrl) throws Exception {
         // given
-        String jwtToken = getCorrectToken(userEnum);
+        String jwtToken = getCorrectToken(userRole);
 
         // when
         ResultActions resultActions = mvc.perform(get( allowUrl).header(JwtVO.HEADER,  jwtToken));
@@ -48,7 +49,7 @@ class JwtAuthorizationFilterTest {
     @ValueSource(strings = {"", " ", JwtVO.HEADER + " ", " " + JwtVO.HEADER })
     public void authorization_fail_test() throws Exception {
         // given
-        String jwtToken = getCorrectToken(UserEnum.CUSTOMER);
+        String jwtToken = getCorrectToken(UserRole.CUSTOMER);
 
         // when
         ResultActions resultActions = mvc.perform(get("/api/admin/test").header(JwtVO.HEADER, jwtToken));
@@ -93,9 +94,9 @@ class JwtAuthorizationFilterTest {
 
     private static Stream<Arguments> provideUserEnum() {
         return Stream.of(
-                Arguments.of(UserEnum.CUSTOMER, "/api/s/test"),
-                Arguments.of(UserEnum.ADMIN, "/api/s/test"),
-                Arguments.of(UserEnum.ADMIN, "/api/admin/test")
+                Arguments.of(UserRole.CUSTOMER, "/api/s/test"),
+                Arguments.of(UserRole.ADMIN, "/api/s/test"),
+                Arguments.of(UserRole.ADMIN, "/api/admin/test")
         );
     }
 
@@ -104,13 +105,13 @@ class JwtAuthorizationFilterTest {
                 Arguments.of("잘못된 토큰", getWrongToken()),
                 Arguments.of("빈공백", ""),
                 Arguments.of("한칸공백", " "),
-                Arguments.of("토큰 앞에 한칸공백", " " + getCorrectToken(UserEnum.CUSTOMER)),
-                Arguments.of("토큰 뒤에 한칸공백", getCorrectToken(UserEnum.CUSTOMER) + " ")
+                Arguments.of("토큰 앞에 한칸공백", " " + getCorrectToken(UserRole.CUSTOMER)),
+                Arguments.of("토큰 뒤에 한칸공백", getCorrectToken(UserRole.CUSTOMER) + " ")
         );
     }
 
-    private static String getCorrectToken(UserEnum userEnum) {
-        User user = User.builder().id(1L).role(userEnum).build();
+    private static String getCorrectToken(UserRole userRole) {
+        User user = User.builder().id(1L).role(userRole).build();
         LoginUser loginUser = new LoginUser(user);
         JwtSystemHolder jwtSystemHolder = new JwtSystemHolder();
         return JwtProcess.create(jwtSystemHolder, loginUser);

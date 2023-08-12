@@ -9,9 +9,9 @@ import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
-import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
 import javax.persistence.EntityManager;
@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TransactionRepositoryImplTest extends DummyUserObject {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
@@ -67,10 +67,10 @@ class TransactionRepositoryImplTest extends DummyUserObject {
     }
 
     private void dataSetting() {
-        User ssar = userRepository.save(newUser("ssar", "1234","ssar@test.com","쌀", UserEnum.CUSTOMER));
-        User cos = userRepository.save(newUser("cos", "1234", "cos@test.com","코스", UserEnum.CUSTOMER));
-        User love = userRepository.save(newUser("love", "1234", "love@test.com","러브", UserEnum.CUSTOMER));
-        User admin = userRepository.save(newUser("admin", "1234", "admin@test.com","관리자", UserEnum.ADMIN));
+        UserEntity ssar = userJpaRepository.save(newUser("ssar", "1234","ssar@test.com", UserRole.CUSTOMER));
+        UserEntity cos = userJpaRepository.save(newUser("cos", "1234", "cos@test.com",UserRole.CUSTOMER));
+        UserEntity love = userJpaRepository.save(newUser("love", "1234", "love@test.com", UserRole.CUSTOMER));
+        UserEntity admin = userJpaRepository.save(newUser("admin", "1234", "admin@test.com",UserRole.ADMIN));
 
         Account ssarAccount1 = accountRepository.save(newAccount(1111L, ssar));
         Account cosAccount = accountRepository.save(newAccount(2222L, cos));

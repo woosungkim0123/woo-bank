@@ -17,7 +17,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.woosung.bank.config.jwt.JwtAuthenticationFilter;
 import shop.woosung.bank.config.jwt.JwtAuthorizationFilter;
 import shop.woosung.bank.config.jwt.JwtHolder;
-import shop.woosung.bank.domain.user.UserEnum;
+import shop.woosung.bank.user.UserRole;
 
 import shop.woosung.bank.util.CustomResponseUtil;
 
@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests()
                 .antMatchers("/api/s/**").authenticated()
-                .antMatchers("/api/admin/**").hasRole("" + UserEnum.ADMIN)
+                .antMatchers("/api/admin/**").hasRole("" + UserRole.ADMIN)
                 .anyRequest().permitAll();
 
         return http.build();

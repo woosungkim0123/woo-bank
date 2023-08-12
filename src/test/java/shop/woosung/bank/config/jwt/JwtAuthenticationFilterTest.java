@@ -1,7 +1,6 @@
 package shop.woosung.bank.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.domain.user.UserEnum;
-import shop.woosung.bank.domain.user.repository.UserRepository;
+import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 
 import static org.assertj.core.api.Assertions.*;
@@ -34,14 +33,14 @@ class JwtAuthenticationFilterTest extends DummyUserObject {
     @Autowired
     private MockMvc mvc;
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     private final String correctUsername = "correctUsername";
     private final String correctPassword = "correctPassword";
 
     @BeforeEach
     public void setUp() {
-       userRepository.save(newUser(correctUsername, correctPassword, "correct@naver.com", "correctFullname", UserEnum.CUSTOMER));
+       userJpaRepository.save(newUser(correctUsername, correctPassword, "correct@naver.com",  UserRole.CUSTOMER));
     }
 
     @DisplayName("로그인 성공")

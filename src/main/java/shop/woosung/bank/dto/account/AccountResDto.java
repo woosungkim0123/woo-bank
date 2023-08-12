@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.transaction.Transaction;
-import shop.woosung.bank.domain.user.User;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.util.CustomDateUtil;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class AccountResDto {
         private List<AccountDto> accounts = new ArrayList<>();
 
         public AccountListResDto(User user, List<Account> accounts) {
-            this.fullname = user.getFullname();
+            this.fullname = user.getName();
             this.accounts = accounts.stream().map(AccountDto::new).collect(Collectors.toList());
         }
         /*

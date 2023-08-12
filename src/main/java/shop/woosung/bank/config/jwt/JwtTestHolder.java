@@ -1,8 +1,9 @@
 package shop.woosung.bank.config.jwt;
 
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.domain.user.User;
-import shop.woosung.bank.domain.user.UserEnum;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.infrastructure.UserEntity;
+import shop.woosung.bank.user.UserRole;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +26,8 @@ public class JwtTestHolder implements JwtHolder {
     public User verifyToken(String token) {
         for (Map.Entry<String, String> entry : ROLE_TOKEN_MAP.entrySet()) {
             if (entry.getValue().equals(token)) {
-                UserEnum userEnum = UserEnum.valueOf(entry.getKey());
-                return User.builder().role(userEnum).build();
+                UserRole userRole = UserRole.valueOf(entry.getKey());
+                return User.builder().role(userRole).build();
             }
         }
         return null;
