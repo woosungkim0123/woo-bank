@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
         User user = User.join(userCreateConvert(joinRequestServiceDto, UserRole.CUSTOMER), passwordEncoder);
         User newUser = userRepository.save(user);
 
-        return new JoinResponseDto(newUser);
+        return JoinResponseDto.from(newUser);
     }
 
     private void checkDuplicateEmail(String requestEmail) {

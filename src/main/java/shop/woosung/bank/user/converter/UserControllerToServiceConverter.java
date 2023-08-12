@@ -5,7 +5,7 @@ import shop.woosung.bank.user.service.dto.JoinRequestServiceDto;
 
 public class UserControllerToServiceConverter {
 
-    static public JoinRequestServiceDto joinRequestConvert(JoinRequestDto joinRequestDto){
+    public static JoinRequestServiceDto joinRequestConvert(JoinRequestDto joinRequestDto){
         return JoinRequestServiceDto.builder()
                 .email(joinRequestDto.getEmail())
                 .password(joinRequestDto.getPassword())
