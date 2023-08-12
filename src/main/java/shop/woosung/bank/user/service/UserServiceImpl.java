@@ -15,7 +15,7 @@ import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.Optional;
 
-import static shop.woosung.bank.user.converter.UserServiceToDomainConverter.userCreateConvert;
+import static shop.woosung.bank.user.util.UserServiceToDomainConverter.userCreateConvert;
 
 @Builder
 @RequiredArgsConstructor
