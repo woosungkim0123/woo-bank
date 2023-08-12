@@ -44,7 +44,7 @@ class UserServiceImplTest {
     }
     
     @Test
-    void 동일한_이메일_을_가진_유저가_있다면_예외를_뱉는다() {
+    void 동일한_이메일_을_가진_유저가_있다면_예외를_던진다() {
         // given & when
         userService.join(JoinRequestServiceDto.builder()
                 .email("test1@test.com")
