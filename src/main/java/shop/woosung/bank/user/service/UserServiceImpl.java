@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.common.exception.EmailAlreadyInUseException;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.controller.port.UserService;
 import shop.woosung.bank.user.service.dto.JoinRequestServiceDto;

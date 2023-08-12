@@ -12,7 +12,7 @@ import shop.woosung.bank.domain.account.repository.AccountRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.util.dummy.DummyUserObject;

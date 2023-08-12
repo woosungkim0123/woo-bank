@@ -2,7 +2,6 @@ package shop.woosung.bank.user.domain;
 
 import org.junit.jupiter.api.Test;
 import shop.woosung.bank.mock.FakePasswordEncoder;
-import shop.woosung.bank.user.UserRole;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

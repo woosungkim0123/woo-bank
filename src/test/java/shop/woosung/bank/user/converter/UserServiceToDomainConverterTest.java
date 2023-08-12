@@ -1,7 +1,7 @@
 package shop.woosung.bank.user.converter;
 
 import org.junit.jupiter.api.Test;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.domain.UserCreate;
 import shop.woosung.bank.user.service.dto.JoinRequestServiceDto;
 

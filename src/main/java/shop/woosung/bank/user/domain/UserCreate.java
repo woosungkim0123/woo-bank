@@ -2,7 +2,6 @@ package shop.woosung.bank.user.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-import shop.woosung.bank.user.UserRole;
 
 @Getter
 public class UserCreate {

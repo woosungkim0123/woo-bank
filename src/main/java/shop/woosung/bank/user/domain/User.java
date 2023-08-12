@@ -4,7 +4,6 @@ package shop.woosung.bank.user.domain;
 import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.user.UserRole;
 
 import java.time.LocalDateTime;
 

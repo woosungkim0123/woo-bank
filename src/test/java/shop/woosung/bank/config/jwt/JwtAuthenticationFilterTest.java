@@ -13,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.util.dummy.DummyUserObject;
 

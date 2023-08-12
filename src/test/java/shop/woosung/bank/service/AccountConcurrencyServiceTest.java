@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 
 import shop.woosung.bank.util.dummy.DummyUserObject;

@@ -1,4 +1,4 @@
-package shop.woosung.bank.user;
+package shop.woosung.bank.user.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

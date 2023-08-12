@@ -1,7 +1,7 @@
 package shop.woosung.bank.user.service.dto;
 
 import org.junit.jupiter.api.Test;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.domain.User;
 
 import static org.assertj.core.api.Assertions.assertThat;

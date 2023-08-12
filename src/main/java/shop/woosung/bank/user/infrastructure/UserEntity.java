@@ -14,7 +14,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import shop.woosung.bank.common.infrastructure.BaseTimeEntity;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.domain.User;
 
 @Getter

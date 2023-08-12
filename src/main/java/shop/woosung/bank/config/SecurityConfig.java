@@ -17,7 +17,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.woosung.bank.config.jwt.JwtAuthenticationFilter;
 import shop.woosung.bank.config.jwt.JwtAuthorizationFilter;
 import shop.woosung.bank.config.jwt.JwtHolder;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 
 import shop.woosung.bank.util.CustomResponseUtil;
 

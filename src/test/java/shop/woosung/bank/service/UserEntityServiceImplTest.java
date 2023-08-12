@@ -1,25 +1,6 @@
 package shop.woosung.bank.service;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.user.UserRole;
-import shop.woosung.bank.user.infrastructure.UserJpaRepository;
-import shop.woosung.bank.dto.user.UserReqDto;
-import shop.woosung.bank.dto.user.UserResDto;
-import shop.woosung.bank.user.service.UserServiceImpl;
-import shop.woosung.bank.util.dummy.DummyUserObject;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 //@ExtendWith(MockitoExtension.class)
 //class UserEntityServiceImplTest extends DummyUserObject {

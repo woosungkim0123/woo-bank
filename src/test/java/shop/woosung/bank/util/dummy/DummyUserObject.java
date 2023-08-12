@@ -6,7 +6,7 @@ import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.user.UserRole;
+import shop.woosung.bank.user.domain.UserRole;
 
 import java.time.LocalDateTime;
 
