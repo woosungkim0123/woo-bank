@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static shop.woosung.bank.dto.account.AccountReqDto.*;
 
 
-@Sql("classpath:db/teardown.sql")
+@Sql("classpath:sql/initAutoIncrementReset.sql")
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)

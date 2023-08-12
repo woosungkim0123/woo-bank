@@ -1,4 +1,4 @@
-package shop.woosung.bank.common.domain;
+package shop.woosung.bank.common.infrastructure;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 public class JoinRequestServiceDto {
-    private String email;
-    private String password;
-    private String name;
+    private final String email;
+    private final String password;
+    private final String name;
 
     @Builder
     public JoinRequestServiceDto(String email, String password, String name) {

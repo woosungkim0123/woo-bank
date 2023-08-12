@@ -6,10 +6,10 @@ import shop.woosung.bank.user.UserRole;
 
 @Getter
 public class UserCreate {
-    private String email;
-    private String password;
-    private String name;
-    private UserRole role;
+    private final String email;
+    private final String password;
+    private final String name;
+    private final UserRole role;
 
     @Builder
     public UserCreate(String email, String password, String name, UserRole role) {

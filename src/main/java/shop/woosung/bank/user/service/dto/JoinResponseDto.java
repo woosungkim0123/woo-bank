@@ -1,15 +1,16 @@
 package shop.woosung.bank.user.service.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.user.domain.User;
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 public class JoinResponseDto {
-    private Long id;
-    private String email;
-    private String name;
+    private final Long id;
+    private final String email;
+    private final String name;
 
     public static JoinResponseDto from(User user) {
         return JoinResponseDto.builder()
