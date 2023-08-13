@@ -4,6 +4,11 @@ server:
     encoding:
       charset: utf-8
       force: true
+  error:
+    include-binding-errors: never
+    include-exception: false
+    include-message: never
+    include-stacktrace: never
 
 spring:
   datasource:
