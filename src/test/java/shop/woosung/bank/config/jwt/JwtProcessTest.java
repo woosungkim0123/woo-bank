@@ -22,7 +22,7 @@ class JwtProcessTest {
         User userEntity = User.builder()
                 .id(1L).role(UserRole.ADMIN).build();
         LoginUser loginUser = new LoginUser(userEntity);
-        JwtTestHolder jwtTestHolder = new JwtTestHolder();
+        JwtTestTokenProvider jwtTestHolder = new JwtTestTokenProvider();
 
         // when
         String jwtToken = JwtProcess.create(jwtTestHolder, loginUser);
@@ -37,7 +37,7 @@ class JwtProcessTest {
     public void verify_test(Long id, UserRole expectedRole) {
 
         String jwtToken = createToken(id, expectedRole);
-        JwtTestHolder jwtTestHolder = new JwtTestHolder();
+        JwtTestTokenProvider jwtTestHolder = new JwtTestTokenProvider();
         // given & when
         LoginUser loginUser = JwtProcess.verify(jwtTestHolder, jwtToken);
 
@@ -59,7 +59,7 @@ class JwtProcessTest {
         User userEntity = User.builder()
                 .id(id).role(role).build();
         LoginUser loginUser = new LoginUser(userEntity);
-        JwtTestHolder jwtTestHolder = new JwtTestHolder();
+        JwtTestTokenProvider jwtTestHolder = new JwtTestTokenProvider();
         return JwtProcess.create(jwtTestHolder, loginUser).replace(JwtVO.TOKEN_PREFIX, "");
     }
 }

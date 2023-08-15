@@ -112,7 +112,7 @@ class JwtAuthorizationFilterTest {
     private static String getCorrectToken(UserRole userRole) {
         User user = User.builder().id(1L).role(userRole).build();
         LoginUser loginUser = new LoginUser(user);
-        JwtSystemHolder jwtSystemHolder = new JwtSystemHolder();
+        JwtTokenManager jwtSystemHolder = new JwtTokenManager();
         return JwtProcess.create(jwtSystemHolder, loginUser);
     }
 
