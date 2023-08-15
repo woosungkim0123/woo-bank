@@ -2,24 +2,28 @@ package shop.woosung.bank.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import shop.woosung.bank.common.handler.CommonResponseHandler;
 import shop.woosung.bank.config.filter.JwtAuthenticationFilter;
 import shop.woosung.bank.config.filter.JwtAuthorizationFilter;
 import shop.woosung.bank.config.jwt.JwtTokenProvider;
 import shop.woosung.bank.user.domain.UserRole;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 @Slf4j
@@ -43,22 +47,15 @@ public class SecurityConfig {
                             .antMatchers("/api/s/**").authenticated()
                             .antMatchers("/api/admin/**").hasRole(UserRole.ADMIN.name())
                             .anyRequest().permitAll())
-                // todo ->handler로못잡음->시큐리티에서잡자
-//                    .exceptionHandling(config -> {
-//
-//                        config
-//                                .authenticationEntryPoint((req, res, e) -> {
-//                                    throw new AException("11");
-//                                });
-//                            }
-//
-//                    )
+                    .exceptionHandling(config -> {
+                        config.authenticationEntryPoint(this::authenticationEntryPointResponseHandler);
+                        config.accessDeniedHandler(this::accessDeniedResponseHandler);
+                    })
                     .apply(new CustomSecurityFilterManager()).and()
                     .build();
     }
 
     private class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
-
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
@@ -79,6 +76,17 @@ public class SecurityConfig {
         return source;
     }
 
+    private void authenticationEntryPointResponseHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("AuthenticationException = {}", exception.getMessage());
+        CommonResponseHandler.handleException(response, "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+    }
+
+    private void accessDeniedResponseHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("AccessDeniedException = {}", exception.getMessage());
+        CommonResponseHandler.handleException(response, "권한이 없습니다.", HttpStatus.FORBIDDEN);
+    }
 
     private void configureDevSettings(HttpSecurity http) throws Exception {
         if (isDevProfileActive()) {
