@@ -12,7 +12,7 @@ import shop.woosung.bank.user.domain.UserRole;
 import java.util.Date;
 
 @Component
-public class JwtSystemHolder implements JwtHolder {
+public class JwtTokenManager implements JwtTokenProvider {
     @Override
     public String createToken(LoginUser loginUser) {
         return JWT.create()

@@ -3,7 +3,7 @@ package shop.woosung.bank.dto.transaction;
 import lombok.Getter;
 import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.transaction.Transaction;
-import shop.woosung.bank.util.CustomDateUtil;
+import shop.woosung.bank.common.util.CustomDateUtil;
 
 import java.util.ArrayList;
 import java.util.List;

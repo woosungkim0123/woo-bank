@@ -6,8 +6,7 @@ import lombok.Setter;
 import shop.woosung.bank.domain.account.Account;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.util.CustomDateUtil;
+import shop.woosung.bank.common.util.CustomDateUtil;
 
 import java.util.ArrayList;
 import java.util.List;

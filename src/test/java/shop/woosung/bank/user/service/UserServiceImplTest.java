@@ -2,7 +2,7 @@ package shop.woosung.bank.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import shop.woosung.bank.common.exception.EmailAlreadyInUseException;
+import shop.woosung.bank.user.handler.exception.EmailAlreadyInUseException;
 import shop.woosung.bank.mock.FakePasswordEncoder;
 import shop.woosung.bank.mock.FakeUserRepository;
 import shop.woosung.bank.user.controller.port.UserService;

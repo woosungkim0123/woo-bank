@@ -7,7 +7,7 @@ import shop.woosung.bank.user.domain.UserRole;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JwtTestHolder implements JwtHolder {
+public class JwtTestTokenProvider implements JwtTokenProvider {
     private static final Map<String, String> ROLE_TOKEN_MAP = new HashMap<>();
 
     static {
