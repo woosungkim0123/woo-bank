@@ -3,11 +3,13 @@ package shop.woosung.bank.config.filter;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import shop.woosung.bank.common.handler.CommonResponseHandler;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.config.jwt.JwtTokenProvider;
 import shop.woosung.bank.config.jwt.JwtProcess;
@@ -22,7 +24,7 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
-    private JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public JwtAuthorizationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -39,15 +41,18 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
             chain.doFilter(request, response);
-        } catch (TokenExpiredException e) {
-            log.error("token expired = {}", e);
-           // CustomResponseUtil.fail(response, "토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED);
-        } catch (JWTVerificationException e) {
-            log.error("token fail = {}", e);
-            //CustomResponseUtil.fail(response, "토큰 검증에 실패했습니다.", HttpStatus.UNAUTHORIZED);
-        } catch (IOException | ServletException e) {
-            log.error("IOException | ServletException = {}", e);
-            //CustomResponseUtil.fail(response, "서버 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (TokenExpiredException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+            log.error("token expired = {}", exception.getMessage());
+            CommonResponseHandler.handleException(response, "토큰이 만료 되었습니다.", HttpStatus.UNAUTHORIZED);
+        } catch (JWTVerificationException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+            log.error("token fail = {}", exception.getMessage());
+            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
+        } catch (IOException | ServletException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+            log.error("IOException | ServletException = {}", exception.getMessage());
+            CommonResponseHandler.handleException(response, "서버 오류가 발생 했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -55,5 +60,4 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String header = request.getHeader(JwtVO.HEADER);
         return header != null;
     }
-
 }
