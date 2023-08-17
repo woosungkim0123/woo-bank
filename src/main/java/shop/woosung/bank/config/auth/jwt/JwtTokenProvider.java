@@ -1,11 +1,11 @@
-package shop.woosung.bank.config.jwt;
+package shop.woosung.bank.config.auth.jwt;
 
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.user.domain.User;
 
 public interface JwtTokenProvider {
 
-    String createToken(LoginUser loginUser);
+    String create(LoginUser loginUser);
 
-    User verifyToken(String token);
+    Long verify(String token);
 }

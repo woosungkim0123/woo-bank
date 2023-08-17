@@ -19,8 +19,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import shop.woosung.bank.common.handler.CommonResponseHandler;
 import shop.woosung.bank.config.filter.JwtAuthenticationFilter;
 import shop.woosung.bank.config.filter.JwtAuthorizationFilter;
-import shop.woosung.bank.config.jwt.JwtTokenProvider;
+import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.user.domain.UserRole;
+import shop.woosung.bank.user.service.port.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ public class SecurityConfig {
 
     private final Environment environment;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -60,7 +62,7 @@ public class SecurityConfig {
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
             getBuilder().addFilter(new JwtAuthenticationFilter(jwtTokenProvider, authenticationManager));
-            getBuilder().addFilter(new JwtAuthorizationFilter(jwtTokenProvider, authenticationManager));
+            getBuilder().addFilter(new JwtAuthorizationFilter(jwtTokenProvider, authenticationManager, userRepository));
             super.configure(http);
         }
     }
@@ -89,7 +91,7 @@ public class SecurityConfig {
     }
 
     private void configureDevSettings(HttpSecurity http) throws Exception {
-        if (isDevProfileActive()) {
+        if (isDevProfileActive() || isTestProfileActive()) {
             http
                 .headers(config -> config.frameOptions().disable())
                 .csrf(AbstractHttpConfigurer::disable);
@@ -98,5 +100,8 @@ public class SecurityConfig {
 
     private boolean isDevProfileActive() {
         return Arrays.asList(environment.getActiveProfiles()).contains("dev");
+    }
+    private boolean isTestProfileActive() {
+        return Arrays.asList(environment.getActiveProfiles()).contains("test");
     }
 }
