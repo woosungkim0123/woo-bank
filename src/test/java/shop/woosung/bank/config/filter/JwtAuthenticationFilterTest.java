@@ -23,7 +23,6 @@ import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.service.port.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;

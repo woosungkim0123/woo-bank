@@ -29,11 +29,14 @@ public class FakeUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         if(user.getId() == null || user.getId() == 0) {
+            data.removeIf(item -> Objects.equals(item.getEmail(), user.getEmail()));
+
             User newUser = user.builder()
                     .id(++autoIncrementId)
                     .email(user.getEmail())
                     .name(user.getName())
                     .password(user.getPassword())
+                    .role(user.getRole())
                     .createdAt(currentDateTime)
                     .updatedAt(currentDateTime)
                     .build();

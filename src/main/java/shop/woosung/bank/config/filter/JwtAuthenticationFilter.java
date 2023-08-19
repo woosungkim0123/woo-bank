@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -84,6 +83,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         validateNonEmpty(loginRequestDto.getEmail(), "이메일을 입력해주세요.");
         validateNonEmpty(loginRequestDto.getPassword(), "비밀번호를 입력해주세요.");
     }
+
     private void validateNonEmpty(String value, String errorMessage) {
         if (value == null || value.isEmpty()) {
             throw new LoginValidationException(errorMessage);

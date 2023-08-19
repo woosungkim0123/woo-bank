@@ -1,4 +1,4 @@
-package shop.woosung.bank.config.jwt;
+package shop.woosung.bank.config.filter;
 
 
 import org.junit.jupiter.api.DisplayName;
@@ -10,18 +10,30 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import shop.woosung.bank.config.auth.LoginUser;
+import shop.woosung.bank.config.auth.jwt.JwtProcess;
+import shop.woosung.bank.config.auth.jwt.JwtTokenManager;
+import shop.woosung.bank.config.auth.jwt.JwtVO;
+import shop.woosung.bank.mock.FakeJwtTokenProvider;
+import shop.woosung.bank.mock.config.FakeJwtConfiguration;
+import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.domain.UserRole;
+import shop.woosung.bank.user.service.port.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("test")
+@Import({FakeJwtConfiguration.class, FakeRepositoryConfiguration.class})
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class JwtAuthorizationFilterTest {
@@ -29,15 +41,24 @@ class JwtAuthorizationFilterTest {
     @Autowired
     private MockMvc mvc;
 
-    @DisplayName("권한 통과 테스트")
-    @ParameterizedTest(name = "로그인이 필요한 요청 => {0}")
+    @Autowired
+    private FakeJwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UserRepository userRepository;
+
+
+    @ParameterizedTest()
     @MethodSource("provideUserEnum")
-    public void authorization_success_test(UserRole userRole, String allowUrl) throws Exception {
+    public void 권한_성공_테스트(UserRole userRole, String allowUrl) throws Exception {
         // given
-        String jwtToken = getCorrectToken(userRole);
+        User user = userRepository.save(User.builder().email("test@test.com").role(userRole).build());
+        jwtTokenProvider.userId = user.getId();
+        jwtTokenProvider.token = "abcdefg";
+        String requestToken = JwtVO.TOKEN_PREFIX + "abcdefg";
 
         // when
-        ResultActions resultActions = mvc.perform(get( allowUrl).header(JwtVO.HEADER,  jwtToken));
+        ResultActions resultActions = mvc.perform(get(allowUrl).header(JwtVO.HEADER, requestToken));
 
         // then
         resultActions.andExpect(status().isNotFound());
@@ -123,5 +144,7 @@ class JwtAuthorizationFilterTest {
     private String getExpiredToken() {
         return JwtVO.TOKEN_PREFIX + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiYW5rIiwicm9sZSI6IkNVU1RPTUVSIiwiaWQiOjEsImV4cCI6MTY4ODk5NzkzMH0.mLdls0X1C-dDiewYMGoK7fxw448_BVtYX4n8UBGImzHQDNzMcVeOmakHCEFsRLoIFDRr5TWBnWXy0sHj-Q9qJQ";
     }
+
+
 
 }
