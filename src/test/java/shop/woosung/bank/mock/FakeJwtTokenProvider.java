@@ -1,8 +1,5 @@
 package shop.woosung.bank.mock;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.config.auth.jwt.exception.JwtExpiredException;
@@ -20,6 +17,13 @@ public class FakeJwtTokenProvider implements JwtTokenProvider {
     public LocalDateTime expiredAt;
     public String error;
 
+    public void init() {
+        this.token = null;
+        this.userId = null;
+        this.currentAt = null;
+        this.expiredAt = null;
+        this.error = null;
+    }
 
     @Override
     public String create(LoginUser loginUser) {
@@ -28,14 +32,11 @@ public class FakeJwtTokenProvider implements JwtTokenProvider {
 
     @Override
     public Long verify(String receiveToken) {
-        System.out.println("하이");
-        System.out.println("this.currentAt = " + this.currentAt);
-        System.out.println("this.token = " + this.token);
+        System.out.println("token" + token);
+        checkError();
         checkSameToken(receiveToken);
         checkExpireToken();
-        checkError();
-
-        return 1L;
+        return userId;
     }
 
     private void checkSameToken(String receiveToken) {

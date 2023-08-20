@@ -29,8 +29,6 @@ public class FakeUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         if(user.getId() == null || user.getId() == 0) {
-            data.removeIf(item -> Objects.equals(item.getEmail(), user.getEmail()));
-
             User newUser = user.builder()
                     .id(++autoIncrementId)
                     .email(user.getEmail())
@@ -47,5 +45,10 @@ public class FakeUserRepository implements UserRepository {
             data.add(user);
             return user;
         }
+    }
+
+    public void deleteAll() {
+        autoIncrementId = 0L;
+        data.clear();
     }
 }

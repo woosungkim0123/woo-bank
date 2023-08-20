@@ -18,51 +18,34 @@ import static org.assertj.core.api.Assertions.*;
 
 class JwtProcessTest {
     
-    @DisplayName("jwt create success")
     @Test
-    public void create_test() {
+    public void 토큰_생성_절차_테스트() {
         // given
-        User userEntity = User.builder()
+        FakeJwtTokenProvider jwtTokenProvider = new FakeJwtTokenProvider();
+        jwtTokenProvider.token = "abcdef";
+        User user = User.builder()
                 .id(1L).role(UserRole.ADMIN).build();
-        LoginUser loginUser = new LoginUser(userEntity);
-        FakeJwtTokenProvider jwtTestHolder = new FakeJwtTokenProvider();
+        LoginUser loginUser = new LoginUser(user);
 
         // when
-        String jwtToken = JwtProcess.create(jwtTestHolder, loginUser);
+        String jwtToken = JwtProcess.create(jwtTokenProvider, loginUser);
         
         // then
         assertThat(jwtToken).startsWith(JwtVO.TOKEN_PREFIX);
+        assertThat(jwtTokenProvider.token).isEqualTo(jwtToken.replace(JwtVO.TOKEN_PREFIX, ""));
     }
 
-    @DisplayName("jwt 검증 성공")
-    @ParameterizedTest(name = "{index} - ID : {1}, 역할 : {2}")
-    @MethodSource("jwtTokenAndRoleProvider")
-    public void verify_test(Long id, UserRole expectedRole) {
+    @Test
+    public void 토큰_검증_절차_테스트() {
+        // given
+        FakeJwtTokenProvider jwtTokenProvider = new FakeJwtTokenProvider();
+        jwtTokenProvider.token = "abcdef";
+        jwtTokenProvider.userId = 1L;
 
-        String jwtToken = createToken(id, expectedRole);
-        FakeJwtTokenProvider jwtTestHolder = new FakeJwtTokenProvider();
-        // given & when
-        Long userId = JwtProcess.verify(jwtTestHolder, jwtToken);
+        // when
+        Long userId = JwtProcess.verify(jwtTokenProvider, jwtTokenProvider.token);
 
         // then
         assertThat(userId).isEqualTo(1L);
-    }
-    /*
-        첫번째 : { no : 1, userEnum : CUSTOMER }
-        두번째 : { no : 1, userEnum : ADMIN }
-     */
-    private static Stream<Arguments> jwtTokenAndRoleProvider() {
-        return Stream.of(
-                Arguments.of(1L, UserRole.CUSTOMER),
-                Arguments.of(1L, UserRole.ADMIN)
-        );
-    }
-
-    private String createToken(Long id, UserRole role) {
-        User userEntity = User.builder()
-                .id(id).role(role).build();
-        LoginUser loginUser = new LoginUser(userEntity);
-        FakeJwtTokenProvider jwtTestHolder = new FakeJwtTokenProvider();
-        return JwtProcess.create(jwtTestHolder, loginUser).replace(JwtVO.TOKEN_PREFIX, "");
     }
 }

@@ -1,7 +1,5 @@
 package shop.woosung.bank.config.filter;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +12,7 @@ import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.config.auth.jwt.JwtProcess;
 import shop.woosung.bank.config.auth.jwt.JwtVO;
-import shop.woosung.bank.config.auth.jwt.exception.JwtIdConversionException;
-import shop.woosung.bank.config.auth.jwt.exception.JwtNotFoundUser;
-import shop.woosung.bank.config.auth.jwt.exception.JwtNotHaveIdException;
+import shop.woosung.bank.config.auth.jwt.exception.*;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -50,12 +46,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             }
             chain.doFilter(request, response);
 
-        } catch (TokenExpiredException exception) {
+        }  catch (JwtVerifyException exception) {
+            log.error("JwtVerifyException = {}", exception.getMessage());
+            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
+        } catch (JwtExpiredException exception) {
             log.error("token expired = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰이 만료 되었습니다.", HttpStatus.UNAUTHORIZED);
-        } catch (JWTVerificationException exception) {
-            log.error("JWTVerificationException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
         } catch (JwtNotHaveIdException exception) {
             log.error("JwtNotHaveIdException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
