@@ -1,4 +1,4 @@
-package shop.woosung.bank.user.converter;
+package shop.woosung.bank.user.util;
 
 import shop.woosung.bank.user.controller.dto.JoinRequestDto;
 import shop.woosung.bank.user.service.dto.JoinRequestServiceDto;

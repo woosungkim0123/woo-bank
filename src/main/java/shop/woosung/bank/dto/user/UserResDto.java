@@ -2,10 +2,8 @@ package shop.woosung.bank.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.util.CustomDateUtil;
+import shop.woosung.bank.common.util.CustomDateUtil;
 
 @Getter @Setter
 public class UserResDto {

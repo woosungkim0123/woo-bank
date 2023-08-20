@@ -1,4 +1,4 @@
-package shop.woosung.bank.config.jwt;
+package shop.woosung.bank.config.auth.jwt;
 
 public interface JwtVO {
     String SECRET = "woosung1";

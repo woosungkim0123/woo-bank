@@ -9,8 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @AutoConfigureMockMvc
@@ -20,15 +21,16 @@ class SecurityConfigTest {
     @Autowired
     private MockMvc mvc;
 
-    @DisplayName("/api/s/** 로그인 없이 요청시 401 리턴 테스트")
+    @DisplayName("로그인이  로그인 없이 요청시 401 리턴 테스트")
     @Test
-    public void authenticationTest() throws Exception {
-        // given
-        // when
-        ResultActions resultAction = mvc.perform(get("/api/s/test"));
-        int httpStatus = resultAction.andReturn().getResponse().getStatus();
+    public void 로그인이_필요한_요청에_로그인_없이_요청시_예외를_던진다() throws Exception {
+        // given & when
+        ResultActions resultActions = mvc.perform(get("/api/s/test"));
 
         // then
-        assertThat(httpStatus).isEqualTo(401);
+        resultActions.andExpect(status().isUnauthorized());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("로그인이 필요합니다."));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 }

@@ -14,7 +14,7 @@ import shop.woosung.bank.user.service.dto.JoinResponseDto;
 
 import javax.validation.Valid;
 
-import static shop.woosung.bank.user.converter.UserControllerToServiceConverter.joinRequestConvert;
+import static shop.woosung.bank.user.util.UserControllerToServiceConverter.joinRequestConvert;
 
 @RequiredArgsConstructor
 @RequestMapping("/api")

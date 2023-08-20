@@ -1,4 +1,4 @@
-package shop.woosung.bank.user.converter;
+package shop.woosung.bank.user.util;
 
 import org.junit.jupiter.api.Test;
 import shop.woosung.bank.user.domain.UserRole;

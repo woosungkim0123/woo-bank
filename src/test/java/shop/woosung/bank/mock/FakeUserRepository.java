@@ -27,11 +27,6 @@ public class FakeUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByName(String name) {
-        return data.stream().filter(item -> Objects.equals(item.getName(), name)).findAny();
-    }
-
-    @Override
     public User save(User user) {
         if(user.getId() == null || user.getId() == 0) {
             User newUser = user.builder()
@@ -39,6 +34,7 @@ public class FakeUserRepository implements UserRepository {
                     .email(user.getEmail())
                     .name(user.getName())
                     .password(user.getPassword())
+                    .role(user.getRole())
                     .createdAt(currentDateTime)
                     .updatedAt(currentDateTime)
                     .build();
@@ -49,5 +45,10 @@ public class FakeUserRepository implements UserRepository {
             data.add(user);
             return user;
         }
+    }
+
+    public void deleteAll() {
+        autoIncrementId = 0L;
+        data.clear();
     }
 }

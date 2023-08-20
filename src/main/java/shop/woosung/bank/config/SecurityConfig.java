@@ -4,82 +4,104 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import shop.woosung.bank.config.jwt.JwtAuthenticationFilter;
-import shop.woosung.bank.config.jwt.JwtAuthorizationFilter;
-import shop.woosung.bank.config.jwt.JwtHolder;
+import shop.woosung.bank.common.handler.CommonResponseHandler;
+import shop.woosung.bank.config.filter.JwtAuthenticationFilter;
+import shop.woosung.bank.config.filter.JwtAuthorizationFilter;
+import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.user.domain.UserRole;
+import shop.woosung.bank.user.service.port.UserRepository;
 
-import shop.woosung.bank.util.CustomResponseUtil;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
 
-    private final JwtHolder jwtHolder;
+    private final Environment environment;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        log.debug("디버그 : BCryptPasswordEncoder 빈 등록됨");
-        return new BCryptPasswordEncoder();
-    }
-
-    // TODO2 : 권한 에러처리 필요
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.headers().frameOptions().disable();
-        http.csrf().disable();
-        http.cors().configurationSource(configurationSource());
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.formLogin().disable();
-        http.httpBasic().disable();
+        configureDevSettings(http);
 
-        http.apply(new CustomSecurityFilterManager());
-
-
-        http.exceptionHandling()
-                .authenticationEntryPoint((req, res, e) -> CustomResponseUtil.fail(res, "로그인을 진행 해주세요", HttpStatus.UNAUTHORIZED))
-                .accessDeniedHandler((req, res, e) -> CustomResponseUtil.fail(res, "권한이 없습니다", HttpStatus.FORBIDDEN));
-
-        http.authorizeHttpRequests()
-                .antMatchers("/api/s/**").authenticated()
-                .antMatchers("/api/admin/**").hasRole("" + UserRole.ADMIN)
-                .anyRequest().permitAll();
-
-        return http.build();
+        return http
+                    .cors(config -> config.configurationSource(configureCors()))
+                    .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .formLogin(AbstractHttpConfigurer::disable)
+                    .httpBasic(AbstractHttpConfigurer::disable)
+                    .authorizeRequests(config -> config
+                            .antMatchers("/api/s/**").authenticated()
+                            .antMatchers("/api/admin/**").hasRole(UserRole.ADMIN.name())
+                            .anyRequest().permitAll())
+                    .exceptionHandling(config -> {
+                        config.authenticationEntryPoint(this::authenticationEntryPointResponseHandler);
+                        config.accessDeniedHandler(this::accessDeniedResponseHandler);
+                    })
+                    .apply(new CustomSecurityFilterManager()).and()
+                    .build();
     }
 
-    public CorsConfigurationSource configurationSource() {
+    private class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
+            getBuilder().addFilter(new JwtAuthenticationFilter(jwtTokenProvider, authenticationManager));
+            getBuilder().addFilter(new JwtAuthorizationFilter(jwtTokenProvider, authenticationManager, userRepository));
+            super.configure(http);
+        }
+    }
+
+    private CorsConfigurationSource configureCors() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
-        configuration.addAllowedOriginPattern("*");
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-        // 안해도 되는 것 같은데?
-        // configuration.addExposedHeader("Authorization");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-    public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+    private void authenticationEntryPointResponseHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("AuthenticationException = {}", exception.getMessage());
+        CommonResponseHandler.handleException(response, "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+    }
 
-        @Override
-        public void configure(HttpSecurity http) throws Exception {
-            AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
-            getBuilder().addFilter(new JwtAuthenticationFilter(jwtHolder, authenticationManager));
-            getBuilder().addFilter(new JwtAuthorizationFilter(jwtHolder, authenticationManager));
-            super.configure(http);
+    private void accessDeniedResponseHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("AccessDeniedException = {}", exception.getMessage());
+        CommonResponseHandler.handleException(response, "권한이 없습니다.", HttpStatus.FORBIDDEN);
+    }
+
+    private void configureDevSettings(HttpSecurity http) throws Exception {
+        if (isDevProfileActive() || isTestProfileActive()) {
+            http
+                .headers(config -> config.frameOptions().disable())
+                .csrf(AbstractHttpConfigurer::disable);
         }
+    }
+
+    private boolean isDevProfileActive() {
+        return Arrays.asList(environment.getActiveProfiles()).contains("dev");
+    }
+    private boolean isTestProfileActive() {
+        return Arrays.asList(environment.getActiveProfiles()).contains("test");
     }
 }
