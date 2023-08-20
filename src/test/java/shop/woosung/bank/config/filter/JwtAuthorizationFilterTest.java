@@ -2,12 +2,10 @@ package shop.woosung.bank.config.filter;
 
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,9 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.config.auth.jwt.JwtProcess;
-import shop.woosung.bank.config.auth.jwt.JwtTokenManager;
 import shop.woosung.bank.config.auth.jwt.JwtVO;
 import shop.woosung.bank.mock.FakeJwtTokenProvider;
 import shop.woosung.bank.mock.FakeUserRepository;
@@ -25,7 +20,6 @@ import shop.woosung.bank.mock.config.FakeJwtConfiguration;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.domain.UserRole;
-import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
