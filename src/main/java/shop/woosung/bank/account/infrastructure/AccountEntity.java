@@ -1,6 +1,5 @@
 package shop.woosung.bank.account.infrastructure;
 
-import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,78 +11,55 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.AccessLevel;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.common.infrastructure.BaseTimeEntity;
 import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.handler.ex.CustomApiException;
 
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "tb_wb_account")
 @Entity
-public class AccountEntity {
+public class AccountEntity extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(unique = true, nullable = false, length = 20)
     private Long number;
+
     @Column(nullable = false, length = 4)
     private Long password;
+
     @Column(nullable = false)
     private Long balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private UserEntity user;
 
-    @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @Builder
-    public AccountEntity(Long id, Long number, Long password, Long balance, UserEntity user, LocalDateTime createdAt,
-                         LocalDateTime updatedAt) {
-        this.id = id;
-        this.number = number;
-        this.password = password;
-        this.balance = balance;
-        this.user = user;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public static AccountEntity fromModel(Account account) {
+        AccountEntity accountEntity = new AccountEntity();
+        accountEntity.id = account.getId();
+        accountEntity.number = account.getNumber();
+        accountEntity.password = account.getPassword();
+        accountEntity.balance = account.getBalance();
+        accountEntity.user = UserEntity.fromModel(account.getUser());
+        return accountEntity;
     }
 
-    public void checkOwner(Long userId) {
-        if(!user.getId().equals(userId)) {
-            throw new CustomApiException("계좌 소유자가 아닙니다.");
-        }
+    public Account toModel() {
+        return Account.builder()
+                .id(id)
+                .number(number)
+                .password(password)
+                .balance(balance)
+                .user(user.toModel())
+                .build();
     }
-
-    public void deposit(Long amount) {
-        this.balance = this.balance + amount;
-    }
-    public void checkSamePassword(Long password) {
-        if(!this.password.equals(password)) {
-            throw new CustomApiException("비밀번호가 일치하지 않습니다.");
-        }
-    }
-
-    public void checkBalance(Long amount) {
-        if(this.balance < amount) {
-            throw new CustomApiException("계좌 잔액이 부족합니다.");
-        }
-    }
-
-    public void withdraw(Long amount) {
-        balance = balance - amount;
-    }
-
 }
