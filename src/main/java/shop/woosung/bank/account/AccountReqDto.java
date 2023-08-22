@@ -1,4 +1,4 @@
-package shop.woosung.bank.dto.account;
+package shop.woosung.bank.account;
 
 import lombok.Getter;
 import lombok.Setter;

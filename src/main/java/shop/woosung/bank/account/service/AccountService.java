@@ -1,23 +1,22 @@
-package shop.woosung.bank.service;
+package shop.woosung.bank.account.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.domain.account.Account;
-import shop.woosung.bank.domain.account.repository.AccountRepository;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
+import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.infrastructure.UserEntity;
-import shop.woosung.bank.user.infrastructure.UserJpaRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
 
-import static shop.woosung.bank.dto.account.AccountReqDto.*;
-import static shop.woosung.bank.dto.account.AccountResDto.*;
+import static shop.woosung.bank.account.AccountReqDto.*;
+import static shop.woosung.bank.account.AccountResDto.*;
 
 
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ import static shop.woosung.bank.dto.account.AccountResDto.*;
 @Service
 public class AccountService {
 
-    private final AccountRepository accountRepository;
+    private final AccountJpaRepository accountJpaRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
 
@@ -33,8 +32,8 @@ public class AccountService {
     public AccountListResDto getAccountList(Long userId) {
         User user = findUser(userId);
 
-        List<Account> accountListPS = accountRepository.findByUserId(userId);
-        return new AccountListResDto(user, accountListPS);
+        List<AccountEntity> accountEntityListPS = accountJpaRepository.findByUserId(userId);
+        return new AccountListResDto(user, accountEntityListPS);
     }
 
     /*
@@ -49,25 +48,25 @@ public class AccountService {
 
     @Transactional
     public void deleteAccount(Long accountNumber, Long userId) {
-        Account accountPS = accountRepository.findByNumber(accountNumber)
+        AccountEntity accountEntityPS = accountJpaRepository.findByNumber(accountNumber)
                 .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
 
-        accountPS.checkOwner(userId);
+        accountEntityPS.checkOwner(userId);
 
-        accountRepository.deleteById(accountPS.getId());
+        accountJpaRepository.deleteById(accountEntityPS.getId());
     }
 
     @Transactional
     public AccountDepositResDto depositAccount(AccountDepositReqDto accountDepositReqDto) { // ATM -> 누군가의 계좌
-        Account depositAccountPS = accountRepository.findByNumber(accountDepositReqDto.getNumber())
+        AccountEntity depositAccountPSEntity = accountJpaRepository.findByNumber(accountDepositReqDto.getNumber())
                 .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
 
-        depositAccountPS.deposit(accountDepositReqDto.getAmount());
+        depositAccountPSEntity.deposit(accountDepositReqDto.getAmount());
 
         Transaction transaction = Transaction.builder()
-                        .depositAccount(depositAccountPS)
+                        .depositAccount(depositAccountPSEntity)
                         .withdrawAccount(null)
-                        .depositAccountBalance(depositAccountPS.getBalance())
+                        .depositAccountBalance(depositAccountPSEntity.getBalance())
                         .withdrawAccountBalance(null)
                         .amount(accountDepositReqDto.getAmount())
                         .gubun(TransactionEnum.DEPOSIT)
@@ -78,7 +77,7 @@ public class AccountService {
 
         Transaction transactionPS = transactionRepository.save(transaction);
 
-        return new AccountDepositResDto(depositAccountPS, transactionPS);
+        return new AccountDepositResDto(depositAccountPSEntity, transactionPS);
     }
 
 
@@ -89,44 +88,44 @@ public class AccountService {
 
     @Transactional
     public synchronized AccountRegisterResDto registerNewAccount(User user, AccountRegisterReqDto accountRegisterReqDto) {
-        Long newAccountNumber = accountRepository.findFirstByOrderByNumberDesc()
+        Long newAccountNumber = accountJpaRepository.findFirstByOrderByNumberDesc()
                 .map(account -> account.getNumber() + 1L)
                 .orElse(11111111111L);
 
-        Account newAccount = accountRepository.save(Account.builder()
+        AccountEntity newAccountEntity = accountJpaRepository.save(AccountEntity.builder()
                 .number(newAccountNumber)
                 .password(accountRegisterReqDto.getPassword())
                 .balance(1000L)
                 .user(UserEntity.fromModel(user))
                 .build());
-        return new AccountRegisterResDto(newAccount.getId(), newAccountNumber, newAccount.getBalance());
+        return new AccountRegisterResDto(newAccountEntity.getId(), newAccountNumber, newAccountEntity.getBalance());
     }
 
     @Transactional
     public AccountWithdrawResDto withdraw(AccountWithdrawReqDto accountWithdrawReqDto, Long userId) {
-        Account withdrawAccount = accountRepository.findByNumber(accountWithdrawReqDto.getNumber())
+        AccountEntity withdrawAccountEntity = accountJpaRepository.findByNumber(accountWithdrawReqDto.getNumber())
                 .orElseThrow(
                         () -> new CustomApiException("계좌를 찾을 수 없습니다.")
                 );
 
         // 출금 소유자 확인
-        withdrawAccount.checkOwner(userId);
+        withdrawAccountEntity.checkOwner(userId);
 
         // 비밀번호 확인
-        withdrawAccount.checkSamePassword(accountWithdrawReqDto.getPassword());
+        withdrawAccountEntity.checkSamePassword(accountWithdrawReqDto.getPassword());
 
         // 잔액 확인
-        withdrawAccount.checkBalance(accountWithdrawReqDto.getAmount());
+        withdrawAccountEntity.checkBalance(accountWithdrawReqDto.getAmount());
 
         // 출금하기
-        withdrawAccount.withdraw(accountWithdrawReqDto.getAmount());
+        withdrawAccountEntity.withdraw(accountWithdrawReqDto.getAmount());
 
 
         // 거래내역 남기기
         // 내 계좌 -> ATM 출금
         Transaction transaction = Transaction.builder()
-                .withdrawAccount(withdrawAccount)
-                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .withdrawAccount(withdrawAccountEntity)
+                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
                 .amount(accountWithdrawReqDto.getAmount())
                 .gubun(TransactionEnum.WITHDRAW)
                 .sender(accountWithdrawReqDto.getNumber() + "")
@@ -137,7 +136,7 @@ public class AccountService {
 
 
         // DTO 응답
-        return new AccountWithdrawResDto(withdrawAccount, savedTransaction);
+        return new AccountWithdrawResDto(withdrawAccountEntity, savedTransaction);
     }
 
 
@@ -149,33 +148,33 @@ public class AccountService {
             throw new CustomApiException("입출금계좌가 동일할 수 없습니다.");
         }
 
-        Account withdrawAccount = accountRepository.findByNumber(accountTransferReqDto.getWithdrawNumber())
+        AccountEntity withdrawAccountEntity = accountJpaRepository.findByNumber(accountTransferReqDto.getWithdrawNumber())
                 .orElseThrow(
                         () -> new CustomApiException("출금계좌를 찾을 수 없습니다."));
 
-        Account depositAccount = accountRepository.findByNumber(accountTransferReqDto.getDepositNumber())
+        AccountEntity depositAccountEntity = accountJpaRepository.findByNumber(accountTransferReqDto.getDepositNumber())
                 .orElseThrow(
                         () -> new CustomApiException("출금계좌를 찾을 수 없습니다."));
 
         // 출금 소유자 확인
-        withdrawAccount.checkOwner(userId);
+        withdrawAccountEntity.checkOwner(userId);
 
         // 비밀번호 확인
-        withdrawAccount.checkSamePassword(accountTransferReqDto.getWithdrawPassword());
+        withdrawAccountEntity.checkSamePassword(accountTransferReqDto.getWithdrawPassword());
 
         // 잔액 확인
-        withdrawAccount.checkBalance(accountTransferReqDto.getAmount());
+        withdrawAccountEntity.checkBalance(accountTransferReqDto.getAmount());
 
         // 이체하기
-        withdrawAccount.withdraw(accountTransferReqDto.getAmount());
-        depositAccount.deposit(accountTransferReqDto.getAmount());
+        withdrawAccountEntity.withdraw(accountTransferReqDto.getAmount());
+        depositAccountEntity.deposit(accountTransferReqDto.getAmount());
 
         // 거래내역 남기기
         Transaction transaction = Transaction.builder()
-                .withdrawAccount(withdrawAccount)
-                .depositAccount(depositAccount)
-                .withdrawAccountBalance(withdrawAccount.getBalance())
-                .depositAccountBalance(depositAccount.getBalance())
+                .withdrawAccount(withdrawAccountEntity)
+                .depositAccount(depositAccountEntity)
+                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
+                .depositAccountBalance(depositAccountEntity.getBalance())
                 .amount(accountTransferReqDto.getAmount())
                 .gubun(TransactionEnum.TRANSFER)
                 .sender(accountTransferReqDto.getWithdrawNumber() + "")
@@ -185,21 +184,21 @@ public class AccountService {
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         // DTO 응답
-        return new AccountTransferResDto(withdrawAccount, savedTransaction);
+        return new AccountTransferResDto(withdrawAccountEntity, savedTransaction);
     }
 
     @Transactional(readOnly = true)
     public AccountDetailResDto getAccountDetail(Long number, Long userId, Integer page) {
         String type = "ALL";
 
-        Account accountPS = accountRepository.findByNumber(number)
+        AccountEntity accountEntityPS = accountJpaRepository.findByNumber(number)
                 .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
 
-        accountPS.checkOwner(userId);
+        accountEntityPS.checkOwner(userId);
 
-        List<Transaction> transactionList = transactionRepository.findTransactionList(accountPS.getId(), type, page);
+        List<Transaction> transactionList = transactionRepository.findTransactionList(accountEntityPS.getId(), type, page);
 
         // DTO 응답
-        return new AccountDetailResDto(accountPS, transactionList);
+        return new AccountDetailResDto(accountEntityPS, transactionList);
     }
 }

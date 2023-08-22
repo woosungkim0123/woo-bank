@@ -11,8 +11,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import shop.woosung.bank.domain.account.Account;
-import shop.woosung.bank.domain.account.repository.AccountRepository;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
+import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
@@ -38,7 +38,7 @@ class TransactionControllerTest extends DummyUserObject {
     @Autowired
     private UserJpaRepository userJpaRepository;
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountJpaRepository accountJpaRepository;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
@@ -75,59 +75,59 @@ class TransactionControllerTest extends DummyUserObject {
         UserEntity love = userJpaRepository.save(newUser("love", "1234", "love@test.com", UserRole.CUSTOMER));
         UserEntity admin = userJpaRepository.save(newUser("admin", "1234", "admin@test.com", UserRole.ADMIN));
 
-        Account ssarAccount1 = accountRepository.save(newAccount(1111L, ssar));
-        Account cosAccount = accountRepository.save(newAccount(2222L, cos));
-        Account loveAccount = accountRepository.save(newAccount(3333L, love));
-        Account ssarAccount2 = accountRepository.save(newAccount(4444L, ssar));
+        AccountEntity ssarAccount1Entity = accountJpaRepository.save(newAccount(1111L, ssar));
+        AccountEntity cosAccountEntity = accountJpaRepository.save(newAccount(2222L, cos));
+        AccountEntity loveAccountEntity = accountJpaRepository.save(newAccount(3333L, love));
+        AccountEntity ssarAccount2Entity = accountJpaRepository.save(newAccount(4444L, ssar));
 
-        transactionRepository.save(makeWithdrawTransaction(ssarAccount1, 100L));
-        transactionRepository.save(makeDepositTransaction(cosAccount, 100L));
-        transactionRepository.save(makeTransferTransaction(ssarAccount1, cosAccount, 100L));
-        transactionRepository.save(makeTransferTransaction(ssarAccount1, loveAccount, 100L));
-        transactionRepository.save(makeTransferTransaction(cosAccount, ssarAccount1, 100L));
+        transactionRepository.save(makeWithdrawTransaction(ssarAccount1Entity, 100L));
+        transactionRepository.save(makeDepositTransaction(cosAccountEntity, 100L));
+        transactionRepository.save(makeTransferTransaction(ssarAccount1Entity, cosAccountEntity, 100L));
+        transactionRepository.save(makeTransferTransaction(ssarAccount1Entity, loveAccountEntity, 100L));
+        transactionRepository.save(makeTransferTransaction(cosAccountEntity, ssarAccount1Entity, 100L));
     }
 
-    private Transaction makeDepositTransaction(Account account, long amount) {
-        account.deposit(amount);
-        accountRepository.save(account);
+    private Transaction makeDepositTransaction(AccountEntity accountEntity, long amount) {
+        accountEntity.deposit(amount);
+        accountJpaRepository.save(accountEntity);
         return Transaction.builder()
-                .depositAccount(account)
-                .depositAccountBalance(account.getBalance())
+                .depositAccount(accountEntity)
+                .depositAccountBalance(accountEntity.getBalance())
                 .amount(amount)
                 .gubun(TransactionEnum.DEPOSIT)
                 .sender("ATM")
-                .receiver(Long.toString(account.getNumber()))
+                .receiver(Long.toString(accountEntity.getNumber()))
                 .tel("01012341234")
                 .build();
     }
 
-    private Transaction makeWithdrawTransaction(Account account, long amount) {
-        account.withdraw(amount);
-        accountRepository.save(account);
+    private Transaction makeWithdrawTransaction(AccountEntity accountEntity, long amount) {
+        accountEntity.withdraw(amount);
+        accountJpaRepository.save(accountEntity);
         return Transaction.builder()
-                .withdrawAccount(account)
-                .withdrawAccountBalance(account.getBalance())
+                .withdrawAccount(accountEntity)
+                .withdrawAccountBalance(accountEntity.getBalance())
                 .amount(amount)
                 .gubun(TransactionEnum.WITHDRAW)
-                .sender(Long.toString(account.getNumber()))
+                .sender(Long.toString(accountEntity.getNumber()))
                 .receiver("ATM")
                 .build();
     }
 
-    private Transaction makeTransferTransaction(Account withdrawAccount, Account depositAccount, long amount) {
-        withdrawAccount.withdraw(amount);
-        depositAccount.deposit(amount);
-        accountRepository.save(withdrawAccount);
-        accountRepository.save(depositAccount);
+    private Transaction makeTransferTransaction(AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, long amount) {
+        withdrawAccountEntity.withdraw(amount);
+        depositAccountEntity.deposit(amount);
+        accountJpaRepository.save(withdrawAccountEntity);
+        accountJpaRepository.save(depositAccountEntity);
         return Transaction.builder()
-                .withdrawAccount(withdrawAccount)
-                .depositAccount(depositAccount)
-                .withdrawAccountBalance(withdrawAccount.getBalance())
-                .depositAccountBalance(depositAccount.getBalance())
+                .withdrawAccount(withdrawAccountEntity)
+                .depositAccount(depositAccountEntity)
+                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
+                .depositAccountBalance(depositAccountEntity.getBalance())
                 .amount(amount)
                 .gubun(TransactionEnum.TRANSFER)
-                .sender(Long.toString(withdrawAccount.getNumber()))
-                .receiver(Long.toString(depositAccount.getNumber()))
+                .sender(Long.toString(withdrawAccountEntity.getNumber()))
+                .receiver(Long.toString(depositAccountEntity.getNumber()))
                 .build();
     }
 }

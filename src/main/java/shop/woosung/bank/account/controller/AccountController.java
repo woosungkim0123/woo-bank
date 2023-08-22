@@ -1,4 +1,4 @@
-package shop.woosung.bank.web;
+package shop.woosung.bank.account.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,12 +8,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.dto.ResponseDto;
-import shop.woosung.bank.service.AccountService;
+import shop.woosung.bank.account.service.AccountService;
 
 import javax.validation.Valid;
 
-import static shop.woosung.bank.dto.account.AccountReqDto.*;
-import static shop.woosung.bank.dto.account.AccountResDto.*;
+import static shop.woosung.bank.account.AccountReqDto.*;
+import static shop.woosung.bank.account.AccountResDto.*;
 
 
 @RequiredArgsConstructor

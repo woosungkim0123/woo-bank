@@ -7,8 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import shop.woosung.bank.domain.account.Account;
-import shop.woosung.bank.domain.account.repository.AccountRepository;
+import shop.woosung.bank.account.service.AccountService;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
+import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.user.infrastructure.UserEntity;
@@ -24,11 +25,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static shop.woosung.bank.dto.account.AccountReqDto.*;
-import static shop.woosung.bank.dto.account.AccountResDto.*;
+import static shop.woosung.bank.account.AccountReqDto.*;
+import static shop.woosung.bank.account.AccountResDto.*;
 
 @ExtendWith(MockitoExtension.class)
-public class AccountServiceTest extends DummyUserObject {
+public class AccountEntityServiceTest extends DummyUserObject {
 
     @InjectMocks
     private AccountService accountService;
@@ -37,7 +38,7 @@ public class AccountServiceTest extends DummyUserObject {
     private UserJpaRepository userJpaRepository;
 
     @Mock
-    private AccountRepository accountRepository;
+    private AccountJpaRepository accountJpaRepository;
     @Mock
     private TransactionRepository transactionRepository;
 
@@ -51,10 +52,10 @@ public class AccountServiceTest extends DummyUserObject {
         // stub
         UserEntity userEntity = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserRole.CUSTOMER);
         when(userJpaRepository.findById(any())).thenReturn(Optional.of(userEntity));
-        when(accountRepository.findFirstByOrderByNumberDesc()).thenReturn(Optional.of(Account.builder().number(LAST_ACCOUNT_NUMBER).build()));
+        when(accountJpaRepository.findFirstByOrderByNumberDesc()).thenReturn(Optional.of(AccountEntity.builder().number(LAST_ACCOUNT_NUMBER).build()));
 
-        Account testAccount = newMockAccount(1L, LAST_ACCOUNT_NUMBER + 1, 1234L, userEntity);
-        when(accountRepository.save(any())).thenReturn(testAccount);
+        AccountEntity testAccountEntity = newMockAccount(1L, LAST_ACCOUNT_NUMBER + 1, 1234L, userEntity);
+        when(accountJpaRepository.save(any())).thenReturn(testAccountEntity);
 
         // when
         AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, userEntity.getId());
@@ -73,10 +74,10 @@ public class AccountServiceTest extends DummyUserObject {
         UserEntity userEntity = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserRole.CUSTOMER);
         when(userJpaRepository.findById(userId)).thenReturn(Optional.of(userEntity));
 
-        Account account1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-        Account account2 = newMockAccount(2L, 11111111112L, 1000L, userEntity);
-        List<Account> accountList = Arrays.asList(account1, account2);
-        when(accountRepository.findByUserId(any())).thenReturn(accountList);
+        AccountEntity accountEntity1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        AccountEntity accountEntity2 = newMockAccount(2L, 11111111112L, 1000L, userEntity);
+        List<AccountEntity> accountEntityList = Arrays.asList(accountEntity1, accountEntity2);
+        when(accountJpaRepository.findByUserId(any())).thenReturn(accountEntityList);
 
         // when
         AccountListResDto accountListRespDto = accountService.getAccountList(userId);
@@ -94,8 +95,8 @@ public class AccountServiceTest extends DummyUserObject {
 
 
         UserEntity userEntity = newMockUser(1L, "test1", "1234", "test@test.com", "test1", UserRole.CUSTOMER);
-        Account account = newMockAccount(1L, number, 1000L, userEntity);
-        when(accountRepository.findByNumber(number)).thenReturn(Optional.of(account));
+        AccountEntity accountEntity = newMockAccount(1L, number, 1000L, userEntity);
+        when(accountJpaRepository.findByNumber(number)).thenReturn(Optional.of(accountEntity));
 
         // when
         // then
@@ -115,18 +116,18 @@ public class AccountServiceTest extends DummyUserObject {
 
         // stub
         UserEntity userEntity = newMockUser(1L, "test", "1234", "test@teest.com", "test", UserRole.CUSTOMER);
-        Account account1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(account1));
+        AccountEntity accountEntity1 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        when(accountJpaRepository.findByNumber(any())).thenReturn(Optional.of(accountEntity1));
 
         // stub
-        Account account2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-        Transaction transaction = newMockDepositTransaction(1L, account2);
+        AccountEntity accountEntity2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        Transaction transaction = newMockDepositTransaction(1L, accountEntity2);
         when(transactionRepository.save(any())).thenReturn(transaction);
         // when
         AccountDepositResDto accountDepositResDto = accountService.depositAccount(accountDepositReqDto);
 
         // then
-        assertThat(account1.getBalance()).isEqualTo(1100L);
+        assertThat(accountEntity1.getBalance()).isEqualTo(1100L);
 
     }
 
@@ -140,14 +141,14 @@ public class AccountServiceTest extends DummyUserObject {
         accountWithdrawReqDto.setType("WITHDRAW");
 
         UserEntity userEntity = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserRole.CUSTOMER);
-        Account account = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        AccountEntity accountEntity = newMockAccount(1L, 11111111111L, 1000L, userEntity);
 
         // stub
-        when(accountRepository.findByNumber(any())).thenReturn(Optional.of(account));
+        when(accountJpaRepository.findByNumber(any())).thenReturn(Optional.of(accountEntity));
 
         // stub
-        Account account2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-        Transaction transaction = newMockWithdrawTransaction(1L, account2);
+        AccountEntity accountEntity2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        Transaction transaction = newMockWithdrawTransaction(1L, accountEntity2);
         when(transactionRepository.save(any())).thenReturn(transaction);
         // when
         AccountWithdrawResDto accountWithdrawResDto = accountService.withdraw(accountWithdrawReqDto, 1L);
@@ -169,13 +170,13 @@ public class AccountServiceTest extends DummyUserObject {
         accountTransferReqDto.setType("TRANSFER");
 
         UserEntity userEntity = newMockUser(1L, "test1", "1234", "sibu2005@naver.com", "테스터", UserRole.CUSTOMER);
-        Account withdrawAccount = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-        when(accountRepository.findByNumber(11111111111L)).thenReturn(Optional.of(withdrawAccount));
+        AccountEntity withdrawAccountEntity = newMockAccount(1L, 11111111111L, 1000L, userEntity);
+        when(accountJpaRepository.findByNumber(11111111111L)).thenReturn(Optional.of(withdrawAccountEntity));
 
-        Account depositAccount = newMockAccount(2L, 11111111112L, 1000L, userEntity);
-        when(accountRepository.findByNumber(11111111112L)).thenReturn(Optional.of(depositAccount));
+        AccountEntity depositAccountEntity = newMockAccount(2L, 11111111112L, 1000L, userEntity);
+        when(accountJpaRepository.findByNumber(11111111112L)).thenReturn(Optional.of(depositAccountEntity));
 
-        Transaction transaction = newMockTransferTransaction(1L, withdrawAccount, depositAccount);
+        Transaction transaction = newMockTransferTransaction(1L, withdrawAccountEntity, depositAccountEntity);
         when(transactionRepository.save(any())).thenReturn(transaction);
 
         // when

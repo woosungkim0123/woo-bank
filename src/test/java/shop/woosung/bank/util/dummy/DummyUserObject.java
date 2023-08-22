@@ -1,7 +1,7 @@
 package shop.woosung.bank.util.dummy;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import shop.woosung.bank.domain.account.Account;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
 import shop.woosung.bank.user.domain.User;
@@ -12,47 +12,47 @@ import java.time.LocalDateTime;
 
 public class DummyUserObject {
 
-    protected Transaction newMockTransferTransaction(Long id, Account withdrawAccount, Account depositAccount) {
-        depositAccount.deposit(100L);
+    protected Transaction newMockTransferTransaction(Long id, AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity) {
+        depositAccountEntity.deposit(100L);
         return Transaction.builder()
                 .id(id)
-                .depositAccount(depositAccount)
-                .withdrawAccount(withdrawAccount)
-                .depositAccountBalance(depositAccount.getBalance())
-                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccount(depositAccountEntity)
+                .withdrawAccount(withdrawAccountEntity)
+                .depositAccountBalance(depositAccountEntity.getBalance())
+                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
                 .amount(100L)
                 .gubun(TransactionEnum.TRANSFER)
-                .sender(withdrawAccount.getNumber() + "")
-                .receiver(depositAccount.getNumber() + "")
+                .sender(withdrawAccountEntity.getNumber() + "")
+                .receiver(depositAccountEntity.getNumber() + "")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
 
-    protected Transaction newMockDepositTransaction(Long id, Account account) {
-        account.deposit(100L);
+    protected Transaction newMockDepositTransaction(Long id, AccountEntity accountEntity) {
+        accountEntity.deposit(100L);
         return Transaction.builder()
                 .id(id)
-                .depositAccount(account)
+                .depositAccount(accountEntity)
                 .withdrawAccount(null)
-                .depositAccountBalance(account.getBalance())
+                .depositAccountBalance(accountEntity.getBalance())
                 .withdrawAccountBalance(null)
                 .amount(100L)
                 .gubun(TransactionEnum.DEPOSIT)
                 .sender("ATM")
-                .receiver(account.getNumber() + "")
+                .receiver(accountEntity.getNumber() + "")
                 .tel("01012341234")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
 
-    protected Transaction newMockWithdrawTransaction(Long id, Account account) {
-        account.withdraw(100L);
+    protected Transaction newMockWithdrawTransaction(Long id, AccountEntity accountEntity) {
+        accountEntity.withdraw(100L);
         return Transaction.builder()
                 .id(id)
-                .withdrawAccount(account)
-                .withdrawAccountBalance(account.getBalance())
+                .withdrawAccount(accountEntity)
+                .withdrawAccountBalance(accountEntity.getBalance())
                 .amount(100L)
                 .gubun(TransactionEnum.WITHDRAW)
                 .receiver("ATM")
@@ -86,8 +86,8 @@ public class DummyUserObject {
                 .build());
     }
 
-    protected Account newAccount(Long number, UserEntity userEntity) {
-        return Account.builder()
+    protected AccountEntity newAccount(Long number, UserEntity userEntity) {
+        return AccountEntity.builder()
                 .number(number)
                 .password(1234L)
                 .balance(1000L)
@@ -95,8 +95,8 @@ public class DummyUserObject {
                 .build();
     }
 
-    protected Account newMockAccount(Long id, Long number, Long balance, UserEntity userEntity) {
-        return Account.builder()
+    protected AccountEntity newMockAccount(Long id, Long number, Long balance, UserEntity userEntity) {
+        return AccountEntity.builder()
                 .id(id)
                 .number(number)
                 .password(1234L)

@@ -1,9 +1,9 @@
-package shop.woosung.bank.dto.account;
+package shop.woosung.bank.account;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import shop.woosung.bank.domain.account.Account;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.common.util.CustomDateUtil;
@@ -33,9 +33,9 @@ public class AccountResDto {
         private String fullname;
         private List<AccountDto> accounts = new ArrayList<>();
 
-        public AccountListResDto(User user, List<Account> accounts) {
+        public AccountListResDto(User user, List<AccountEntity> accountEntities) {
             this.fullname = user.getName();
-            this.accounts = accounts.stream().map(AccountDto::new).collect(Collectors.toList());
+            this.accounts = accountEntities.stream().map(AccountDto::new).collect(Collectors.toList());
         }
         /*
             json이 모든 필드를 getter해서 원하지 않는 LazyLoading이 일어날 수도 있어서 dto사용
@@ -46,10 +46,10 @@ public class AccountResDto {
             private Long number;
             private Long balance;
 
-            public AccountDto(Account account) {
-                this.id = account.getId();
-                this.number = account.getNumber();
-                this.balance = account.getBalance();
+            public AccountDto(AccountEntity accountEntity) {
+                this.id = accountEntity.getId();
+                this.number = accountEntity.getNumber();
+                this.balance = accountEntity.getBalance();
             }
         }
     }
@@ -60,9 +60,9 @@ public class AccountResDto {
         private Long number;
         private TransactionDto transaction;
 
-        public AccountDepositResDto(Account account, Transaction transaction) {
-            this.id = account.getId();
-            this.number = account.getNumber();
+        public AccountDepositResDto(AccountEntity accountEntity, Transaction transaction) {
+            this.id = accountEntity.getId();
+            this.number = accountEntity.getNumber();
             this.transaction = new TransactionDto(transaction);
         }
 
@@ -98,10 +98,10 @@ public class AccountResDto {
         private Long balance;
         private TransactionDto transaction;
 
-        public AccountWithdrawResDto(Account account, Transaction transaction) {
-            this.id = account.getId();
-            this.number = account.getNumber();
-            this.balance = account.getBalance();
+        public AccountWithdrawResDto(AccountEntity accountEntity, Transaction transaction) {
+            this.id = accountEntity.getId();
+            this.number = accountEntity.getNumber();
+            this.balance = accountEntity.getBalance();
             this.transaction = new TransactionDto(transaction);
         }
 
@@ -132,10 +132,10 @@ public class AccountResDto {
         private Long balance;
         private TransactionDto transaction;
 
-        public AccountTransferResDto(Account account, Transaction transaction) {
-            this.id = account.getId();
-            this.number = account.getNumber();
-            this.balance = account.getBalance();
+        public AccountTransferResDto(AccountEntity accountEntity, Transaction transaction) {
+            this.id = accountEntity.getId();
+            this.number = accountEntity.getNumber();
+            this.balance = accountEntity.getBalance();
             this.transaction = new TransactionDto(transaction);
         }
 
@@ -169,12 +169,12 @@ public class AccountResDto {
         private Long balance;
         private List<TransactionDto> transactions = new ArrayList<>();
 
-        public AccountDetailResDto(Account account, List<Transaction> transactions) {
-            this.id = account.getId();
-            this.number = account.getNumber();
-            this.balance = account.getBalance();
+        public AccountDetailResDto(AccountEntity accountEntity, List<Transaction> transactions) {
+            this.id = accountEntity.getId();
+            this.number = accountEntity.getNumber();
+            this.balance = accountEntity.getBalance();
             this.transactions = transactions.stream()
-                    .map(transaction -> new TransactionDto(transaction, account.getNumber()))
+                    .map(transaction -> new TransactionDto(transaction, accountEntity.getNumber()))
                     .collect(Collectors.toList());
         }
 
@@ -198,12 +198,12 @@ public class AccountResDto {
                 this.tel = transaction.getTel() == null ? "없음" : transaction.getTel();
                 this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
 
-                if (transaction.getDepositAccount() == null) {
+                if (transaction.getDepositAccountEntity() == null) {
                     this.balance = transaction.getWithdrawAccountBalance();
-                } else if (transaction.getWithdrawAccount() == null) {
+                } else if (transaction.getWithdrawAccountEntity() == null) {
                     this.balance = transaction.getDepositAccountBalance();
                 } else {
-                    if (transaction.getDepositAccount().getNumber() == accountNumber.longValue()) {
+                    if (transaction.getDepositAccountEntity().getNumber() == accountNumber.longValue()) {
                         this.balance = transaction.getDepositAccountBalance();
                     } else {
                         this.balance = transaction.getWithdrawAccountBalance();

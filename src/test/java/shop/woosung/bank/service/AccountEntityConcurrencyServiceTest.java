@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import shop.woosung.bank.account.service.AccountService;
 import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.infrastructure.UserJpaRepository;
@@ -14,13 +15,13 @@ import shop.woosung.bank.util.dummy.DummyUserObject;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
-import static shop.woosung.bank.dto.account.AccountReqDto.*;
-import static shop.woosung.bank.dto.account.AccountResDto.*;
+import static shop.woosung.bank.account.AccountReqDto.*;
+import static shop.woosung.bank.account.AccountResDto.*;
 
 
 @Transactional
 @SpringBootTest
-class AccountConcurrencyServiceTest extends DummyUserObject {
+class AccountEntityConcurrencyServiceTest extends DummyUserObject {
 
     @Autowired
     private AccountService accountService;

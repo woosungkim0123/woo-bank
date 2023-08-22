@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import shop.woosung.bank.domain.account.repository.AccountRepository;
+import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.infrastructure.UserJpaRepository;
@@ -25,14 +25,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static shop.woosung.bank.dto.account.AccountReqDto.*;
+import static shop.woosung.bank.account.AccountReqDto.*;
 
 
 @Sql("classpath:sql/initAutoIncrementReset.sql")
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class AccountControllerTest extends DummyUserObject {
+class AccountEntityControllerTest extends DummyUserObject {
 
     @Autowired
     private MockMvc mvc;
@@ -43,7 +43,7 @@ class AccountControllerTest extends DummyUserObject {
     @Autowired
     private UserJpaRepository userJpaRepository;
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountJpaRepository accountJpaRepository;
 
     @Autowired
     private EntityManager em;
@@ -52,8 +52,8 @@ class AccountControllerTest extends DummyUserObject {
     public void setUp() {
         UserEntity test1 = userJpaRepository.save(newUser("test1", "1234", "test1@naver.com", UserRole.CUSTOMER));
         UserEntity test2 = userJpaRepository.save(newUser("test2", "1234", "test2@naver.com", UserRole.CUSTOMER));
-        accountRepository.save(newAccount(11111111111L, test1));
-        accountRepository.save(newAccount(11111111112L, test2));
+        accountJpaRepository.save(newAccount(11111111111L, test1));
+        accountJpaRepository.save(newAccount(11111111112L, test2));
         em.clear();
     }
 
@@ -95,7 +95,7 @@ class AccountControllerTest extends DummyUserObject {
         mvc.perform(delete("/api/s/account/" + accountNumber));
 
         // then
-        assertThat(accountRepository.findByNumber(accountNumber)).isEmpty();
+        assertThat(accountJpaRepository.findByNumber(accountNumber)).isEmpty();
     }
     @Test
     public void depositAccount_test() throws Exception {

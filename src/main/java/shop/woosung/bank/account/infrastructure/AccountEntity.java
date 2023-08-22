@@ -1,4 +1,4 @@
-package shop.woosung.bank.domain.account;
+package shop.woosung.bank.account.infrastructure;
 
 import java.time.LocalDateTime;
 
@@ -27,7 +27,7 @@ import shop.woosung.bank.handler.ex.CustomApiException;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "tb_wb_account")
 @Entity
-public class Account {
+public class AccountEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,8 +50,8 @@ public class Account {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Account(Long id, Long number, Long password, Long balance, UserEntity user, LocalDateTime createdAt,
-                   LocalDateTime updatedAt) {
+    public AccountEntity(Long id, Long number, Long password, Long balance, UserEntity user, LocalDateTime createdAt,
+                         LocalDateTime updatedAt) {
         this.id = id;
         this.number = number;
         this.password = password;
