@@ -29,7 +29,7 @@ public class FakeUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         if(user.getId() == null || user.getId() == 0) {
-            User newUser = user.builder()
+            User newUser = User.builder()
                     .id(++autoIncrementId)
                     .email(user.getEmail())
                     .name(user.getName())
