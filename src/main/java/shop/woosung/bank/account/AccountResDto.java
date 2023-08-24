@@ -28,32 +28,6 @@ public class AccountResDto {
         }
     }
 
-    @Getter
-    public static class AccountListResDto {
-        private String fullname;
-        private List<AccountDto> accounts = new ArrayList<>();
-
-        public AccountListResDto(User user, List<AccountEntity> accountEntities) {
-            this.fullname = user.getName();
-            this.accounts = accountEntities.stream().map(AccountDto::new).collect(Collectors.toList());
-        }
-        /*
-            json이 모든 필드를 getter해서 원하지 않는 LazyLoading이 일어날 수도 있어서 dto사용
-         */
-        @Getter
-        public class AccountDto {
-            private Long id;
-            private Long number;
-            private Long balance;
-
-            public AccountDto(AccountEntity accountEntity) {
-                this.id = accountEntity.getId();
-                this.number = accountEntity.getNumber();
-                this.balance = accountEntity.getBalance();
-            }
-        }
-    }
-
     @Getter @Setter
     public static class AccountDepositResDto {
         private Long id;

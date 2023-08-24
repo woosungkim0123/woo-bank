@@ -24,7 +24,7 @@ public class TransactionService {
         AccountEntity accountEntity = accountJpaRepository.findByNumber(accountNumber)
                 .orElseThrow(() -> new CustomApiException("해당 계좌를 찾을 수 없습니다."));
 
-        accountEntity.checkOwner(userId);
+        //accountEntity.checkOwner(userId);
 
         List<Transaction> transactionList = transactionRepository.findTransactionList(accountEntity.getId(), type, page);
 
