@@ -31,19 +31,17 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
-//
+
 //    @Transactional
-//    public AccountRegisterResDto registerAccount(AccountRegisterReqDto accountRegisterReqDto, Long userId) {
+//    public AccountRegisterResDto register(AccountRegisterReqDto accountRegisterReqDto, User user) {
 //        User user = findUser(userId);
 //
 //        return registerNewAccount(user, accountRegisterReqDto);
 //    }
 
-
     @Transactional(readOnly = true)
-    public AccountListResponseDto getAccountList(Long userId) {
-        User user = findUser(userId);
-        List<Account> userAccounts = accountRepository.findByUserId(userId);
+    public AccountListResponseDto getAccountList(User user) {
+        List<Account> userAccounts = accountRepository.findByUserId(user.getId());
 
         return AccountListResponseDto.from(user, userAccounts);
     }

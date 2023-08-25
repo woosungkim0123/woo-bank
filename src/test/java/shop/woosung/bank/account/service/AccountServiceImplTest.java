@@ -37,7 +37,7 @@ class AccountServiceImplTest {
         accountRepository.save(Account.builder().number(1111111113L).balance(3000L).user(user2).build());
 
         // when
-        AccountListResponseDto result = accountService.getAccountList(user1.getId());
+        AccountListResponseDto result = accountService.getAccountList(user1);
 
         // then
         assertThat(result.getAccounts().size()).isEqualTo(2);
@@ -46,5 +46,4 @@ class AccountServiceImplTest {
         assertThat(result.getAccounts().get(1).getNumber()).isEqualTo(1111111112L);
         assertThat(result.getAccounts().get(1).getBalance()).isEqualTo(2000L);
     }
-
 }

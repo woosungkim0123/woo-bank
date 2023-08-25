@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
@@ -22,7 +23,7 @@ import static shop.woosung.bank.account.AccountResDto.*;
 @RequestMapping("/api")
 @RestController
 public class AccountController {
-    private final AccountServiceImpl accountService;
+    private final AccountService accountService;
 
 //    @PostMapping("/s/account")
 //    public ResponseEntity<?> createAccount(@RequestBody @Valid AccountRegisterReqDto accountRegisterReqDto,
@@ -36,7 +37,7 @@ public class AccountController {
     @GetMapping("/s/accounts")
     public ResponseEntity<ApiResponse<AccountListResponseDto>> findUserAccounts(@AuthenticationPrincipal LoginUser loginUser) {
 
-        AccountListResponseDto accountListResponseDto = accountService.getAccountList(loginUser.getUser().getId());
+        AccountListResponseDto accountListResponseDto = accountService.getAccountList(loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(accountListResponseDto));
     }
