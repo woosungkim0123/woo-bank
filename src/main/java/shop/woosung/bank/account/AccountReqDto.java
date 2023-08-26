@@ -6,12 +6,6 @@ import lombok.Setter;
 import javax.validation.constraints.*;
 
 public class AccountReqDto {
-    @Getter @Setter
-    public static class AccountRegisterReqDto {
-        @NotNull
-        @Digits(integer = 4, fraction = 4)
-        private Long password;
-    }
 
     @Getter @Setter
     public static class AccountDepositReqDto {

@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.infrastructure.AccountEntity;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
+import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.common.exception.NotFoundUserException;
 import shop.woosung.bank.domain.transaction.Transaction;
@@ -32,12 +34,18 @@ public class AccountServiceImpl implements AccountService {
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
 
-//    @Transactional
-//    public AccountRegisterResDto register(AccountRegisterReqDto accountRegisterReqDto, User user) {
-//        User user = findUser(userId);
-//
-//        return registerNewAccount(user, accountRegisterReqDto);
-//    }
+    @Transactional
+    public AccountRegisterResponseDto register(AccountRegisterRequestDto accountRegisterRequestDto, User user) {
+        Long newNumber = getNewNumber();
+        Account account = accountRepository.save(Account.builder()
+                .number(newNumber)
+                .password(accountRegisterRequestDto.getPassword())
+                .balance(0L)
+                .user(user)
+                .build());
+
+        return AccountRegisterResponseDto.from(account);
+    }
 
     @Transactional(readOnly = true)
     public AccountListResponseDto getAccountList(User user) {
@@ -88,20 +96,7 @@ public class AccountServiceImpl implements AccountService {
 //
 //
 //
-//    @Transactional
-//    public synchronized AccountRegisterResDto registerNewAccount(User user, AccountRegisterReqDto accountRegisterReqDto) {
-//        Long newAccountNumber = accountJpaRepository.findFirstByOrderByNumberDesc()
-//                .map(account -> account.getNumber() + 1L)
-//                .orElse(11111111111L);
-//
-//        AccountEntity newAccountEntity = accountJpaRepository.save(AccountEntity.builder()
-//                .number(newAccountNumber)
-//                .password(accountRegisterReqDto.getPassword())
-//                .balance(1000L)
-//                .user(UserEntity.fromModel(user))
-//                .build());
-//        return new AccountRegisterResDto(newAccountEntity.getId(), newAccountNumber, newAccountEntity.getBalance());
-//    }
+
 //
 //    @Transactional
 //    public AccountWithdrawResDto withdraw(AccountWithdrawReqDto accountWithdrawReqDto, Long userId) {
@@ -203,9 +198,9 @@ public class AccountServiceImpl implements AccountService {
 //        // DTO 응답
 //        return new AccountDetailResDto(accountEntityPS, transactionList);
 //    }
-
-    private User findUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundUserException("유저를 찾을 수 없습니다."));
+    private Long getNewNumber() {
+        return accountRepository.findLastNumberWithPessimisticLock()
+                .map(account -> account.getNumber() + 1L)
+                .orElse(11111111111L);
     }
 }

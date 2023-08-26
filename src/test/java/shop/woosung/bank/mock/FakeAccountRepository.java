@@ -8,6 +8,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FakeAccountRepository implements AccountRepository {
@@ -40,6 +41,11 @@ public class FakeAccountRepository implements AccountRepository {
             data.add(account);
             return account;
         }
+    }
+
+    @Override
+    public Optional<Account> findLastNumberWithPessimisticLock() {
+        return null;
     }
 
     public void deleteAll() {

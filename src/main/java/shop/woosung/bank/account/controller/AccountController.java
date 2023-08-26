@@ -6,8 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
+import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.dto.ResponseDto;
@@ -23,16 +25,16 @@ import static shop.woosung.bank.account.AccountResDto.*;
 @RequestMapping("/api")
 @RestController
 public class AccountController {
+
     private final AccountService accountService;
 
-//    @PostMapping("/s/account")
-//    public ResponseEntity<?> createAccount(@RequestBody @Valid AccountRegisterReqDto accountRegisterReqDto,
-//                                           BindingResult bindingResult,
-//                                           @AuthenticationPrincipal LoginUser loginUser) {
-//        AccountRegisterResDto accountRegisterResDto = accountService.registerAccount(accountRegisterReqDto, loginUser.getUser().getId());
-//
-//        return new ResponseEntity<>(new ResponseDto<>(1, "계좌등록 성공", accountRegisterResDto), HttpStatus.CREATED);
-//    }
+    @PostMapping("/s/account")
+    public ResponseEntity<ApiResponse<AccountRegisterResponseDto>> register(@RequestBody @Valid AccountRegisterRequestDto accountRegisterRequestDto,
+                                           @AuthenticationPrincipal LoginUser loginUser) {
+        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, loginUser.getUser());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌등록 성공", accountRegisterResponseDto));
+    }
 
     @GetMapping("/s/accounts")
     public ResponseEntity<ApiResponse<AccountListResponseDto>> findUserAccounts(@AuthenticationPrincipal LoginUser loginUser) {
