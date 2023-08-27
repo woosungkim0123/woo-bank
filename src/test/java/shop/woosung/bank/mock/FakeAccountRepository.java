@@ -5,10 +5,7 @@ import shop.woosung.bank.account.service.port.AccountRepository;
 
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeAccountRepository implements AccountRepository {
@@ -45,7 +42,8 @@ public class FakeAccountRepository implements AccountRepository {
 
     @Override
     public Optional<Account> findLastNumberWithPessimisticLock() {
-        return null;
+        return data.stream()
+                .max(Comparator.comparingLong(Account::getNumber));
     }
 
     public void deleteAll() {

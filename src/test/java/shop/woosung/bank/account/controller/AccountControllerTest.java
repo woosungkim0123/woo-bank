@@ -9,9 +9,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,15 +18,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.mock.FakeAccountRepository;
 import shop.woosung.bank.mock.FakeUserRepository;
-import shop.woosung.bank.mock.config.FakeJwtConfiguration;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
-import shop.woosung.bank.user.controller.dto.JoinRequestDto;
 import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.user.service.port.UserRepository;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
