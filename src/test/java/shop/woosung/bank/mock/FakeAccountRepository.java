@@ -41,9 +41,15 @@ public class FakeAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findLastNumberWithPessimisticLock() {
+    public Optional<Account> findHighestNumberAccount() {
         return data.stream()
                 .max(Comparator.comparingLong(Account::getNumber));
+    }
+
+    @Override
+    public Optional<Account> findById(Long id) {
+        System.out.println("ddddddddddddddddddddddddddddddddddddddd");
+        return Optional.empty();
     }
 
     public void deleteAll() {

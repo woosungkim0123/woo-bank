@@ -1,15 +1,7 @@
 package shop.woosung.bank.account.infrastructure;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.AccessLevel;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,6 +33,7 @@ public class AccountEntity extends BaseTimeEntity {
     private Long balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
 
     public static AccountEntity fromModel(Account account) {

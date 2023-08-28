@@ -27,7 +27,13 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findLastNumberWithPessimisticLock() {
-        return accountJpaRepository.findTopByOrderByNumberDesc().map(AccountEntity::toModel);
+    public Optional<Account> findHighestNumberAccount() {
+        return accountJpaRepository.findTopByOrderByNumberDesc()
+                .map(AccountEntity::toModel);
+    }
+
+    @Override
+    public Optional<Account> findById(Long id) {
+        return accountJpaRepository.findById(id).map(AccountEntity::toModel);
     }
 }

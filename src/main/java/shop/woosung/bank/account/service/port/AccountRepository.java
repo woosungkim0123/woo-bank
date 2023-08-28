@@ -10,6 +10,7 @@ public interface AccountRepository {
 
     Account save(Account account);
 
-    Optional<Account> findLastNumberWithPessimisticLock();
+    Optional<Account> findHighestNumberAccount();
 
+    Optional<Account> findById(Long id);
 }
