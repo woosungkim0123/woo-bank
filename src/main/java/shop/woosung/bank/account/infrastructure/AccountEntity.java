@@ -30,8 +30,8 @@ public class AccountEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(unique = true, nullable = false, length = 20)
+//unique = true,
+    @Column(nullable = false, length = 20)
     private Long number;
 
     @Column(nullable = false, length = 4)

@@ -24,7 +24,6 @@ class AccountServiceImplTest {
 
     @BeforeEach
     void init() {
-
         userRepository = new FakeUserRepository();
         accountRepository = new FakeAccountRepository();
         this.accountService = AccountServiceImpl.builder()

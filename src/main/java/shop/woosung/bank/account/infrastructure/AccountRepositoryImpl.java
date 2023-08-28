@@ -28,6 +28,6 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Optional<Account> findLastNumberWithPessimisticLock() {
-        return accountJpaRepository.findFirstByOrderByNumberDesc().map(AccountEntity::toModel);
+        return accountJpaRepository.findTopByOrderByNumberDesc().map(AccountEntity::toModel);
     }
 }

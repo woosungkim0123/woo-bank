@@ -36,14 +36,19 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     public AccountRegisterResponseDto register(AccountRegisterRequestDto accountRegisterRequestDto, User user) {
-        Long newNumber = getNewNumber();
+        Long newNumber = accountRepository.findLastNumberWithPessimisticLock()
+                .map(account -> account.getNumber() + 1L)
+                .orElse(11111111111L);
+        System.out.println("user.getId() = " + user.getId());
+        System.out.println("newNumber = " + newNumber);
+        System.out.println("하이1");
         Account account = accountRepository.save(Account.builder()
                 .number(newNumber)
                 .password(accountRegisterRequestDto.getPassword())
                 .balance(0L)
                 .user(user)
                 .build());
-
+        System.out.println(" 1111111111111111111111111저장");
         return AccountRegisterResponseDto.from(account);
     }
 

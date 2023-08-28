@@ -28,6 +28,7 @@ public class Account extends BaseTimeEntity {
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        System.out.println("user.getId() = " + user.getId());
     }
 
     public void checkOwner(Long userId) {
