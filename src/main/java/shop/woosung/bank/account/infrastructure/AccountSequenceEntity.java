@@ -4,8 +4,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountSequence;
+import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.user.infrastructure.UserEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 @Getter
@@ -18,14 +24,19 @@ public class AccountSequenceEntity {
     private Long nextValue;
     private Long incrementBy;
 
-    @Builder
-    public AccountSequenceEntity(String sequenceName, Long nextValue, Long incrementBy) {
-        this.sequenceName = sequenceName;
-        this.nextValue = nextValue;
-        this.incrementBy = incrementBy;
+    public static AccountSequenceEntity fromModel(AccountSequence accountSequence) {
+        AccountSequenceEntity accountSequenceEntity = new AccountSequenceEntity();
+        accountSequenceEntity.sequenceName = accountSequence.getSequenceName().name();
+        accountSequenceEntity.nextValue = accountSequence.getNextValue();
+        accountSequenceEntity.incrementBy = accountSequence.getIncrementBy();
+        return accountSequenceEntity;
     }
 
-    public void incrementNextValue() {
-        this.nextValue += this.incrementBy;
+    public AccountSequence toModel() {
+        return AccountSequence.builder()
+                .sequenceName(AccountType.valueOf(sequenceName))
+                .nextValue(nextValue)
+                .incrementBy(incrementBy)
+                .build();
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.common.infrastructure.BaseTimeEntity;
 import shop.woosung.bank.user.infrastructure.UserEntity;
 
@@ -21,8 +22,8 @@ public class AccountEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-//unique = true,
-    @Column(nullable = false, length = 20)
+
+    @Column(unique = true, nullable = false, length = 20)
     private Long number;
 
     @Column(nullable = false, length = 4)
@@ -30,6 +31,9 @@ public class AccountEntity extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Long balance;
+
+    @Enumerated(EnumType.STRING)
+    private AccountType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -41,6 +45,7 @@ public class AccountEntity extends BaseTimeEntity {
         accountEntity.number = account.getNumber();
         accountEntity.password = account.getPassword();
         accountEntity.balance = account.getBalance();
+        accountEntity.type = account.getType();
         accountEntity.user = UserEntity.fromModel(account.getUser());
         return accountEntity;
     }
@@ -51,6 +56,7 @@ public class AccountEntity extends BaseTimeEntity {
                 .number(number)
                 .password(password)
                 .balance(balance)
+                .type(type)
                 .user(user.toModel())
                 .build();
     }

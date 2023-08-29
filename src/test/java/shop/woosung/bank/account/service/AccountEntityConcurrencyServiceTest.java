@@ -53,7 +53,9 @@ class AccountEntityConcurrencyServiceTest {
                 try {
                     AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, sharedUser);
                     accountNumbers.add(accountRegisterResponseDto.getNumber());
-                } finally {
+                } catch (Exception e) {
+                    System.out.println("e = " + e);
+                } finally{
                     latch.countDown();
                 }
             });

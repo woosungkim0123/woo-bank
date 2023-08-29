@@ -5,9 +5,7 @@ import org.springframework.stereotype.Repository;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.service.port.AccountRepository;
 
-import java.awt.print.Pageable;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -26,5 +24,4 @@ public class AccountRepositoryImpl implements AccountRepository {
     public Account save(Account account) {
         return accountJpaRepository.save(AccountEntity.fromModel(account)).toModel();
     }
-
 }

@@ -30,6 +30,7 @@ public class FakeAccountRepository implements AccountRepository {
                     .password(account.getPassword())
                     .user(account.getUser())
                     .balance(account.getBalance())
+                    .type(account.getType())
                     .createdAt(currentDateTime)
                     .updatedAt(currentDateTime)
                     .build();

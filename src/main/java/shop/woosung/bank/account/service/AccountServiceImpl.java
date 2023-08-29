@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.infrastructure.AccountEntity;
 import shop.woosung.bank.account.infrastructure.AccountSequenceEntity;
@@ -41,23 +42,21 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     public AccountRegisterResponseDto register(AccountRegisterRequestDto accountRegisterRequestDto, User user) {
-        String accountType = AccountType.NORMAL.name();
-        Long newNumber = getNewNumber(accountType);
-
-        System.out.println(" 0000000000000");
+        Long newNumber = getNewNumber(accountRegisterRequestDto.getType());
 
         Account account = accountRepository.save(Account.builder()
                 .number(newNumber)
                 .password(accountRegisterRequestDto.getPassword())
                 .balance(0L)
+                .type(accountRegisterRequestDto.getType())
                 .user(user)
                 .build());
 
         return AccountRegisterResponseDto.from(account);
     }
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long getNewNumber (String type) {
-        AccountSequenceEntity accountSequence = accountSequenceRepository.findById(type)
+    public Long getNewNumber (AccountType accountType) {
+        AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
                 .orElseThrow(() -> new CustomApiException("계좌 시퀀스를 찾을 수 없습니다."));
 
         Long nextValue = accountSequence.getNextValue();

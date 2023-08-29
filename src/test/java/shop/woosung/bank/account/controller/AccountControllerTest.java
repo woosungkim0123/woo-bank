@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
 import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
@@ -48,9 +49,9 @@ class AccountControllerTest {
         // given
         User user1 = userRepository.findByEmail("test1@test.com").get();
         User user2 = userRepository.findByEmail("test2@test.com").get();
-        accountRepository.save(Account.builder().number(1111111111L).balance(1000L).user(user1).build());
-        accountRepository.save(Account.builder().number(1111111112L).balance(2000L).user(user1).build());
-        accountRepository.save(Account.builder().number(1111111113L).balance(3000L).user(user2).build());
+        accountRepository.save(Account.builder().number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user1).build());
+        accountRepository.save(Account.builder().number(1111111112L).balance(2000L).type(AccountType.SAVING).user(user1).build());
+        accountRepository.save(Account.builder().number(1111111113L).balance(3000L).type(AccountType.SAVING).user(user2).build());
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -63,7 +64,9 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.accounts.length()").value(2));
         resultActions.andExpect(jsonPath("$.data.accounts[0].number").value(1111111111L));
         resultActions.andExpect(jsonPath("$.data.accounts[0].balance").value(1000L));
+        resultActions.andExpect(jsonPath("$.data.accounts[0].type").value("NORMAL"));
         resultActions.andExpect(jsonPath("$.data.accounts[1].number").value(1111111112L));
         resultActions.andExpect(jsonPath("$.data.accounts[1].balance").value(2000L));
+        resultActions.andExpect(jsonPath("$.data.accounts[1].type").value("SAVING"));
     }
 }

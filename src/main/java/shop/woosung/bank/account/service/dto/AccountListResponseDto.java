@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.user.domain.User;
 
 import java.util.List;
@@ -30,11 +31,13 @@ public class AccountListResponseDto {
         private final Long id;
         private final Long number;
         private final Long balance;
+        private final AccountType type;
 
         public AccountDto(Account account) {
             this.id = account.getId();
             this.number = account.getNumber();
             this.balance = account.getBalance();
+            this.type = account.getType();
         }
     }
 }

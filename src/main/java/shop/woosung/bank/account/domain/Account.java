@@ -15,16 +15,18 @@ public class Account extends BaseTimeEntity {
     private Long number;
     private Long password;
     private Long balance;
+    private AccountType type;
     private User user;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public Account(Long id, Long number, Long password, Long balance, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Account(Long id, Long number, Long password, Long balance, AccountType type, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.number = number;
         this.password = password;
         this.balance = balance;
+        this.type = type;
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
