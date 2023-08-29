@@ -1,5 +1,6 @@
 package shop.woosung.bank.common.handler;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import shop.woosung.bank.common.ApiResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Map;
 
 @Slf4j
@@ -36,6 +38,15 @@ public class CommonExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleNotReadBodyException(HttpServletRequest request, HttpMessageNotReadableException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("HttpMessageNotReadableException = {}", exception.getMessage());
+
+        Throwable cause = exception.getCause();
+        if (cause instanceof InvalidFormatException) {
+            InvalidFormatException invalidFormatException = (InvalidFormatException) cause;
+            String fieldName = invalidFormatException.getPath().get(0).getFieldName();
+            String value = invalidFormatException.getValue().toString();
+            String types = Arrays.toString(invalidFormatException.getTargetType().getEnumConstants());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(String.format("'%s' 은/는 올바른 '%s' 값이 아닙니다. 허용되는 값: %s", value, fieldName, types)));
+        }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(BAD_REQUEST_MESSAGE));
     }
 

@@ -17,7 +17,7 @@ public class AccountRegisterRequestDto {
     @Digits(integer = 4, fraction = 4)
     private Long password;
 
-    @NotNull(message = "계좌 종류를 확인해주세요.")
+    @NotNull(message = "계좌 종류를 선택해주세요")
     private AccountType type;
 
     @Builder
