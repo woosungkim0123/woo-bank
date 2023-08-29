@@ -1,4 +1,4 @@
-package shop.woosung.bank.mock;
+package shop.woosung.bank.mock.repository;
 
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;

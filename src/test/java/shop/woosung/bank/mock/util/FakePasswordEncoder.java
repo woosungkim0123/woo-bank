@@ -1,4 +1,4 @@
-package shop.woosung.bank.mock;
+package shop.woosung.bank.mock.util;
 
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 

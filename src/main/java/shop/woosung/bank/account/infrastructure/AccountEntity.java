@@ -15,7 +15,6 @@ import shop.woosung.bank.user.infrastructure.UserEntity;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "tb_wb_account")
 @Entity
 public class AccountEntity extends BaseTimeEntity {
 
@@ -33,7 +32,7 @@ public class AccountEntity extends BaseTimeEntity {
     private Long balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 
     public static AccountEntity fromModel(Account account) {

@@ -14,6 +14,8 @@ public class AccountRegisterRequestDto {
     @Digits(integer = 4, fraction = 4)
     private Long password;
 
+    private String type;
+
     @Builder
     public AccountRegisterRequestDto(Long password) {
         this.password = password;

@@ -12,14 +12,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import shop.woosung.bank.mock.FakeUserRepository;
+import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.controller.dto.JoinRequestDto;
-import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.stream.Stream;
 

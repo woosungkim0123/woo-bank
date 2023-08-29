@@ -1,8 +1,10 @@
-package shop.woosung.bank.mock;
+package shop.woosung.bank.mock.repository;
 
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
 import shop.woosung.bank.account.service.port.AccountRepository;
 
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
@@ -38,18 +40,6 @@ public class FakeAccountRepository implements AccountRepository {
             data.add(account);
             return account;
         }
-    }
-
-    @Override
-    public Optional<Account> findHighestNumberAccount() {
-        return data.stream()
-                .max(Comparator.comparingLong(Account::getNumber));
-    }
-
-    @Override
-    public Optional<Account> findById(Long id) {
-        System.out.println("ddddddddddddddddddddddddddddddddddddddd");
-        return Optional.empty();
     }
 
     public void deleteAll() {

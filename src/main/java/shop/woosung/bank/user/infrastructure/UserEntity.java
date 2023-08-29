@@ -20,7 +20,6 @@ import shop.woosung.bank.user.domain.User;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "tb_wb_user")
 @Entity
 public class UserEntity extends BaseTimeEntity {
 

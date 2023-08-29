@@ -1,7 +1,12 @@
 package shop.woosung.bank.account.service.port;
 
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.infrastructure.AccountEntity;
 
+import javax.persistence.LockModeType;
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +15,4 @@ public interface AccountRepository {
 
     Account save(Account account);
 
-    Optional<Account> findHighestNumberAccount();
-
-    Optional<Account> findById(Long id);
 }

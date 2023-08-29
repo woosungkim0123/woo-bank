@@ -8,8 +8,8 @@ import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
-import shop.woosung.bank.mock.FakeAccountRepository;
-import shop.woosung.bank.mock.FakeUserRepository;
+import shop.woosung.bank.mock.repository.FakeAccountRepository;
+import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 

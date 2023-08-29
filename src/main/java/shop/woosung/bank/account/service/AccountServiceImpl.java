@@ -3,14 +3,18 @@ package shop.woosung.bank.account.service;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.infrastructure.AccountEntity;
+import shop.woosung.bank.account.infrastructure.AccountSequenceEntity;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
+import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.common.exception.NotFoundUserException;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.domain.transaction.TransactionEnum;
@@ -31,15 +35,16 @@ import static shop.woosung.bank.account.AccountResDto.*;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    private final AccountSequenceRepository accountSequenceRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
 
     @Transactional
     public AccountRegisterResponseDto register(AccountRegisterRequestDto accountRegisterRequestDto, User user) {
+        String accountType = AccountType.NORMAL.name();
+        Long newNumber = getNewNumber(accountType);
 
-        Long newNumber = accountRepository.findHighestNumberAccount()
-                .map(account -> account.getNumber() + 1L)
-                .orElse(11111111111L);
+        System.out.println(" 0000000000000");
 
         Account account = accountRepository.save(Account.builder()
                 .number(newNumber)
@@ -49,6 +54,16 @@ public class AccountServiceImpl implements AccountService {
                 .build());
 
         return AccountRegisterResponseDto.from(account);
+    }
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long getNewNumber (String type) {
+        AccountSequenceEntity accountSequence = accountSequenceRepository.findById(type)
+                .orElseThrow(() -> new CustomApiException("계좌 시퀀스를 찾을 수 없습니다."));
+
+        Long nextValue = accountSequence.getNextValue();
+        accountSequence.incrementNextValue();
+        accountSequenceRepository.save(accountSequence);
+        return nextValue;
     }
 
     @Transactional(readOnly = true)

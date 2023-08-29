@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.service.port.AccountRepository;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,14 +27,4 @@ public class AccountRepositoryImpl implements AccountRepository {
         return accountJpaRepository.save(AccountEntity.fromModel(account)).toModel();
     }
 
-    @Override
-    public Optional<Account> findHighestNumberAccount() {
-        return accountJpaRepository.findTopByOrderByNumberDesc()
-                .map(AccountEntity::toModel);
-    }
-
-    @Override
-    public Optional<Account> findById(Long id) {
-        return accountJpaRepository.findById(id).map(AccountEntity::toModel);
-    }
 }
