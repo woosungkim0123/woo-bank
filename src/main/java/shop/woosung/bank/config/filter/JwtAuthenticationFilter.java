@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -80,12 +81,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private void validateLoginRequestDto(LoginRequestDto loginRequestDto) {
         validateNonEmpty(loginRequestDto.getEmail(), "이메일을 입력해주세요.");
+        validateWhitespace(loginRequestDto.getEmail(), "인증실패 - request email : " + loginRequestDto.getEmail());
         validateNonEmpty(loginRequestDto.getPassword(), "비밀번호를 입력해주세요.");
     }
 
     private void validateNonEmpty(String value, String errorMessage) {
         if (value == null || value.isEmpty()) {
             throw new LoginValidationException(errorMessage);
+        }
+    }
+    private void validateWhitespace(String value, String errorMessage) {
+        String trimValue = value.trim();
+        if (value.length() != trimValue.length()) {
+            throw new InternalAuthenticationServiceException(errorMessage);
         }
     }
 }
