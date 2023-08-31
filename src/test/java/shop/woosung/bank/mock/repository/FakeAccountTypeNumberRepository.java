@@ -26,4 +26,8 @@ public class FakeAccountTypeNumberRepository implements AccountTypeNumberReposit
         data.add(accountTypeNumber);
         return accountTypeNumber;
     }
+
+    public void deleteAll() {
+        data.clear();
+    }
 }

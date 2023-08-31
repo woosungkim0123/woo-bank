@@ -30,4 +30,8 @@ public class FakeAccountSequenceRepository implements AccountSequenceRepository 
                 .filter(accountSequence -> accountSequence.getSequenceName().equals(AccountType.valueOf(accountType)))
                 .findFirst();
     }
+
+    public void deleteAll() {
+        data.clear();
+    }
 }
