@@ -11,7 +11,7 @@
 //import org.springframework.test.context.jdbc.Sql;
 //import org.springframework.test.web.servlet.MockMvc;
 //import org.springframework.test.web.servlet.ResultActions;
-//import shop.woosung.bank.account.infrastructure.AccountEntity;
+//import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 //import shop.woosung.bank.domain.transaction.Transaction;
 //import shop.woosung.bank.domain.transaction.TransactionEnum;

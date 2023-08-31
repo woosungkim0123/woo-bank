@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
-import shop.woosung.bank.account.infrastructure.AccountSequenceEntity;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 
 @RequiredArgsConstructor
@@ -22,13 +21,13 @@ public class AccountSequenceInitializer implements ApplicationRunner {
         if(accountSequenceRepository.count() == 0) {
             AccountSequence normalAccountSequence = AccountSequence.builder()
                     .sequenceName(AccountType.NORMAL)
-                    .nextValue(1L)
+                    .nextValue(1111111111L)
                     .incrementBy(1L)
                     .build();
 
             AccountSequence savingAccountSequence = AccountSequence.builder()
                     .sequenceName(AccountType.SAVING)
-                    .nextValue(1L)
+                    .nextValue(1111111111L)
                     .incrementBy(1L)
                     .build();
 

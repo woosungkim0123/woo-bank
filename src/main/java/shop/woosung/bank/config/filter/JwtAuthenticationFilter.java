@@ -45,13 +45,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword());
             return authenticationManager.authenticate(authenticationToken);
         } catch (LoginValidationException exception) {
+            log.error("request.getRequestURI = {}", request.getRequestURI());
             log.error("LoginValidationException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "유효하지 않은 요청 입니다.", HttpStatus.BAD_REQUEST);
         } catch (IOException exception) {
+            log.error("request.getRequestURI = {}", request.getRequestURI());
             log.error("IOException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "로그인에 실패 하였습니다.", HttpStatus.UNAUTHORIZED);
-        } finally {
-            log.error("request.getRequestURI = {}", request.getRequestURI());
         }
         return null;
     }

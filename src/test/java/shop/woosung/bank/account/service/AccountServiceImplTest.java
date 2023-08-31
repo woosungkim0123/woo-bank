@@ -1,15 +1,24 @@
 package shop.woosung.bank.account.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountSequence;
+import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
+import shop.woosung.bank.account.service.port.AccountSequenceRepository;
+import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
+import shop.woosung.bank.mock.repository.FakeAccountSequenceRepository;
+import shop.woosung.bank.mock.repository.FakeAccountTypeNumberRepository;
 import shop.woosung.bank.mock.repository.FakeUserRepository;
+import shop.woosung.bank.mock.util.FakePasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -22,18 +31,35 @@ class AccountServiceImplTest {
     private UserRepository userRepository;
     private AccountRepository accountRepository;
 
+    private final Long initSequenceNumber = 11111111111L;
+    private static final Long incrementByNumber = 1L;
+    private static final Long initNormalTypeNumber = 232L;
+    private static final Long initSavingTypeNumber = 787L;
+
     @BeforeEach
     void init() {
         userRepository = new FakeUserRepository();
         accountRepository = new FakeAccountRepository();
+        AccountSequenceRepository accountSequenceRepository = new FakeAccountSequenceRepository();
+        AccountTypeNumberRepository accountTypeNumberRepository = new FakeAccountTypeNumberRepository();
+
         this.accountService = AccountServiceImpl.builder()
+                .passwordEncoder(new FakePasswordEncoder("aaaa_bbbb_cccc_dddd"))
                 .userRepository(userRepository)
                 .accountRepository(accountRepository)
+                .accountSequenceRepository(accountSequenceRepository)
+                .accountTypeNumberRepository(accountTypeNumberRepository)
                 .build();
+
+        accountSequenceRepository.save(AccountSequence.builder().sequenceName(AccountType.NORMAL).nextValue(initSequenceNumber).incrementBy(incrementByNumber).build());
+        accountSequenceRepository.save(AccountSequence.builder().sequenceName(AccountType.SAVING).nextValue(initSequenceNumber).incrementBy(incrementByNumber).build());
+        accountTypeNumberRepository.save(AccountTypeNumber.builder().accountType(AccountType.NORMAL).number(initNormalTypeNumber).build());
+        accountTypeNumberRepository.save(AccountTypeNumber.builder().accountType(AccountType.SAVING).number(initSavingTypeNumber).build());
     }
-    
+
+    @DisplayName("자신이 가진 모든 계좌 리스트를 조회할 수 있다.")
     @Test
-    public void userId를_사용하여_해당_유저가_가진_모든_계좌_리스트를_찾을_수_있다() {
+    public void get_account_list_success_test() {
         // given
         User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
         User user2 = userRepository.save(User.builder().email("test2@tset.com").name("test2").build());
@@ -52,36 +78,75 @@ class AccountServiceImplTest {
         assertThat(result.getAccounts().get(1).getBalance()).isEqualTo(2000L);
     }
 
+    @DisplayName("계좌를 등록하면 계좌번호를 부여하고 생성한다")
     @Test
-    public void 계좌등록시_서비스_첫_고객이면_11111111111로_배정된다() throws Exception {
+    public void account_register_success_test1() {
         // given
-        User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder().password(1234L).build();
+        Long fullNumber = Long.parseLong(initNormalTypeNumber + "" + 11111111111L);
+        User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
+        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
 
         // when
-        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, user);
 
         // then
         assertThat(accountRegisterResponseDto.getId()).isEqualTo(1L);
         assertThat(accountRegisterResponseDto.getNumber()).isEqualTo(11111111111L);
+        assertThat(accountRegisterResponseDto.getFullnumber()).isEqualTo(fullNumber);
         assertThat(accountRegisterResponseDto.getBalance()).isEqualTo(0L);
     }
 
+    @DisplayName("계좌 종류에 따라 다른 타입 번호가 부여되고 중복된 계좌번호는 부여되지 않는다.")
     @Test
-    public void 계좌등록시_가장_높은_계좌번호에서_1을_더한값을_계좌번호로_생성한다() throws Exception {
-        // given
+    public void account_register_success_test2() {
         User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        accountRepository.save(Account.builder().number(11111111111L).balance(1000L).user(user1).build());
-        accountRepository.save(Account.builder().number(11111111115L).balance(1000L).user(user1).build());
-        accountRepository.save(Account.builder().number(99999999998L).balance(1000L).user(user1).build());
-        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder().password(1234L).build();
+        User user2 = userRepository.save(User.builder().email("test2@tset.com").name("test2").build());
+        AccountRegisterRequestDto accountRegisterRequestDto1 = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
+        AccountRegisterRequestDto accountRegisterRequestDto2 = AccountRegisterRequestDto.builder().type(AccountType.SAVING).password("1234").balance(1000L).build();
+        AccountRegisterRequestDto accountRegisterRequestDto3 = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").balance(2000L).build();
 
-        // when
-        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto1 = accountService.register(accountRegisterRequestDto1, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto2 = accountService.register(accountRegisterRequestDto2, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto3 = accountService.register(accountRegisterRequestDto3, user2);
 
-        // then
-        assertThat(accountRegisterResponseDto.getId()).isEqualTo(4L);
-        assertThat(accountRegisterResponseDto.getNumber()).isEqualTo(99999999999L);
-        assertThat(accountRegisterResponseDto.getBalance()).isEqualTo(0L);
+        assertThat(accountRegisterResponseDto1.getId()).isEqualTo(1L);
+        assertThat(accountRegisterResponseDto1.getNumber()).isEqualTo(11111111111L);
+        assertThat(accountRegisterResponseDto1.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto1.getBalance()).isEqualTo(0L);
+        assertThat(accountRegisterResponseDto2.getId()).isEqualTo(2L);
+        assertThat(accountRegisterResponseDto2.getNumber()).isEqualTo(11111111111L);
+        assertThat(accountRegisterResponseDto2.getFullnumber()).isEqualTo(Long.parseLong(initSavingTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto2.getBalance()).isEqualTo(1000L);
+        assertThat(accountRegisterResponseDto3.getId()).isEqualTo(3L);
+        assertThat(accountRegisterResponseDto3.getNumber()).isEqualTo(11111111112L);
+        assertThat(accountRegisterResponseDto3.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111112L));
+        assertThat(accountRegisterResponseDto3.getBalance()).isEqualTo(2000L);
+    }
+
+    @DisplayName("계좌 종류에 따라 다른 타입 번호가 부여되고 중복된 계좌번호는 부여되지 않는다.")
+    @Test
+    public void account_register_fail_test() {
+        User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
+        User user2 = userRepository.save(User.builder().email("test2@tset.com").name("test2").build());
+        AccountRegisterRequestDto accountRegisterRequestDto1 = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
+        AccountRegisterRequestDto accountRegisterRequestDto2 = AccountRegisterRequestDto.builder().type(AccountType.SAVING).password("1234").balance(1000L).build();
+        AccountRegisterRequestDto accountRegisterRequestDto3 = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").balance(2000L).build();
+
+        AccountRegisterResponseDto accountRegisterResponseDto1 = accountService.register(accountRegisterRequestDto1, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto2 = accountService.register(accountRegisterRequestDto2, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto3 = accountService.register(accountRegisterRequestDto3, user2);
+
+        assertThat(accountRegisterResponseDto1.getId()).isEqualTo(1L);
+        assertThat(accountRegisterResponseDto1.getNumber()).isEqualTo(11111111111L);
+        assertThat(accountRegisterResponseDto1.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto1.getBalance()).isEqualTo(0L);
+        assertThat(accountRegisterResponseDto2.getId()).isEqualTo(2L);
+        assertThat(accountRegisterResponseDto2.getNumber()).isEqualTo(11111111111L);
+        assertThat(accountRegisterResponseDto2.getFullnumber()).isEqualTo(Long.parseLong(initSavingTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto2.getBalance()).isEqualTo(1000L);
+        assertThat(accountRegisterResponseDto3.getId()).isEqualTo(3L);
+        assertThat(accountRegisterResponseDto3.getNumber()).isEqualTo(11111111112L);
+        assertThat(accountRegisterResponseDto3.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111112L));
+        assertThat(accountRegisterResponseDto3.getBalance()).isEqualTo(2000L);
     }
 }

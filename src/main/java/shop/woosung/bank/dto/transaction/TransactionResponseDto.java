@@ -1,7 +1,7 @@
 package shop.woosung.bank.dto.transaction;
 
 import lombok.Getter;
-import shop.woosung.bank.account.infrastructure.AccountEntity;
+import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.common.util.CustomDateUtil;
 

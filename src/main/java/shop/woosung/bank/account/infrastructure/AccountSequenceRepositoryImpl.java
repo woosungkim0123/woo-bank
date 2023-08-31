@@ -3,7 +3,7 @@ package shop.woosung.bank.account.infrastructure;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import shop.woosung.bank.account.domain.AccountSequence;
-import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.infrastructure.entity.AccountSequenceEntity;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 
 import java.util.Optional;

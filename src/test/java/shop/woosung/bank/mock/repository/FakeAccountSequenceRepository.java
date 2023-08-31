@@ -1,9 +1,7 @@
 package shop.woosung.bank.mock.repository;
 
-import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
-import shop.woosung.bank.account.infrastructure.AccountSequenceEntity;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 
 import java.util.ArrayList;
@@ -16,16 +14,20 @@ public class FakeAccountSequenceRepository implements AccountSequenceRepository 
 
     @Override
     public long count() {
-        return 0;
+        return data.size();
     }
 
     @Override
     public AccountSequence save(AccountSequence accountSequence) {
-        return null;
+        data.remove(accountSequence);
+        data.add(accountSequence);
+        return accountSequence;
     }
 
     @Override
     public Optional<AccountSequence> findById(String accountType) {
-        return Optional.empty();
+        return data.stream()
+                .filter(accountSequence -> accountSequence.getSequenceName().equals(AccountType.valueOf(accountType)))
+                .findFirst();
     }
 }

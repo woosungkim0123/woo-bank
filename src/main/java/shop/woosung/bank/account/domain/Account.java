@@ -2,18 +2,19 @@ package shop.woosung.bank.account.domain;
 
 import lombok.Builder;
 import lombok.Getter;
-import shop.woosung.bank.common.infrastructure.BaseTimeEntity;
+import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.user.domain.User;
 
 import java.time.LocalDateTime;
 
 @Getter
-public class Account extends BaseTimeEntity {
+public class Account {
 
     private Long id;
     private Long number;
-    private Long password;
+    private Long fullnumber;
+    private String password;
     private Long balance;
     private AccountType type;
     private User user;
@@ -21,15 +22,27 @@ public class Account extends BaseTimeEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Account(Long id, Long number, Long password, Long balance, AccountType type, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Account(Long id, Long number, Long fullnumber, String password, Long balance, AccountType type, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.number = number;
+        this.fullnumber = fullnumber;
         this.password = password;
         this.balance = balance;
         this.type = type;
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public static Account register(AccountRegister accountRegister, PasswordEncoder passwordEncoder) {
+        return Account.builder()
+                .number(accountRegister.getNewNumber())
+                .fullnumber(concatNumbers(accountRegister.getTypeNumber(), accountRegister.getNewNumber()))
+                .password(passwordEncoder.encode(accountRegister.getPassword()))
+                .balance(accountRegister.getBalance())
+                .type(accountRegister.getAccountType())
+                .user(accountRegister.getUser())
+                .build();
     }
 
     public void checkOwner(Long userId) {
@@ -56,5 +69,10 @@ public class Account extends BaseTimeEntity {
 
     public void withdraw(Long amount) {
         balance = balance - amount;
+    }
+
+    private static Long concatNumbers(Long num1, Long num2) {
+        String concatenatedStr = num1 + "" + num2;
+        return Long.parseLong(concatenatedStr);
     }
 }

@@ -1,4 +1,4 @@
-package shop.woosung.bank.account.infrastructure;
+package shop.woosung.bank.account.infrastructure.entity;
 
 
 import javax.persistence.*;
@@ -23,11 +23,14 @@ public class AccountEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(nullable = false, length = 20)
     private Long number;
 
-    @Column(nullable = false, length = 4)
-    private Long password;
+    @Column(unique = true, nullable = false, length = 20)
+    private Long fullnumber;
+
+    @Column(nullable = false)
+    private String password;
 
     @Column(nullable = false)
     private Long balance;
@@ -43,6 +46,7 @@ public class AccountEntity extends BaseTimeEntity {
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.id = account.getId();
         accountEntity.number = account.getNumber();
+        accountEntity.fullnumber = account.getFullnumber();
         accountEntity.password = account.getPassword();
         accountEntity.balance = account.getBalance();
         accountEntity.type = account.getType();
@@ -54,10 +58,13 @@ public class AccountEntity extends BaseTimeEntity {
         return Account.builder()
                 .id(id)
                 .number(number)
+                .fullnumber(fullnumber)
                 .password(password)
                 .balance(balance)
                 .type(type)
                 .user(user.toModel())
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
                 .build();
     }
 }

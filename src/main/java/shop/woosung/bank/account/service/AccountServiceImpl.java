@@ -10,25 +10,26 @@ import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
-import shop.woosung.bank.account.infrastructure.AccountEntity;
-import shop.woosung.bank.account.infrastructure.AccountSequenceEntity;
+import shop.woosung.bank.account.domain.AccountTypeNumber;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountSequence;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumber;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
-import shop.woosung.bank.common.exception.NotFoundUserException;
-import shop.woosung.bank.domain.transaction.Transaction;
-import shop.woosung.bank.domain.transaction.TransactionEnum;
+import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
+import shop.woosung.bank.account.util.AccountServiceToDomainConverter;
+import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.handler.ex.CustomApiException;
+import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
 
-import static shop.woosung.bank.account.AccountReqDto.*;
-import static shop.woosung.bank.account.AccountResDto.*;
+import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.accountRegisterConvert;
+import static shop.woosung.bank.user.util.UserServiceToDomainConverter.userCreateConvert;
 
 @Builder
 @RequiredArgsConstructor
@@ -37,33 +38,23 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountSequenceRepository accountSequenceRepository;
+    private final AccountTypeNumberRepository accountTypeNumberRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public AccountRegisterResponseDto register(AccountRegisterRequestDto accountRegisterRequestDto, User user) {
+        Long typeNumber = getTypeNumber(accountRegisterRequestDto.getType());
         Long newNumber = getNewNumber(accountRegisterRequestDto.getType());
 
-        Account account = accountRepository.save(Account.builder()
-                .number(newNumber)
-                .password(accountRegisterRequestDto.getPassword())
-                .balance(0L)
-                .type(accountRegisterRequestDto.getType())
-                .user(user)
-                .build());
+        Account account = Account.register(accountRegisterConvert(accountRegisterRequestDto, typeNumber, newNumber, user), passwordEncoder);
+        Account newAccount = accountRepository.save(account);
 
-        return AccountRegisterResponseDto.from(account);
+        return AccountRegisterResponseDto.from(newAccount);
     }
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long getNewNumber (AccountType accountType) {
-        AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
-                .orElseThrow(() -> new CustomApiException("계좌 시퀀스를 찾을 수 없습니다."));
 
-        Long nextValue = accountSequence.getNextValue();
-        accountSequence.incrementNextValue();
-        accountSequenceRepository.save(accountSequence);
-        return nextValue;
-    }
+
 
     @Transactional(readOnly = true)
     public AccountListResponseDto getAccountList(User user) {
@@ -221,4 +212,21 @@ public class AccountServiceImpl implements AccountService {
 //                .map(account -> account.getNumber() + 1L)
 //                .orElse(11111111111L);
 //    }
+
+    private Long getTypeNumber(AccountType accountType) {
+        AccountTypeNumber accountTypeNumber = accountTypeNumberRepository.findById(accountType.name())
+                .orElseThrow(NotFoundAccountTypeNumber::new);
+        return accountTypeNumber.getNumber();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long getNewNumber (AccountType accountType) {
+        AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
+                .orElseThrow(NotFoundAccountSequence::new);
+
+        Long nextValue = accountSequence.getNextValue();
+        accountSequence.incrementNextValue();
+        accountSequenceRepository.save(accountSequence);
+        return nextValue;
+    }
 }

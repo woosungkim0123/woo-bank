@@ -1,20 +1,15 @@
 package shop.woosung.bank.account.service;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
-import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
-import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.user.infrastructure.UserEntity;
 import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -35,6 +30,7 @@ class AccountEntityConcurrencyServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @DisplayName("100명이 동시에 계좌를 가입할 때 모두 다른 계좌번호가 부여된다")
     @Test
     public void 계좌생성_동시성_문제_락을_걸어_해결() throws Exception {
         int threadCount = 100;
@@ -42,19 +38,25 @@ class AccountEntityConcurrencyServiceTest {
         
         ExecutorService executorService = Executors.newFixedThreadPool(32);
 
-        List<Long> accountNumbers = Collections.synchronizedList(new ArrayList<>());
-        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder()
-                .password(1111L)
+        List<Long> accountFullNumbers = Collections.synchronizedList(new ArrayList<>());
+
+        AccountRegisterRequestDto normalAccountRegisterRequestDto = AccountRegisterRequestDto.builder()
+                .type(AccountType.NORMAL)
+                .password("1111")
+                .build();
+        AccountRegisterRequestDto savingAccountRegisterRequestDto = AccountRegisterRequestDto.builder()
+                .type(AccountType.SAVING)
+                .password("1111")
                 .build();
 
         CountDownLatch latch = new CountDownLatch(threadCount);
         for (int i = 0; i < threadCount; i++) {
+            final int threadIndex = i;
             executorService.submit(() -> {
                 try {
-                    AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, sharedUser);
-                    accountNumbers.add(accountRegisterResponseDto.getNumber());
-                } catch (Exception e) {
-                    System.out.println("e = " + e);
+                    AccountRegisterRequestDto selectedDto = (threadIndex % 2 == 0) ? normalAccountRegisterRequestDto : savingAccountRegisterRequestDto;
+                    AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(selectedDto, sharedUser);
+                    accountFullNumbers.add(accountRegisterResponseDto.getFullnumber());
                 } finally{
                     latch.countDown();
                 }
@@ -63,13 +65,10 @@ class AccountEntityConcurrencyServiceTest {
         latch.await();
         executorService.shutdown();
 
-        Set<Long> accountNumberSet = new HashSet<>(accountNumbers);
-        for (Long l : accountNumberSet) {
-            System.out.println("l = " + l);
-        }
+        Set<Long> accountFullNemberSet = new HashSet<>(accountFullNumbers);
 
-        assertThat(accountNumbers).hasSize(threadCount);
-        assertThat(accountNumberSet).hasSize(threadCount);
+        assertThat(accountFullNumbers).hasSize(threadCount);
+        assertThat(accountFullNemberSet).hasSize(threadCount);
     }
 
 }

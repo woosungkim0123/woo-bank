@@ -5,7 +5,7 @@
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 //import org.springframework.test.context.ActiveProfiles;
-//import shop.woosung.bank.account.infrastructure.AccountEntity;
+//import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 //import shop.woosung.bank.domain.transaction.Transaction;
 //import shop.woosung.bank.domain.transaction.TransactionEnum;

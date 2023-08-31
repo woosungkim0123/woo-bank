@@ -1,10 +1,8 @@
 package shop.woosung.bank.mock.repository;
 
 import shop.woosung.bank.account.domain.Account;
-import shop.woosung.bank.account.infrastructure.AccountEntity;
 import shop.woosung.bank.account.service.port.AccountRepository;
 
-import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
@@ -27,6 +25,7 @@ public class FakeAccountRepository implements AccountRepository {
             Account newAccount = Account.builder()
                     .id(++autoIncrementId)
                     .number(account.getNumber())
+                    .fullnumber(account.getFullnumber())
                     .password(account.getPassword())
                     .user(account.getUser())
                     .balance(account.getBalance())

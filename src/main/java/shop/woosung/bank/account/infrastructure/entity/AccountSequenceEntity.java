@@ -1,17 +1,13 @@
-package shop.woosung.bank.account.infrastructure;
+package shop.woosung.bank.account.infrastructure.entity;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
-import shop.woosung.bank.user.infrastructure.UserEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 @Getter
@@ -21,7 +17,9 @@ public class AccountSequenceEntity {
 
     @Id
     private String sequenceName;
+    @Column(nullable = false)
     private Long nextValue;
+    @Column(nullable = false)
     private Long incrementBy;
 
     public static AccountSequenceEntity fromModel(AccountSequence accountSequence) {

@@ -2,7 +2,7 @@ package shop.woosung.bank.account.infrastructure;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.infrastructure.entity.AccountSequenceEntity;
 
 import javax.persistence.LockModeType;
 import java.util.Optional;

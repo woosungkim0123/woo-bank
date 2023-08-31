@@ -8,7 +8,7 @@
 //import org.mockito.Mock;
 //import org.mockito.junit.jupiter.MockitoExtension;
 //import shop.woosung.bank.account.service.AccountServiceImpl;
-//import shop.woosung.bank.account.infrastructure.AccountEntity;
+//import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 //import shop.woosung.bank.domain.transaction.Transaction;
 //import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
