@@ -14,6 +14,7 @@ import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequence;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumber;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
+import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
@@ -44,17 +45,15 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public AccountRegisterResponseDto register(AccountRegisterRequestDto accountRegisterRequestDto, User user) {
-        Long typeNumber = getTypeNumber(accountRegisterRequestDto.getType());
-        Long newNumber = getNewNumber(accountRegisterRequestDto.getType());
+    public AccountRegisterResponseDto register(AccountRegisterRequestServiceDto accountRegisterRequestServiceDto, User user) {
+        Long typeNumber = getTypeNumber(accountRegisterRequestServiceDto.getType());
+        Long newNumber = getNewNumber(accountRegisterRequestServiceDto.getType());
 
-        Account account = Account.register(accountRegisterConvert(accountRegisterRequestDto, typeNumber, newNumber, user), passwordEncoder);
+        Account account = Account.register(accountRegisterConvert(accountRegisterRequestServiceDto, typeNumber, newNumber, user), passwordEncoder);
         Account newAccount = accountRepository.save(account);
 
         return AccountRegisterResponseDto.from(newAccount);
     }
-
-
 
     @Transactional(readOnly = true)
     public AccountListResponseDto getAccountList(User user) {

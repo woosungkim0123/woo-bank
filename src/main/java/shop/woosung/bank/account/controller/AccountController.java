@@ -10,6 +10,7 @@ import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
+import shop.woosung.bank.account.util.AccountControllerToServiceConverter;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.dto.ResponseDto;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 
 import static shop.woosung.bank.account.AccountReqDto.*;
 import static shop.woosung.bank.account.AccountResDto.*;
+import static shop.woosung.bank.account.util.AccountControllerToServiceConverter.accountRegisterRequestConvert;
 
 
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class AccountController {
     @PostMapping("/s/account")
     public ResponseEntity<ApiResponse<AccountRegisterResponseDto>> register(@RequestBody @Valid AccountRegisterRequestDto accountRegisterRequestDto,
                                            @AuthenticationPrincipal LoginUser loginUser) {
-        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, loginUser.getUser());
+        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestConvert(accountRegisterRequestDto), loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌등록 성공", accountRegisterResponseDto));
     }

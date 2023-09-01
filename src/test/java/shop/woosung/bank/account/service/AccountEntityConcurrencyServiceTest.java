@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.domain.UserRole;
@@ -40,11 +41,11 @@ class AccountEntityConcurrencyServiceTest {
 
         List<Long> accountFullNumbers = Collections.synchronizedList(new ArrayList<>());
 
-        AccountRegisterRequestDto normalAccountRegisterRequestDto = AccountRegisterRequestDto.builder()
+        AccountRegisterRequestServiceDto normalAccountRegisterServiceDto = AccountRegisterRequestServiceDto.builder()
                 .type(AccountType.NORMAL)
                 .password("1111")
                 .build();
-        AccountRegisterRequestDto savingAccountRegisterRequestDto = AccountRegisterRequestDto.builder()
+        AccountRegisterRequestServiceDto savingAccountRegisterServiceDto = AccountRegisterRequestServiceDto.builder()
                 .type(AccountType.SAVING)
                 .password("1111")
                 .build();
@@ -54,7 +55,7 @@ class AccountEntityConcurrencyServiceTest {
             final int threadIndex = i;
             executorService.submit(() -> {
                 try {
-                    AccountRegisterRequestDto selectedDto = (threadIndex % 2 == 0) ? normalAccountRegisterRequestDto : savingAccountRegisterRequestDto;
+                    AccountRegisterRequestServiceDto selectedDto = (threadIndex % 2 == 0) ? normalAccountRegisterServiceDto : savingAccountRegisterServiceDto;
                     AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(selectedDto, sharedUser);
                     accountFullNumbers.add(accountRegisterResponseDto.getFullnumber());
                 } finally{

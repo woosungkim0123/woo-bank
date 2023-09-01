@@ -1,5 +1,6 @@
 package shop.woosung.bank.user.util;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.domain.UserCreate;
@@ -9,8 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserServiceToDomainConverterTest {
 
+    @DisplayName("회원가입을 위해 서비스의 데이터를 회원가입 도메인 전용 객체로 변환한다.")
     @Test
-    public void 컨버터는_도메인에_전달할_목적으로_서비스의_데이터를_도메인_전용_객체로_변환_한다() {
+    public void userCreateConvert_test() {
         // given
         JoinRequestServiceDto joinRequestServiceDto = JoinRequestServiceDto.builder()
                 .email("test1@test.com")

@@ -12,6 +12,7 @@ import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequence;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumber;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
+import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
@@ -87,10 +88,10 @@ class AccountServiceImplTest {
         // given
         Long fullNumber = Long.parseLong(initNormalTypeNumber + "" + 11111111111L);
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
+        AccountRegisterRequestServiceDto accountRegisterRequestServiceDto = AccountRegisterRequestServiceDto.builder().type(AccountType.NORMAL).password("1234").build();
 
         // when
-        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestDto, user);
+        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestServiceDto, user);
 
         // then
         assertThat(accountRegisterResponseDto.getId()).isEqualTo(1L);
@@ -105,14 +106,14 @@ class AccountServiceImplTest {
         // given
         User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
         User user2 = userRepository.save(User.builder().email("test2@tset.com").name("test2").build());
-        AccountRegisterRequestDto accountRegisterRequestDto1 = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
-        AccountRegisterRequestDto accountRegisterRequestDto2 = AccountRegisterRequestDto.builder().type(AccountType.SAVING).password("1234").balance(1000L).build();
-        AccountRegisterRequestDto accountRegisterRequestDto3 = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").balance(2000L).build();
+        AccountRegisterRequestServiceDto accountRegisterRequestServiceDto1 = AccountRegisterRequestServiceDto.builder().type(AccountType.NORMAL).password("1234").build();
+        AccountRegisterRequestServiceDto accountRegisterRequestServiceDto2 = AccountRegisterRequestServiceDto.builder().type(AccountType.SAVING).password("1234").balance(1000L).build();
+        AccountRegisterRequestServiceDto accountRegisterRequestServiceDto3 = AccountRegisterRequestServiceDto.builder().type(AccountType.NORMAL).password("1234").balance(2000L).build();
 
         // when
-        AccountRegisterResponseDto accountRegisterResponseDto1 = accountService.register(accountRegisterRequestDto1, user1);
-        AccountRegisterResponseDto accountRegisterResponseDto2 = accountService.register(accountRegisterRequestDto2, user1);
-        AccountRegisterResponseDto accountRegisterResponseDto3 = accountService.register(accountRegisterRequestDto3, user2);
+        AccountRegisterResponseDto accountRegisterResponseDto1 = accountService.register(accountRegisterRequestServiceDto1, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto2 = accountService.register(accountRegisterRequestServiceDto2, user1);
+        AccountRegisterResponseDto accountRegisterResponseDto3 = accountService.register(accountRegisterRequestServiceDto3, user2);
 
         // then
         assertThat(accountRegisterResponseDto1.getId()).isEqualTo(1L);
@@ -135,10 +136,10 @@ class AccountServiceImplTest {
         // given & when
         accountTypeNumberRepository.deleteAll();
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
+        AccountRegisterRequestServiceDto accountRegisterRequestServiceDto = AccountRegisterRequestServiceDto.builder().type(AccountType.NORMAL).password("1234").build();
 
         // then
-        assertThatThrownBy(() -> accountService.register(accountRegisterRequestDto, user))
+        assertThatThrownBy(() -> accountService.register(accountRegisterRequestServiceDto, user))
                 .isInstanceOf(NotFoundAccountTypeNumber.class);
     }
 
@@ -148,10 +149,10 @@ class AccountServiceImplTest {
         // given & when
         accountSequenceRepository.deleteAll();
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder().type(AccountType.NORMAL).password("1234").build();
+        AccountRegisterRequestServiceDto accountRegisterRequestServiceDto = AccountRegisterRequestServiceDto.builder().type(AccountType.NORMAL).password("1234").build();
 
         // then
-        assertThatThrownBy(() -> accountService.register(accountRegisterRequestDto, user))
+        assertThatThrownBy(() -> accountService.register(accountRegisterRequestServiceDto, user))
                 .isInstanceOf(NotFoundAccountSequence.class);
     }
 }
