@@ -1,6 +1,5 @@
 package shop.woosung.bank.account.util;
 
-import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.domain.AccountRegister;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.user.domain.User;

@@ -29,6 +29,5 @@ class UserServiceToDomainConverterTest {
         assertThat(result.getPassword()).isEqualTo("1234");
         assertThat(result.getName()).isEqualTo("test1");
         assertThat(result.getRole()).isEqualTo(UserRole.CUSTOMER);
-
     }
 }

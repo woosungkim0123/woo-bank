@@ -44,10 +44,10 @@ class UserControllerTest {
     }
 
 
-    @DisplayName("/api/join으로 요청을 보내면 회원가입이 성공한다.")
+    @DisplayName("/api/join으로 알맞은 형식의 요청을 보내면 회원가입이 성공한다.")
     @ParameterizedTest
     @MethodSource("validJoinRequests")
-    public void joinApi_success(String email, String password, String name) throws Exception {
+    public void join_test_success(String email, String password, String name) throws Exception {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email(email)
@@ -74,7 +74,7 @@ class UserControllerTest {
     @DisplayName("/api/join으로 잘못된 형식의 요청을 보내면 예외가 응답된다.")
     @ParameterizedTest
     @MethodSource("invalidJoinRequests")
-    public void joinApi_fail(String email, String password, String name) throws Exception {
+    public void join_test_fail(String email, String password, String name) throws Exception {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email(email)

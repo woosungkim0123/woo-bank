@@ -1,16 +1,20 @@
 package shop.woosung.bank.account.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
@@ -18,6 +22,7 @@ import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.domain.User;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,6 +34,9 @@ class AccountControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private FakeUserRepository userRepository;
@@ -43,9 +51,10 @@ class AccountControllerTest {
         userRepository.save(User.builder().email("test2@test.com").name("test2").build());
     }
 
+    @DisplayName("로그인 한 사용자는 자신의 계좌 리스트를 볼 수 있다.")
     @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    public void 로그인이_된_상태에서_자신의_계좌_리스트를_요청하면_정상적으로_응답한다() throws Exception {
+    public void get_account_list_test_success() throws Exception {
         // given
         User user1 = userRepository.findByEmail("test1@test.com").get();
         User user2 = userRepository.findByEmail("test2@test.com").get();
@@ -68,5 +77,32 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.accounts[1].number").value(1111111112L));
         resultActions.andExpect(jsonPath("$.data.accounts[1].balance").value(2000L));
         resultActions.andExpect(jsonPath("$.data.accounts[1].type").value("SAVING"));
+    }
+
+    @DisplayName("로그인 한 사용자는 계좌를 생성할 수 있다.")
+    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void register_account_test_success() throws Exception {
+        // given
+        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder()
+                .password("1234")
+                .type(AccountType.NORMAL)
+                .build();
+        String requestBody = om.writeValueAsString(accountRegisterRequestDto);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account")
+                    .content(requestBody)
+                    .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isCreated());
+        resultActions.andExpect(jsonPath("$.status").value("success"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌등록 성공"));
+        resultActions.andExpect(jsonPath("$.data.id").value(1L));
+        resultActions.andExpect(jsonPath("$.data.fullnumber").value(2321111111111L));
+        resultActions.andExpect(jsonPath("$.data.number").doesNotExist());
+        resultActions.andExpect(jsonPath("$.data.balance").value(0L));
     }
 }

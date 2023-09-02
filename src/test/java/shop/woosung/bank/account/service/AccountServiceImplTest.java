@@ -63,7 +63,7 @@ class AccountServiceImplTest {
 
     @DisplayName("자신이 가진 모든 계좌 리스트를 조회할 수 있다.")
     @Test
-    public void get_account_list_success_test() {
+    public void account_list_success_test() {
         // given
         User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
         User user2 = userRepository.save(User.builder().email("test2@tset.com").name("test2").build());
