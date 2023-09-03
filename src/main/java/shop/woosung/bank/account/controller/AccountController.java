@@ -46,13 +46,13 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(accountListResponseDto));
     }
 
-//    @DeleteMapping("/s/account/{number}")
-//    public ResponseEntity<?> deleteAccount(@PathVariable Long number,
-//                                           @AuthenticationPrincipal LoginUser loginUser) {
-//        accountService.deleteAccount(number, loginUser.getUser().getId());
-//
-//        return new ResponseEntity<>(new ResponseDto<>(1, "계좌삭제 성공", null), HttpStatus.OK);
-//    }
+    @DeleteMapping("/s/account/{number}")
+    public ResponseEntity<?> deleteAccount(@PathVariable Long number,
+                                           @AuthenticationPrincipal LoginUser loginUser) {
+        accountService.deleteAccount(number, loginUser.getUser().getId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("계좌 삭제 성공"));
+    }
 //
 //    @PostMapping("/account/deposit")
 //    public ResponseEntity<?> depositAccount(@RequestBody @Valid AccountDepositReqDto accountDepositReqDto, BindingResult bindingResult) {

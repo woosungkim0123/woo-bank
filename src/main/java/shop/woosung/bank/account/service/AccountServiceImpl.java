@@ -5,32 +5,30 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.domain.AccountTypeNumber;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequence;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumber;
+import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
-import shop.woosung.bank.account.util.AccountServiceToDomainConverter;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.handler.ex.CustomApiException;
-import shop.woosung.bank.user.domain.UserRole;
 import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
 
 import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.accountRegisterConvert;
-import static shop.woosung.bank.user.util.UserServiceToDomainConverter.userCreateConvert;
 
 @Builder
 @RequiredArgsConstructor
@@ -61,6 +59,18 @@ public class AccountServiceImpl implements AccountService {
 
         return AccountListResponseDto.from(user, userAccounts);
     }
+
+    @Transactional
+    public void deleteAccount(Long accountFullnumber, Long userId) {
+        Account account = accountRepository.findByFullnumber(accountFullnumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumber(accountFullnumber));
+
+        account.checkOwner(userId);
+
+        accountRepository.deleteById(account.getId());
+    }
+
+
 //
 //    /*
 //        TODO 영업점, 종류 추가

@@ -10,4 +10,6 @@ public interface AccountService {
 
     AccountRegisterResponseDto register(AccountRegisterRequestServiceDto accountRegisterRequestServiceDto, User user);
     AccountListResponseDto getAccountList(User user);
+
+    void deleteAccount(Long number, Long userId);
 }

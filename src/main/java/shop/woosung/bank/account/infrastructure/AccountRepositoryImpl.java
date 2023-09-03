@@ -7,6 +7,7 @@ import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.account.service.port.AccountRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -24,5 +25,15 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public Account save(Account account) {
         return accountJpaRepository.save(AccountEntity.fromModel(account)).toModel();
+    }
+
+    @Override
+    public Optional<Account> findByFullnumber(Long fullnumber) {
+        return accountJpaRepository.findByFullnumber(fullnumber).map(AccountEntity::toModel);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        accountJpaRepository.deleteById(id);
     }
 }
