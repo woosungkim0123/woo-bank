@@ -2,6 +2,7 @@ package shop.woosung.bank.account.domain;
 
 import lombok.Builder;
 import lombok.Getter;
+import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.user.domain.User;
@@ -47,7 +48,7 @@ public class Account {
 
     public void checkOwner(Long userId) {
         if(!user.getId().equals(userId)) {
-            throw new CustomApiException("계좌 소유자가 아닙니다.");
+            throw new NotAccountOwnerException();
         }
     }
 

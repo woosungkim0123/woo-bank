@@ -47,6 +47,7 @@ class AccountControllerTest {
     @BeforeEach
     public void init() {
         userRepository.deleteAll();
+        accountRepository.deleteAll();
         userRepository.save(User.builder().email("test1@test.com").name("test1").build());
         userRepository.save(User.builder().email("test2@test.com").name("test2").build());
     }

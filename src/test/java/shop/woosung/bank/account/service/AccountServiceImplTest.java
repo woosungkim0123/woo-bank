@@ -3,14 +3,14 @@ package shop.woosung.bank.account.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.domain.AccountTypeNumber;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountSequence;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumber;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
@@ -23,6 +23,8 @@ import shop.woosung.bank.mock.util.FakePasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -140,7 +142,7 @@ class AccountServiceImplTest {
 
         // then
         assertThatThrownBy(() -> accountService.register(accountRegisterRequestServiceDto, user))
-                .isInstanceOf(NotFoundAccountTypeNumber.class);
+                .isInstanceOf(NotFoundAccountTypeNumberException.class);
     }
 
     @DisplayName("계좌 종류에 해당하는 시퀀스 값이 없으면 예외를 뱉는다.")
@@ -153,6 +155,34 @@ class AccountServiceImplTest {
 
         // then
         assertThatThrownBy(() -> accountService.register(accountRegisterRequestServiceDto, user))
-                .isInstanceOf(NotFoundAccountSequence.class);
+                .isInstanceOf(NotFoundAccountSequenceException.class);
+    }
+
+    @DisplayName("자신의 계좌를 없앨 수 있다.")
+    @Test
+    public void account_delete_success_test() {
+        // given
+        User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
+        accountRepository.save(Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
+
+        // when
+        accountService.deleteAccount(23211111111L, user.getId());
+
+        // then
+        Optional<Account> account = accountRepository.findByFullnumber(23211111111L);
+        assertThat(account.isPresent()).isFalse();
+    }
+
+    @DisplayName("계좌번호가 일치하지 않으면 삭제할 수 없다.")
+    @Test
+    public void account_delete_fail_test1() {
+        // given & when
+        User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
+        accountRepository.save(Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
+        Long notExistAccount = 23299999999L;
+
+        // then
+        assertThatThrownBy(() -> accountService.deleteAccount(notExistAccount, user.getId()))
+                .isInstanceOf(NotFoundAccountFullNumberException.class);
     }
 }

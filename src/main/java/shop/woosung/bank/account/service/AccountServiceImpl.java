@@ -10,10 +10,9 @@ import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.domain.AccountTypeNumber;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumber;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountSequence;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumber;
-import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
@@ -23,7 +22,6 @@ import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
-import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
@@ -63,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public void deleteAccount(Long accountFullnumber, Long userId) {
         Account account = accountRepository.findByFullnumber(accountFullnumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumber(accountFullnumber));
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullnumber));
 
         account.checkOwner(userId);
 
@@ -224,14 +222,14 @@ public class AccountServiceImpl implements AccountService {
 
     private Long getTypeNumber(AccountType accountType) {
         AccountTypeNumber accountTypeNumber = accountTypeNumberRepository.findById(accountType.name())
-                .orElseThrow(NotFoundAccountTypeNumber::new);
+                .orElseThrow(() -> new NotFoundAccountTypeNumberException(accountType));
         return accountTypeNumber.getNumber();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long getNewNumber (AccountType accountType) {
         AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
-                .orElseThrow(NotFoundAccountSequence::new);
+                .orElseThrow(() -> new NotFoundAccountSequenceException(accountType));
 
         Long nextValue = accountSequence.getNextValue();
         accountSequence.incrementNextValue();
