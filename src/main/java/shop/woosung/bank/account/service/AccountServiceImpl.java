@@ -70,21 +70,6 @@ public class AccountServiceImpl implements AccountService {
 
 
 //
-//    /*
-//        TODO 영업점, 종류 추가
-//        영업점 - 계좌종류 - 보통 무작위로 추출(순서) - 검증번호(복잡하게 더하거나 곱해서 작성)
-//     */
-//
-//    @Transactional
-//    public void deleteAccount(Long accountNumber, Long userId) {
-//        AccountEntity accountEntityPS = accountJpaRepository.findByNumber(accountNumber)
-//                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
-//
-//        accountEntityPS.checkOwner(userId);
-//
-//        accountJpaRepository.deleteById(accountEntityPS.getId());
-//    }
-//
 //    @Transactional
 //    public AccountDepositResDto depositAccount(AccountDepositReqDto accountDepositReqDto) { // ATM -> 누군가의 계좌
 //        AccountEntity depositAccountPSEntity = accountJpaRepository.findByNumber(accountDepositReqDto.getNumber())

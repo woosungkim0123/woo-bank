@@ -21,8 +21,8 @@ import shop.woosung.bank.mock.repository.FakeAccountRepository;
 import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.domain.User;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -106,4 +106,45 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.number").doesNotExist());
         resultActions.andExpect(jsonPath("$.data.balance").value(0L));
     }
+
+    @DisplayName("자신의 계좌를 삭제할 수 있다.")
+    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    public void delete_account_test_success() throws Exception {
+        // given
+        User user1 = userRepository.findByEmail("test1@test.com").get();
+        accountRepository.save(Account.builder().fullnumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user1).build());
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                delete("/api/s/account/" + 2321111111111L));
+
+        // then
+        resultActions.andExpect(status().isOk());
+        resultActions.andExpect(jsonPath("$.status").value("success"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 삭제 성공"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+//    @DisplayName("타인의 계좌를 삭제할 수 없다.")
+//    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+//    @Test
+//    public void delete_account_test_fail() throws Exception {
+//        // given
+//        User user2 = userRepository.findByEmail("test2@test.com").get();
+//        accountRepository.save(Account.builder().fullnumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user2).build());
+//
+//        // when
+//        ResultActions resultActions = mvc.perform(
+//                delete("/api/s/account/" + 2321111111111L));
+//
+//        // then
+//        resultActions.andExpect(status().isCreated());
+//        resultActions.andExpect(jsonPath("$.status").value("success"));
+//        resultActions.andExpect(jsonPath("$.message").value("계좌등록 성공"));
+//        resultActions.andExpect(jsonPath("$.data.id").value(1L));
+//        resultActions.andExpect(jsonPath("$.data.fullnumber").value(2321111111111L));
+//        resultActions.andExpect(jsonPath("$.data.number").doesNotExist());
+//        resultActions.andExpect(jsonPath("$.data.balance").value(0L));
+//    }
 }
