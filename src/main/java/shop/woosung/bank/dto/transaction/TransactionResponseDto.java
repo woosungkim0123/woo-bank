@@ -1,7 +1,7 @@
 package shop.woosung.bank.dto.transaction;
 
 import lombok.Getter;
-import shop.woosung.bank.domain.account.Account;
+import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.domain.transaction.Transaction;
 import shop.woosung.bank.common.util.CustomDateUtil;
 
@@ -15,9 +15,9 @@ public class TransactionResponseDto {
     public static class TransactionResponseListDto {
         private List<TransactionDto> transactions = new ArrayList<>();
 
-        public TransactionResponseListDto(Account account, List<Transaction> transactions) {
+        public TransactionResponseListDto(AccountEntity accountEntity, List<Transaction> transactions) {
             this.transactions = transactions.stream()
-                    .map(transaction -> new TransactionDto(transaction, account.getNumber()))
+                    .map(transaction -> new TransactionDto(transaction, accountEntity.getNumber()))
                     .collect(Collectors.toList());
         }
 
@@ -41,12 +41,12 @@ public class TransactionResponseDto {
                 this.tel = transaction.getTel() == null ? "없음" : transaction.getTel();
                 this.createdAt = CustomDateUtil.toStringFormat(transaction.getCreatedAt());
 
-                if (transaction.getDepositAccount() == null) {
+                if (transaction.getDepositAccountEntity() == null) {
                     this.balance = transaction.getWithdrawAccountBalance();
-                } else if (transaction.getWithdrawAccount() == null) {
+                } else if (transaction.getWithdrawAccountEntity() == null) {
                     this.balance = transaction.getDepositAccountBalance();
                 } else {
-                    if (transaction.getDepositAccount().getNumber() == accountNumber.longValue()) {
+                    if (transaction.getDepositAccountEntity().getNumber() == accountNumber.longValue()) {
                         this.balance = transaction.getDepositAccountBalance();
                     } else {
                         this.balance = transaction.getWithdrawAccountBalance();

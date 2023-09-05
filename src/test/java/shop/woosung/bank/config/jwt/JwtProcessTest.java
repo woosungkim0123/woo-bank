@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.config.auth.jwt.JwtProcess;
 import shop.woosung.bank.config.auth.jwt.JwtVO;
-import shop.woosung.bank.mock.FakeJwtTokenProvider;
+import shop.woosung.bank.mock.util.FakeJwtTokenProvider;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.domain.UserRole;
 

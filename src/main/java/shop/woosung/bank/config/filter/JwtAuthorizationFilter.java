@@ -45,27 +45,30 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
             chain.doFilter(request, response);
-
         }  catch (JwtVerifyException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtVerifyException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
         } catch (JwtExpiredException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("token expired = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰이 만료 되었습니다.", HttpStatus.UNAUTHORIZED);
         } catch (JwtNotHaveIdException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtNotHaveIdException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
         } catch (JwtIdConversionException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtIdConversionException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
         } catch (JwtNotFoundUser exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtNotFoundUser = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
         } catch (IOException | ServletException exception) {
+            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("IOException | ServletException = {}", exception.getMessage());
             CommonResponseHandler.handleException(response, "서버 오류가 발생 했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-        } finally {
-            log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         }
     }
 

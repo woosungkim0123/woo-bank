@@ -1,14 +1,16 @@
 package shop.woosung.bank.user.domain;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import shop.woosung.bank.mock.FakePasswordEncoder;
+import shop.woosung.bank.mock.util.FakePasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserTest {
 
+    @DisplayName("회원가입을 위한 User를 생성한다.")
     @Test
-    void 회원가입을_위한_User_객체는_UserCreate를_받아서_만들어_진다() {
+    void join_test() {
         // given
         UserCreate userCreate = UserCreate.builder()
                 .email("test1@test.com")

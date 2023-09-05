@@ -1,20 +1,21 @@
 package shop.woosung.bank.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import shop.woosung.bank.mock.repository.FakeUserRepository;
+import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.controller.dto.JoinRequestDto;
 
 import java.util.stream.Stream;
@@ -23,8 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("classpath:sql/initAutoIncrementReset.sql")
 @ActiveProfiles("test")
+@Import({ FakeRepositoryConfiguration.class })
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class UserControllerTest {
@@ -32,12 +33,21 @@ class UserControllerTest {
     @Autowired
     private MockMvc mvc;
     @Autowired
-    ObjectMapper om;
+    private ObjectMapper om;
 
-    @DisplayName("/api/join으로 요청을 보내면 회원가입이 성공한다.")
+    @Autowired
+    private FakeUserRepository userRepository;
+
+    @BeforeEach
+    public void init() {
+        userRepository.deleteAll();
+    }
+
+
+    @DisplayName("/api/join으로 알맞은 형식의 요청을 보내면 회원가입이 성공한다.")
     @ParameterizedTest
     @MethodSource("validJoinRequests")
-    public void joinApi_success(String email, String password, String name) throws Exception {
+    public void join_test_success(String email, String password, String name) throws Exception {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email(email)
@@ -64,7 +74,7 @@ class UserControllerTest {
     @DisplayName("/api/join으로 잘못된 형식의 요청을 보내면 예외가 응답된다.")
     @ParameterizedTest
     @MethodSource("invalidJoinRequests")
-    public void joinApi_fail(String email, String password, String name) throws Exception {
+    public void join_test_fail(String email, String password, String name) throws Exception {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email(email)

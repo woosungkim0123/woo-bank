@@ -24,7 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.woosung.bank.domain.account.Account;
+import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 
 @NoArgsConstructor
 @Getter
@@ -38,11 +38,11 @@ public class Transaction {
 
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
-    private Account withdrawAccount;
+    private AccountEntity withdrawAccountEntity;
 
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
-    private Account depositAccount;
+    private AccountEntity depositAccountEntity;
 
     @Column(nullable = false)
     private Long amount;
@@ -67,12 +67,12 @@ public class Transaction {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Transaction(Long id, Account withdrawAccount, Account depositAccount, Long amount,
-            Long withdrawAccountBalance, Long depositAccountBalance, TransactionEnum gubun, String sender,
-            String receiver, String tel, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Transaction(Long id, AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, Long amount,
+                       Long withdrawAccountBalance, Long depositAccountBalance, TransactionEnum gubun, String sender,
+                       String receiver, String tel, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.withdrawAccount = withdrawAccount;
-        this.depositAccount = depositAccount;
+        this.withdrawAccountEntity = withdrawAccountEntity;
+        this.depositAccountEntity = depositAccountEntity;
         this.amount = amount;
         this.withdrawAccountBalance = withdrawAccountBalance;
         this.depositAccountBalance = depositAccountBalance;

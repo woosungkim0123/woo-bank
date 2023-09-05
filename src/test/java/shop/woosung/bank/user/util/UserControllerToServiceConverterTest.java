@@ -1,5 +1,6 @@
 package shop.woosung.bank.user.util;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shop.woosung.bank.user.controller.dto.JoinRequestDto;
 import shop.woosung.bank.user.service.dto.JoinRequestServiceDto;
@@ -9,8 +10,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserControllerToServiceConverterTest {
 
+    @DisplayName("회원가입을 위해 컨트롤러로 전달된 객체를 서비스로 전달하기 위해 알맞게 변환한다.")
     @Test
-    void 컨버터는_서비스에게_전달할_목적으로_컨트롤러에서_받은_데이터를_새로운_객체로_변환_한다() {
+    void joinRequestDtoConvert() {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email("test1@test.com")
