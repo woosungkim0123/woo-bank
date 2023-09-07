@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
-import shop.woosung.bank.domain.transaction.Transaction;
+import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.common.util.CustomDateUtil;
 
 import java.util.ArrayList;

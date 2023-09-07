@@ -1,4 +1,4 @@
-//package shop.woosung.bank.domain.transaction.repository;
+//package shop.woosung.bank.transaction.domain.repository;
 //
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
@@ -7,8 +7,8 @@
 //import org.springframework.test.context.ActiveProfiles;
 //import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
-//import shop.woosung.bank.domain.transaction.Transaction;
-//import shop.woosung.bank.domain.transaction.TransactionEnum;
+//import shop.woosung.bank.transaction.domain.Transaction;
+//import shop.woosung.bank.transaction.domain.TransactionEnum;
 //import shop.woosung.bank.user.infrastructure.UserEntity;
 //import shop.woosung.bank.user.domain.UserRole;
 //import shop.woosung.bank.user.infrastructure.UserJpaRepository;

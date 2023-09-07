@@ -1,7 +1,6 @@
-package shop.woosung.bank.domain.transaction.repository;
+package shop.woosung.bank.transaction.domain;
 
 import org.springframework.data.repository.query.Param;
-import shop.woosung.bank.domain.transaction.Transaction;
 
 import java.util.List;
 

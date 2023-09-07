@@ -1,4 +1,4 @@
-package shop.woosung.bank.web;
+package shop.woosung.bank.transaction;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -7,8 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.dto.ResponseDto;
-import shop.woosung.bank.dto.transaction.TransactionResponseDto.TransactionResponseListDto;
-import shop.woosung.bank.service.TransactionService;
+import shop.woosung.bank.transaction.TransactionResponseDto.TransactionResponseListDto;
 
 @RequestMapping("/api")
 @RequiredArgsConstructor

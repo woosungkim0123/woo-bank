@@ -1,17 +1,17 @@
-package shop.woosung.bank.service;
+package shop.woosung.bank.transaction;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
-import shop.woosung.bank.domain.transaction.Transaction;
-import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
+import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.domain.TransactionRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
 
 import java.util.List;
 
-import static shop.woosung.bank.dto.transaction.TransactionResponseDto.*;
+import static shop.woosung.bank.transaction.TransactionResponseDto.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

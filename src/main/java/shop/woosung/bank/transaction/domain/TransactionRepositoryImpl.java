@@ -1,7 +1,6 @@
-package shop.woosung.bank.domain.transaction.repository;
+package shop.woosung.bank.transaction.domain;
 
 import lombok.RequiredArgsConstructor;
-import shop.woosung.bank.domain.transaction.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;

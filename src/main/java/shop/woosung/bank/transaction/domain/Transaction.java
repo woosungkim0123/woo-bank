@@ -1,4 +1,4 @@
-package shop.woosung.bank.domain.transaction;
+package shop.woosung.bank.transaction.domain;
 
 import java.time.LocalDateTime;
 

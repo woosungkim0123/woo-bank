@@ -1,7 +1,6 @@
-package shop.woosung.bank.domain.transaction.repository;
+package shop.woosung.bank.transaction.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import shop.woosung.bank.domain.transaction.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, TransactionRepositoryDao {
 }
