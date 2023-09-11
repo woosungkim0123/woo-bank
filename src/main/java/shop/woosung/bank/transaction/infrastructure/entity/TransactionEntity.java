@@ -1,4 +1,4 @@
-package shop.woosung.bank.transaction.domain;
+package shop.woosung.bank.transaction.infrastructure.entity;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.AccessLevel;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -25,29 +26,32 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
+import shop.woosung.bank.common.infrastructure.BaseTimeEntity;
+import shop.woosung.bank.transaction.domain.TransactionEnum;
 
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "tb_wb_transaction")
 @Entity
-public class Transaction {
+public class TransactionEntity extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private AccountEntity withdrawAccountEntity;
 
-    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private AccountEntity depositAccountEntity;
 
     @Column(nullable = false)
     private Long amount;
 
     private Long withdrawAccountBalance;
+
     private Long depositAccountBalance;
 
     @Column(nullable = false)
@@ -58,18 +62,10 @@ public class Transaction {
     private String receiver;
     private String tel;
 
-    @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
     @Builder
-    public Transaction(Long id, AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, Long amount,
-                       Long withdrawAccountBalance, Long depositAccountBalance, TransactionEnum gubun, String sender,
-                       String receiver, String tel, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public TransactionEntity(Long id, AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, Long amount,
+                             Long withdrawAccountBalance, Long depositAccountBalance, TransactionEnum gubun, String sender,
+                             String receiver, String tel, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.withdrawAccountEntity = withdrawAccountEntity;
         this.depositAccountEntity = depositAccountEntity;
@@ -83,5 +79,4 @@ public class Transaction {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
-
 }

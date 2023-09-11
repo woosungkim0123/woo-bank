@@ -1,11 +1,12 @@
-package shop.woosung.bank.transaction;
+package shop.woosung.bank.transaction.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
-import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.controller.port.TransactionService;
+import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 import shop.woosung.bank.transaction.domain.TransactionRepository;
 import shop.woosung.bank.handler.ex.CustomApiException;
 
@@ -16,7 +17,7 @@ import static shop.woosung.bank.transaction.TransactionResponseDto.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class TransactionService {
+public class TransactionServiceImpl implements TransactionService {
     private final AccountJpaRepository accountJpaRepository;
     private final TransactionRepository transactionRepository;
 
@@ -26,7 +27,7 @@ public class TransactionService {
 
         //accountEntity.checkOwner(userId);
 
-        List<Transaction> transactionList = transactionRepository.findTransactionList(accountEntity.getId(), type, page);
+        List<TransactionEntity> transactionList = transactionRepository.findTransactionList(accountEntity.getId(), type, page);
 
         return new TransactionResponseListDto(accountEntity, transactionList);
     }

@@ -32,7 +32,6 @@ public class FakeJwtTokenProvider implements JwtTokenProvider {
 
     @Override
     public Long verify(String receiveToken) {
-        System.out.println("token" + token);
         checkError();
         checkSameToken(receiveToken);
         checkExpireToken();

@@ -13,7 +13,7 @@
 //import org.springframework.test.web.servlet.ResultActions;
 //import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
-//import shop.woosung.bank.transaction.domain.Transaction;
+//import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 //import shop.woosung.bank.transaction.domain.TransactionEnum;
 //import shop.woosung.bank.transaction.domain.TransactionRepository;
 //import shop.woosung.bank.user.infrastructure.UserEntity;
@@ -87,10 +87,10 @@
 //        transactionRepository.save(makeTransferTransaction(cosAccountEntity, ssarAccount1Entity, 100L));
 //    }
 //
-//    private Transaction makeDepositTransaction(AccountEntity accountEntity, long amount) {
+//    private TransactionEntity makeDepositTransaction(AccountEntity accountEntity, long amount) {
 //        accountEntity.deposit(amount);
 //        accountJpaRepository.save(accountEntity);
-//        return Transaction.builder()
+//        return TransactionEntity.builder()
 //                .depositAccount(accountEntity)
 //                .depositAccountBalance(accountEntity.getBalance())
 //                .amount(amount)
@@ -101,10 +101,10 @@
 //                .build();
 //    }
 //
-//    private Transaction makeWithdrawTransaction(AccountEntity accountEntity, long amount) {
+//    private TransactionEntity makeWithdrawTransaction(AccountEntity accountEntity, long amount) {
 //        accountEntity.withdraw(amount);
 //        accountJpaRepository.save(accountEntity);
-//        return Transaction.builder()
+//        return TransactionEntity.builder()
 //                .withdrawAccount(accountEntity)
 //                .withdrawAccountBalance(accountEntity.getBalance())
 //                .amount(amount)
@@ -114,12 +114,12 @@
 //                .build();
 //    }
 //
-//    private Transaction makeTransferTransaction(AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, long amount) {
+//    private TransactionEntity makeTransferTransaction(AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, long amount) {
 //        withdrawAccountEntity.withdraw(amount);
 //        depositAccountEntity.deposit(amount);
 //        accountJpaRepository.save(withdrawAccountEntity);
 //        accountJpaRepository.save(depositAccountEntity);
-//        return Transaction.builder()
+//        return TransactionEntity.builder()
 //                .withdrawAccount(withdrawAccountEntity)
 //                .depositAccount(depositAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())

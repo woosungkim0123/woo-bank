@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
 //
 //        depositAccountPSEntity.deposit(accountDepositReqDto.getAmount());
 //
-//        Transaction transaction = Transaction.builder()
+//        TransactionEntity transaction = TransactionEntity.builder()
 //                        .depositAccount(depositAccountPSEntity)
 //                        .withdrawAccount(null)
 //                        .depositAccountBalance(depositAccountPSEntity.getBalance())
@@ -89,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
 //                        .tel(accountDepositReqDto.getTel())
 //                        .build();
 //
-//        Transaction transactionPS = transactionRepository.save(transaction);
+//        TransactionEntity transactionPS = transactionRepository.save(transaction);
 //
 //        return new AccountDepositResDto(depositAccountPSEntity, transactionPS);
 //    }
@@ -121,7 +121,7 @@ public class AccountServiceImpl implements AccountService {
 //
 //        // 거래내역 남기기
 //        // 내 계좌 -> ATM 출금
-//        Transaction transaction = Transaction.builder()
+//        TransactionEntity transaction = TransactionEntity.builder()
 //                .withdrawAccount(withdrawAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
 //                .amount(accountWithdrawReqDto.getAmount())
@@ -130,7 +130,7 @@ public class AccountServiceImpl implements AccountService {
 //                .receiver("ATM")
 //                .build();
 //
-//        Transaction savedTransaction = transactionRepository.save(transaction);
+//        TransactionEntity savedTransaction = transactionRepository.save(transaction);
 //
 //
 //        // DTO 응답
@@ -168,7 +168,7 @@ public class AccountServiceImpl implements AccountService {
 //        depositAccountEntity.deposit(accountTransferReqDto.getAmount());
 //
 //        // 거래내역 남기기
-//        Transaction transaction = Transaction.builder()
+//        TransactionEntity transaction = TransactionEntity.builder()
 //                .withdrawAccount(withdrawAccountEntity)
 //                .depositAccount(depositAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
@@ -179,7 +179,7 @@ public class AccountServiceImpl implements AccountService {
 //                .receiver(accountTransferReqDto.getDepositNumber() + "")
 //                .build();
 //
-//        Transaction savedTransaction = transactionRepository.save(transaction);
+//        TransactionEntity savedTransaction = transactionRepository.save(transaction);
 //
 //        // DTO 응답
 //        return new AccountTransferResDto(withdrawAccountEntity, savedTransaction);
@@ -194,7 +194,7 @@ public class AccountServiceImpl implements AccountService {
 //
 //        accountEntityPS.checkOwner(userId);
 //
-//        List<Transaction> transactionList = transactionRepository.findTransactionList(accountEntityPS.getId(), type, page);
+//        List<TransactionEntity> transactionList = transactionRepository.findTransactionList(accountEntityPS.getId(), type, page);
 //
 //        // DTO 응답
 //        return new AccountDetailResDto(accountEntityPS, transactionList);

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
-import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 import shop.woosung.bank.common.util.CustomDateUtil;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class AccountResDto {
         private Long number;
         private TransactionDto transaction;
 
-        public AccountDepositResDto(AccountEntity accountEntity, Transaction transaction) {
+        public AccountDepositResDto(AccountEntity accountEntity, TransactionEntity transaction) {
             this.id = accountEntity.getId();
             this.number = accountEntity.getNumber();
             this.transaction = new TransactionDto(transaction);
@@ -51,7 +51,7 @@ public class AccountResDto {
             private String tel;
             private String createdAt;
 
-            public TransactionDto(Transaction transaction) {
+            public TransactionDto(TransactionEntity transaction) {
                 this.id = transaction.getId();
                 this.gubun = transaction.getGubun().toString();
                 this.sender = transaction.getSender();
@@ -71,7 +71,7 @@ public class AccountResDto {
         private Long balance;
         private TransactionDto transaction;
 
-        public AccountWithdrawResDto(AccountEntity accountEntity, Transaction transaction) {
+        public AccountWithdrawResDto(AccountEntity accountEntity, TransactionEntity transaction) {
             this.id = accountEntity.getId();
             this.number = accountEntity.getNumber();
             this.balance = accountEntity.getBalance();
@@ -87,7 +87,7 @@ public class AccountResDto {
             private Long amount;
             private String createdAt;
 
-            public TransactionDto(Transaction transaction) {
+            public TransactionDto(TransactionEntity transaction) {
                 this.id = transaction.getId();
                 this.gubun = transaction.getGubun().toString();
                 this.sender = transaction.getSender();
@@ -105,7 +105,7 @@ public class AccountResDto {
         private Long balance;
         private TransactionDto transaction;
 
-        public AccountTransferResDto(AccountEntity accountEntity, Transaction transaction) {
+        public AccountTransferResDto(AccountEntity accountEntity, TransactionEntity transaction) {
             this.id = accountEntity.getId();
             this.number = accountEntity.getNumber();
             this.balance = accountEntity.getBalance();
@@ -123,7 +123,7 @@ public class AccountResDto {
             private Long depositAccountBalance;
             private String createdAt;
 
-            public TransactionDto(Transaction transaction) {
+            public TransactionDto(TransactionEntity transaction) {
                 this.id = transaction.getId();
                 this.gubun = transaction.getGubun().toString();
                 this.sender = transaction.getSender();
@@ -142,7 +142,7 @@ public class AccountResDto {
         private Long balance;
         private List<TransactionDto> transactions = new ArrayList<>();
 
-        public AccountDetailResDto(AccountEntity accountEntity, List<Transaction> transactions) {
+        public AccountDetailResDto(AccountEntity accountEntity, List<TransactionEntity> transactions) {
             this.id = accountEntity.getId();
             this.number = accountEntity.getNumber();
             this.balance = accountEntity.getBalance();
@@ -162,7 +162,7 @@ public class AccountResDto {
             private String createdAt;
             private Long balance;
 
-            public TransactionDto(Transaction transaction, Long accountNumber) {
+            public TransactionDto(TransactionEntity transaction, Long accountNumber) {
                 this.id = transaction.getId();
                 this.type = transaction.getGubun().getValue();
                 this.amount = transaction.getAmount();

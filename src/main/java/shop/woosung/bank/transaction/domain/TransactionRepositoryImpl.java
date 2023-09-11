@@ -1,6 +1,7 @@
 package shop.woosung.bank.transaction.domain;
 
 import lombok.RequiredArgsConstructor;
+import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -12,10 +13,10 @@ public class TransactionRepositoryImpl implements TransactionRepositoryDao {
     private final EntityManager em;
 
     @Override
-    public List<Transaction> findTransactionList(Long accountId, String type, Integer page) {
+    public List<TransactionEntity> findTransactionList(Long accountId, String type, Integer page) {
         // type을 가지고 동적 쿼리
         String sql = "";
-        sql += "select t from Transaction t ";
+        sql += "select t from TransactionEntity t ";
 
         // 입금, 출금 내역을 조회할 때는 inner join
         // 입,출금 내역을 할때는 withdraw가 null이면 deposit이 값이 있어도 못찾음 그래서 left outer join
@@ -34,7 +35,7 @@ public class TransactionRepositoryImpl implements TransactionRepositoryDao {
         }
         // createNativeQuery : 일반적으로 쓰는 쿼리
         // createQuery : JPQL 쿼리
-        TypedQuery<Transaction> query = em.createQuery(sql, Transaction.class);
+        TypedQuery<TransactionEntity> query = em.createQuery(sql, TransactionEntity.class);
 
         if (type.equals("WITHDRAW")) {
             query  = query.setParameter("withdrawAccountId", accountId);

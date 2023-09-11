@@ -2,7 +2,7 @@ package shop.woosung.bank.transaction;
 
 import lombok.Getter;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
-import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 import shop.woosung.bank.common.util.CustomDateUtil;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class TransactionResponseDto {
     public static class TransactionResponseListDto {
         private List<TransactionDto> transactions = new ArrayList<>();
 
-        public TransactionResponseListDto(AccountEntity accountEntity, List<Transaction> transactions) {
+        public TransactionResponseListDto(AccountEntity accountEntity, List<TransactionEntity> transactions) {
             this.transactions = transactions.stream()
                     .map(transaction -> new TransactionDto(transaction, accountEntity.getNumber()))
                     .collect(Collectors.toList());
@@ -32,7 +32,7 @@ public class TransactionResponseDto {
             private String createdAt;
             private Long balance;
 
-            public TransactionDto(Transaction transaction, Long accountNumber) {
+            public TransactionDto(TransactionEntity transaction, Long accountNumber) {
                 this.id = transaction.getId();
                 this.type = transaction.getGubun().getValue();
                 this.amount = transaction.getAmount();
