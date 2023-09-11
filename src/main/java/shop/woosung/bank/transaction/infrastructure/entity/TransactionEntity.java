@@ -1,7 +1,5 @@
 package shop.woosung.bank.transaction.infrastructure.entity;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
@@ -15,19 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
 import lombok.AccessLevel;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 import shop.woosung.bank.common.infrastructure.BaseTimeEntity;
-import shop.woosung.bank.transaction.domain.TransactionEnum;
+import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.domain.TransactionType;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,11 +36,11 @@ public class TransactionEntity extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private AccountEntity withdrawAccountEntity;
+    private AccountEntity withdrawAccount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private AccountEntity depositAccountEntity;
+    private AccountEntity depositAccount;
 
     @Column(nullable = false)
     private Long amount;
@@ -54,29 +49,45 @@ public class TransactionEntity extends BaseTimeEntity {
 
     private Long depositAccountBalance;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private TransactionEnum gubun;
+    @Column(nullable = false)
+    private TransactionType type;
 
     private String sender;
+
     private String receiver;
+
     private String tel;
 
-    @Builder
-    public TransactionEntity(Long id, AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, Long amount,
-                             Long withdrawAccountBalance, Long depositAccountBalance, TransactionEnum gubun, String sender,
-                             String receiver, String tel, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.withdrawAccountEntity = withdrawAccountEntity;
-        this.depositAccountEntity = depositAccountEntity;
-        this.amount = amount;
-        this.withdrawAccountBalance = withdrawAccountBalance;
-        this.depositAccountBalance = depositAccountBalance;
-        this.gubun = gubun;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.tel = tel;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public static TransactionEntity fromModel(Transaction transaction) {
+        TransactionEntity transactionEntity = new TransactionEntity();
+        transactionEntity.id = transaction.getId();
+        transactionEntity.withdrawAccount = AccountEntity.fromModel(transaction.getWithdrawAccount());
+        transactionEntity.depositAccount = AccountEntity.fromModel(transaction.getDepositAccount());
+        transactionEntity.amount = transaction.getAmount();
+        transactionEntity.withdrawAccountBalance = transaction.getWithdrawAccountBalance();
+        transactionEntity.depositAccountBalance = transaction.getDepositAccountBalance();
+        transactionEntity.type = transaction.getType();
+        transactionEntity.sender = transaction.getSender();
+        transactionEntity.receiver = transaction.getReceiver();
+        transactionEntity.tel = transaction.getTel();
+        return transactionEntity;
+    }
+
+    public Transaction toModel() {
+        return Transaction.builder()
+                .id(id)
+                .withdrawAccount(withdrawAccount.toModel())
+                .depositAccount(depositAccount.toModel())
+                .amount(amount)
+                .withdrawAccountBalance(withdrawAccountBalance)
+                .depositAccountBalance(depositAccountBalance)
+                .type(type)
+                .sender(sender)
+                .receiver(receiver)
+                .tel(tel)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .build();
     }
 }
