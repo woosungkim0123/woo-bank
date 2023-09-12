@@ -3,32 +3,31 @@ package shop.woosung.bank.transaction.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
-import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
+import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
+import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.transaction.controller.port.TransactionService;
-import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
-import shop.woosung.bank.transaction.domain.TransactionRepository;
-import shop.woosung.bank.handler.ex.CustomApiException;
+import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.service.dto.TransactionResponseListDto;
+import shop.woosung.bank.transaction.service.port.TransactionRepository;
 
 import java.util.List;
-
-import static shop.woosung.bank.transaction.TransactionResponseDto.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class TransactionServiceImpl implements TransactionService {
-    private final AccountJpaRepository accountJpaRepository;
+    private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
-    public TransactionResponseListDto getTransactionList(Long userId, Long accountNumber, String type, int page) {
-        AccountEntity accountEntity = accountJpaRepository.findByNumber(accountNumber)
-                .orElseThrow(() -> new CustomApiException("해당 계좌를 찾을 수 없습니다."));
+    public TransactionResponseListDto getTransactionList(Long userId, Long accountFullnumber, String type, int page) {
+        Account account = accountRepository.findByFullnumber(accountFullnumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullnumber));
 
-        //accountEntity.checkOwner(userId);
+        account.checkOwner(userId);
 
-        List<TransactionEntity> transactionList = transactionRepository.findTransactionList(accountEntity.getId(), type, page);
+        List<Transaction> transactionList = transactionRepository.findTransactionList(account.getId(), type, page);
 
-        return new TransactionResponseListDto(accountEntity, transactionList);
+        return new TransactionResponseListDto(account, transactionList);
     }
 }

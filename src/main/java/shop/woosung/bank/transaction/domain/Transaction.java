@@ -3,7 +3,6 @@ package shop.woosung.bank.transaction.domain;
 import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.account.domain.Account;
-import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 
 import java.time.LocalDateTime;
 

@@ -11,7 +11,7 @@
 //import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
 //import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
-//import shop.woosung.bank.transaction.domain.repository.TransactionRepository;
+//import shop.woosung.bank.transaction.domain.repository.TransactionJpaRepository;
 //import shop.woosung.bank.user.infrastructure.UserEntity;
 //import shop.woosung.bank.user.domain.UserRole;
 //import shop.woosung.bank.user.infrastructure.UserJpaRepository;
@@ -40,7 +40,7 @@
 //    @Mock
 //    private AccountJpaRepository accountJpaRepository;
 //    @Mock
-//    private TransactionRepository transactionRepository;
+//    private TransactionJpaRepository transactionRepository;
 //
 //    @Test
 //    public void registerAccount() throws JsonProcessingException {

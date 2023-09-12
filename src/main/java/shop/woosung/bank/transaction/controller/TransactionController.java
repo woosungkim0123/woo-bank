@@ -7,8 +7,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.transaction.TransactionResponseDto.TransactionResponseListDto;
 import shop.woosung.bank.transaction.controller.port.TransactionService;
+import shop.woosung.bank.transaction.service.dto.TransactionResponseListDto;
 
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -19,13 +19,13 @@ public class TransactionController {
 
     @GetMapping("/s/account/{number}/transaction")
     public ResponseEntity<ApiResponse<TransactionResponseListDto>> findTransactionList(
-            @PathVariable Long number,
+            @PathVariable Long accountFullnumber,
             @RequestParam(value = "type", defaultValue = "ALL") String type,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @AuthenticationPrincipal LoginUser loginUser) {
 
-        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(loginUser.getUser().getId(), number, type, page);
+        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(loginUser.getUser().getId(), accountFullnumber, type, page);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("입출금목록보기 성공", transactionResponseListDto));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("입출금 목록보기 성공", transactionResponseListDto));
     }
 }

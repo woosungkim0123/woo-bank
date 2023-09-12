@@ -20,7 +20,7 @@ import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.transaction.domain.TransactionRepository;
+import shop.woosung.bank.transaction.infrastructure.TransactionJpaRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -37,7 +37,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountSequenceRepository accountSequenceRepository;
     private final AccountTypeNumberRepository accountTypeNumberRepository;
     private final UserRepository userRepository;
-    private final TransactionRepository transactionRepository;
+    private final TransactionJpaRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -83,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
 //                        .depositAccountBalance(depositAccountPSEntity.getBalance())
 //                        .withdrawAccountBalance(null)
 //                        .amount(accountDepositReqDto.getAmount())
-//                        .gubun(TransactionEnum.DEPOSIT)
+//                        .gubun(TransactionType.DEPOSIT)
 //                        .sender("ATM")
 //                        .receiver(accountDepositReqDto.getNumber() + "")
 //                        .tel(accountDepositReqDto.getTel())
@@ -125,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
 //                .withdrawAccount(withdrawAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
 //                .amount(accountWithdrawReqDto.getAmount())
-//                .gubun(TransactionEnum.WITHDRAW)
+//                .gubun(TransactionType.WITHDRAW)
 //                .sender(accountWithdrawReqDto.getNumber() + "")
 //                .receiver("ATM")
 //                .build();
@@ -174,7 +174,7 @@ public class AccountServiceImpl implements AccountService {
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
 //                .depositAccountBalance(depositAccountEntity.getBalance())
 //                .amount(accountTransferReqDto.getAmount())
-//                .gubun(TransactionEnum.TRANSFER)
+//                .gubun(TransactionType.TRANSFER)
 //                .sender(accountTransferReqDto.getWithdrawNumber() + "")
 //                .receiver(accountTransferReqDto.getDepositNumber() + "")
 //                .build();
