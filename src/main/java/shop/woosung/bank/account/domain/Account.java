@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.handler.ex.CustomApiException;
 import shop.woosung.bank.user.domain.User;
 
 import java.time.LocalDateTime;
@@ -52,21 +51,21 @@ public class Account {
         }
     }
 
-    public void deposit(Long amount) {
-        this.balance = this.balance + amount;
-    }
-
-    public void checkSamePassword(Long password) {
-        if(!this.password.equals(password)) {
-            throw new CustomApiException("비밀번호가 일치하지 않습니다.");
-        }
-    }
-
-    public void checkBalance(Long amount) {
-        if(this.balance < amount) {
-            throw new CustomApiException("계좌 잔액이 부족합니다.");
-        }
-    }
+//    public void deposit(Long amount) {
+//        this.balance = this.balance + amount;
+//    }
+//
+//    public void checkSamePassword(Long password) {
+//        if(!this.password.equals(password)) {
+//            throw new CustomApiException("비밀번호가 일치하지 않습니다.");
+//        }
+//    }
+//
+//    public void checkBalance(Long amount) {
+//        if(this.balance < amount) {
+//            throw new CustomApiException("계좌 잔액이 부족합니다.");
+//        }
+//    }
 
     public void withdraw(Long amount) {
         balance = balance - amount;

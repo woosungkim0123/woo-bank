@@ -1,5 +1,6 @@
 package shop.woosung.bank.transaction.service;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,13 +14,15 @@ import shop.woosung.bank.transaction.service.port.TransactionRepository;
 
 import java.util.List;
 
+@Builder
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class TransactionServiceImpl implements TransactionService {
+
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
+    @Transactional(readOnly = true)
     public TransactionResponseListDto getTransactionList(Long userId, Long accountFullnumber, String type, int page) {
         Account account = accountRepository.findByFullnumber(accountFullnumber)
                 .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullnumber));
