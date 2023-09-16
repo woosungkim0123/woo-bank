@@ -20,7 +20,9 @@ import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
+import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.infrastructure.TransactionJpaRepository;
+import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -37,7 +39,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountSequenceRepository accountSequenceRepository;
     private final AccountTypeNumberRepository accountTypeNumberRepository;
     private final UserRepository userRepository;
-    private final TransactionJpaRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
