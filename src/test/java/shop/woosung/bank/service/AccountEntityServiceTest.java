@@ -10,8 +10,8 @@
 //import shop.woosung.bank.account.service.AccountServiceImpl;
 //import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
-//import shop.woosung.bank.domain.transaction.Transaction;
-//import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
+//import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
+//import shop.woosung.bank.transaction.domain.repository.TransactionJpaRepository;
 //import shop.woosung.bank.user.infrastructure.UserEntity;
 //import shop.woosung.bank.user.domain.UserRole;
 //import shop.woosung.bank.user.infrastructure.UserJpaRepository;
@@ -40,7 +40,7 @@
 //    @Mock
 //    private AccountJpaRepository accountJpaRepository;
 //    @Mock
-//    private TransactionRepository transactionRepository;
+//    private TransactionJpaRepository transactionRepository;
 //
 //    @Test
 //    public void registerAccount() throws JsonProcessingException {
@@ -121,7 +121,7 @@
 //
 //        // stub
 //        AccountEntity accountEntity2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-//        Transaction transaction = newMockDepositTransaction(1L, accountEntity2);
+//        TransactionEntity transaction = newMockDepositTransaction(1L, accountEntity2);
 //        when(transactionRepository.save(any())).thenReturn(transaction);
 //        // when
 //        AccountDepositResDto accountDepositResDto = accountService.depositAccount(accountDepositReqDto);
@@ -148,7 +148,7 @@
 //
 //        // stub
 //        AccountEntity accountEntity2 = newMockAccount(1L, 11111111111L, 1000L, userEntity);
-//        Transaction transaction = newMockWithdrawTransaction(1L, accountEntity2);
+//        TransactionEntity transaction = newMockWithdrawTransaction(1L, accountEntity2);
 //        when(transactionRepository.save(any())).thenReturn(transaction);
 //        // when
 //        AccountWithdrawResDto accountWithdrawResDto = accountService.withdraw(accountWithdrawReqDto, 1L);
@@ -176,7 +176,7 @@
 //        AccountEntity depositAccountEntity = newMockAccount(2L, 11111111112L, 1000L, userEntity);
 //        when(accountJpaRepository.findByNumber(11111111112L)).thenReturn(Optional.of(depositAccountEntity));
 //
-//        Transaction transaction = newMockTransferTransaction(1L, withdrawAccountEntity, depositAccountEntity);
+//        TransactionEntity transaction = newMockTransferTransaction(1L, withdrawAccountEntity, depositAccountEntity);
 //        when(transactionRepository.save(any())).thenReturn(transaction);
 //
 //        // when

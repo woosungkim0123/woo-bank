@@ -13,9 +13,9 @@
 //import org.springframework.test.web.servlet.ResultActions;
 //import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 //import shop.woosung.bank.account.infrastructure.AccountJpaRepository;
-//import shop.woosung.bank.domain.transaction.Transaction;
-//import shop.woosung.bank.domain.transaction.TransactionEnum;
-//import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
+//import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
+//import shop.woosung.bank.transaction.domain.TransactionType;
+//import shop.woosung.bank.transaction.infrastructure.TransactionJpaRepository;
 //import shop.woosung.bank.user.infrastructure.UserEntity;
 //import shop.woosung.bank.user.domain.UserRole;
 //import shop.woosung.bank.user.infrastructure.UserJpaRepository;
@@ -40,7 +40,7 @@
 //    @Autowired
 //    private AccountJpaRepository accountJpaRepository;
 //    @Autowired
-//    private TransactionRepository transactionRepository;
+//    private TransactionJpaRepository transactionRepository;
 //    @Autowired
 //    private EntityManager em;
 //
@@ -87,45 +87,45 @@
 //        transactionRepository.save(makeTransferTransaction(cosAccountEntity, ssarAccount1Entity, 100L));
 //    }
 //
-//    private Transaction makeDepositTransaction(AccountEntity accountEntity, long amount) {
+//    private TransactionEntity makeDepositTransaction(AccountEntity accountEntity, long amount) {
 //        accountEntity.deposit(amount);
 //        accountJpaRepository.save(accountEntity);
-//        return Transaction.builder()
+//        return TransactionEntity.builder()
 //                .depositAccount(accountEntity)
 //                .depositAccountBalance(accountEntity.getBalance())
 //                .amount(amount)
-//                .gubun(TransactionEnum.DEPOSIT)
+//                .gubun(TransactionType.DEPOSIT)
 //                .sender("ATM")
 //                .receiver(Long.toString(accountEntity.getNumber()))
 //                .tel("01012341234")
 //                .build();
 //    }
 //
-//    private Transaction makeWithdrawTransaction(AccountEntity accountEntity, long amount) {
+//    private TransactionEntity makeWithdrawTransaction(AccountEntity accountEntity, long amount) {
 //        accountEntity.withdraw(amount);
 //        accountJpaRepository.save(accountEntity);
-//        return Transaction.builder()
+//        return TransactionEntity.builder()
 //                .withdrawAccount(accountEntity)
 //                .withdrawAccountBalance(accountEntity.getBalance())
 //                .amount(amount)
-//                .gubun(TransactionEnum.WITHDRAW)
+//                .gubun(TransactionType.WITHDRAW)
 //                .sender(Long.toString(accountEntity.getNumber()))
 //                .receiver("ATM")
 //                .build();
 //    }
 //
-//    private Transaction makeTransferTransaction(AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, long amount) {
+//    private TransactionEntity makeTransferTransaction(AccountEntity withdrawAccountEntity, AccountEntity depositAccountEntity, long amount) {
 //        withdrawAccountEntity.withdraw(amount);
 //        depositAccountEntity.deposit(amount);
 //        accountJpaRepository.save(withdrawAccountEntity);
 //        accountJpaRepository.save(depositAccountEntity);
-//        return Transaction.builder()
+//        return TransactionEntity.builder()
 //                .withdrawAccount(withdrawAccountEntity)
 //                .depositAccount(depositAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
 //                .depositAccountBalance(depositAccountEntity.getBalance())
 //                .amount(amount)
-//                .gubun(TransactionEnum.TRANSFER)
+//                .gubun(TransactionType.TRANSFER)
 //                .sender(Long.toString(withdrawAccountEntity.getNumber()))
 //                .receiver(Long.toString(depositAccountEntity.getNumber()))
 //                .build();

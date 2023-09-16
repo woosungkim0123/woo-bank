@@ -20,7 +20,9 @@ import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.domain.transaction.repository.TransactionRepository;
+import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.infrastructure.TransactionJpaRepository;
+import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -77,19 +79,19 @@ public class AccountServiceImpl implements AccountService {
 //
 //        depositAccountPSEntity.deposit(accountDepositReqDto.getAmount());
 //
-//        Transaction transaction = Transaction.builder()
+//        TransactionEntity transaction = TransactionEntity.builder()
 //                        .depositAccount(depositAccountPSEntity)
 //                        .withdrawAccount(null)
 //                        .depositAccountBalance(depositAccountPSEntity.getBalance())
 //                        .withdrawAccountBalance(null)
 //                        .amount(accountDepositReqDto.getAmount())
-//                        .gubun(TransactionEnum.DEPOSIT)
+//                        .gubun(TransactionType.DEPOSIT)
 //                        .sender("ATM")
 //                        .receiver(accountDepositReqDto.getNumber() + "")
 //                        .tel(accountDepositReqDto.getTel())
 //                        .build();
 //
-//        Transaction transactionPS = transactionRepository.save(transaction);
+//        TransactionEntity transactionPS = transactionRepository.save(transaction);
 //
 //        return new AccountDepositResDto(depositAccountPSEntity, transactionPS);
 //    }
@@ -121,16 +123,16 @@ public class AccountServiceImpl implements AccountService {
 //
 //        // 거래내역 남기기
 //        // 내 계좌 -> ATM 출금
-//        Transaction transaction = Transaction.builder()
+//        TransactionEntity transaction = TransactionEntity.builder()
 //                .withdrawAccount(withdrawAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
 //                .amount(accountWithdrawReqDto.getAmount())
-//                .gubun(TransactionEnum.WITHDRAW)
+//                .gubun(TransactionType.WITHDRAW)
 //                .sender(accountWithdrawReqDto.getNumber() + "")
 //                .receiver("ATM")
 //                .build();
 //
-//        Transaction savedTransaction = transactionRepository.save(transaction);
+//        TransactionEntity savedTransaction = transactionRepository.save(transaction);
 //
 //
 //        // DTO 응답
@@ -168,18 +170,18 @@ public class AccountServiceImpl implements AccountService {
 //        depositAccountEntity.deposit(accountTransferReqDto.getAmount());
 //
 //        // 거래내역 남기기
-//        Transaction transaction = Transaction.builder()
+//        TransactionEntity transaction = TransactionEntity.builder()
 //                .withdrawAccount(withdrawAccountEntity)
 //                .depositAccount(depositAccountEntity)
 //                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
 //                .depositAccountBalance(depositAccountEntity.getBalance())
 //                .amount(accountTransferReqDto.getAmount())
-//                .gubun(TransactionEnum.TRANSFER)
+//                .gubun(TransactionType.TRANSFER)
 //                .sender(accountTransferReqDto.getWithdrawNumber() + "")
 //                .receiver(accountTransferReqDto.getDepositNumber() + "")
 //                .build();
 //
-//        Transaction savedTransaction = transactionRepository.save(transaction);
+//        TransactionEntity savedTransaction = transactionRepository.save(transaction);
 //
 //        // DTO 응답
 //        return new AccountTransferResDto(withdrawAccountEntity, savedTransaction);
@@ -194,7 +196,7 @@ public class AccountServiceImpl implements AccountService {
 //
 //        accountEntityPS.checkOwner(userId);
 //
-//        List<Transaction> transactionList = transactionRepository.findTransactionList(accountEntityPS.getId(), type, page);
+//        List<TransactionEntity> transactionList = transactionRepository.findTransactionList(accountEntityPS.getId(), type, page);
 //
 //        // DTO 응답
 //        return new AccountDetailResDto(accountEntityPS, transactionList);

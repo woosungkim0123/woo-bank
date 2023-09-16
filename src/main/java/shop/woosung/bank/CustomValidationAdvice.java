@@ -1,4 +1,4 @@
-package shop.woosung.bank.handler.aop;
+package shop.woosung.bank;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -8,7 +8,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import shop.woosung.bank.handler.ex.CustomValidationException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +37,7 @@ public class CustomValidationAdvice {
                     Map<String, String> errorMap = bindingResult.getFieldErrors().stream()
                             .peek(error -> log.error("error: {}", error.getDefaultMessage()))
                             .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
-                    throw new CustomValidationException("유효성 검사 실패", errorMap);
+                    throw new RuntimeException("유효성 검사 실패");
                 }
             }
         }

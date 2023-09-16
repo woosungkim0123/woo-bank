@@ -1,11 +1,11 @@
-package shop.woosung.bank.domain.transaction;
+package shop.woosung.bank.transaction.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum TransactionEnum {
+public enum TransactionType {
     WITHDRAW("출금"), DEPOSIT("입금"), TRANSFER("이체"), ALL("입출금내역");
 
     private String value;

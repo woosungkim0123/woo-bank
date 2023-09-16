@@ -13,8 +13,6 @@ import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.util.AccountControllerToServiceConverter;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.dto.ResponseDto;
-import shop.woosung.bank.account.service.AccountServiceImpl;
 
 import javax.validation.Valid;
 
