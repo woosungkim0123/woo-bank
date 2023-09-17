@@ -36,4 +36,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public void deleteById(Long id) {
         accountJpaRepository.deleteById(id);
     }
+
+    @Override
+    public Optional<Account> findByFullnumberWithPessimistic(Long fullnumber) {
+        return accountJpaRepository.findByFullnumberWithPessimistic(fullnumber).map(AccountEntity::toModel);
+    }
 }
