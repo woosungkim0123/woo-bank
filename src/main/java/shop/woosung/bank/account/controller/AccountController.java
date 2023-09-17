@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
@@ -18,6 +19,7 @@ import javax.validation.Valid;
 
 import static shop.woosung.bank.account.AccountReqDto.*;
 import static shop.woosung.bank.account.AccountResDto.*;
+import static shop.woosung.bank.account.util.AccountControllerToServiceConverter.accountDepositRequestConvert;
 import static shop.woosung.bank.account.util.AccountControllerToServiceConverter.accountRegisterRequestConvert;
 
 
@@ -45,19 +47,22 @@ public class AccountController {
     }
 
     @DeleteMapping("/s/account/{number}")
-    public ResponseEntity<?> deleteAccount(@PathVariable Long number,
+    public ResponseEntity<ApiResponse<Object>> deleteAccount(@PathVariable Long number,
                                            @AuthenticationPrincipal LoginUser loginUser) {
         accountService.deleteAccount(number, loginUser.getUser().getId());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("계좌 삭제 성공"));
     }
+
+    @PostMapping("/account/deposit")
+    public ResponseEntity<?> depositAccount(@RequestBody @Valid AccountDepositRequestDto accountDepositRequestDto, @AuthenticationPrincipal LoginUser loginUser) {
+        accountService.depositAccount(accountDepositRequestConvert(accountDepositRequestDto, loginUser));
+
+        // 응답값들어가야함 (리턴값도 수정)
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 입금 완료", null));
+    }
+
 //
-//    @PostMapping("/account/deposit")
-//    public ResponseEntity<?> depositAccount(@RequestBody @Valid AccountDepositReqDto accountDepositReqDto, BindingResult bindingResult) {
-//        AccountDepositResDto accountDepositResDto = accountService.depositAccount(accountDepositReqDto);
-//
-//        return new ResponseEntity<>(new ResponseDto<>(1, "계좌 입금 완료", accountDepositResDto), HttpStatus.CREATED);
-//    }
 //
 //    @PostMapping("/s/account/withdraw")
 //    public ResponseEntity<?> withdrawAccount(@RequestBody @Valid AccountWithdrawReqDto accountWithdrawReqDto, BindingResult bindingResult,
