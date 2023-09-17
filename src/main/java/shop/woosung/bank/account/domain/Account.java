@@ -51,9 +51,9 @@ public class Account {
         }
     }
 
-//    public void deposit(Long amount) {
-//        this.balance = this.balance + amount;
-//    }
+    public void deposit(Long amount) {
+        this.balance = this.balance + amount;
+    }
 //
 //    public void checkSamePassword(Long password) {
 //        if(!this.password.equals(password)) {
