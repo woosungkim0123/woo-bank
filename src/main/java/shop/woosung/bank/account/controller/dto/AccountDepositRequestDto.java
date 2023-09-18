@@ -15,8 +15,7 @@ public class AccountDepositRequestDto {
     @NotNull
     private Long amount;
 
-    @Pattern(regexp = "^(DEPOSIT|WITHDRAW)$")
-    @NotEmpty
+    @NotNull
     private TransactionType transactionType;
 
     @Pattern(regexp = "^[0-9]{11}")
