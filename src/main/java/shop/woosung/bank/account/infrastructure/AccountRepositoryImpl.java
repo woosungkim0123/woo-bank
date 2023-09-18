@@ -38,7 +38,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByFullnumberWithPessimistic(Long fullnumber) {
-        return accountJpaRepository.findByFullnumberWithPessimistic(fullnumber).map(AccountEntity::toModel);
+    public Optional<Account> findByFullnumberWithPessimisticLock(Long fullnumber) {
+        return accountJpaRepository.findByFullnumberWithPessimisticLock(fullnumber).map(AccountEntity::toModel);
     }
 }

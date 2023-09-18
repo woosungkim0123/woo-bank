@@ -2,6 +2,7 @@ package shop.woosung.bank.account.infrastructure;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import shop.woosung.bank.account.infrastructure.entity.AccountEntity;
 
 import javax.persistence.LockModeType;
@@ -15,5 +16,6 @@ public interface AccountJpaRepository extends JpaRepository<AccountEntity, Long>
     Optional<AccountEntity> findByFullnumber(Long fullnumber);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<AccountEntity> findByFullnumberWithPessimistic(Long fullnumber);
+    @Query("SELECT a FROM AccountEntity a WHERE a.fullnumber = :fullnumber")
+    Optional<AccountEntity> findByFullnumberWithPessimisticLock(Long fullnumber);
 }
