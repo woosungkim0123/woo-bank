@@ -7,4 +7,6 @@ import java.util.List;
 public interface TransactionRepository {
 
     List<Transaction> findTransactionList(Long accountId, String type, Integer page);
+
+    Transaction save(Transaction transaction);
 }
