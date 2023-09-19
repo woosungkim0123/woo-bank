@@ -15,4 +15,6 @@ public interface AccountRepository {
     void deleteById(Long id);
 
     Optional<Account> findByFullnumberWithPessimisticLock(Long fullnumber);
+
+    void update(Account account);
 }

@@ -41,4 +41,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public Optional<Account> findByFullnumberWithPessimisticLock(Long fullnumber) {
         return accountJpaRepository.findByFullnumberWithPessimisticLock(fullnumber).map(AccountEntity::toModel);
     }
+
+    @Override
+    public void update(Account account) {
+        accountJpaRepository.save(AccountEntity.fromModel(account));
+    }
 }

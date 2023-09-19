@@ -52,6 +52,16 @@ public class FakeAccountRepository implements AccountRepository {
         data.removeIf(item -> Objects.equals(item.getId(), id));
     }
 
+    @Override
+    public Optional<Account> findByFullnumberWithPessimisticLock(Long fullnumber) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void update(Account account) {
+
+    }
+
     public void deleteAll() {
         autoIncrementId = 0L;
         data.clear();
