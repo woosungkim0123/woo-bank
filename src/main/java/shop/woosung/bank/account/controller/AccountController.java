@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
+import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.common.ApiResponse;
@@ -50,11 +51,10 @@ public class AccountController {
     }
 
     @PostMapping("/account/deposit")
-    public ResponseEntity<?> depositAccount(@RequestBody @Valid AccountDepositRequestDto accountDepositRequestDto) {
-        accountService.depositAccount(accountDepositRequestConvert(accountDepositRequestDto));
+    public ResponseEntity<ApiResponse<AccountDepositResponseDto>> depositAccount(@RequestBody @Valid AccountDepositRequestDto accountDepositRequestDto) {
+        AccountDepositResponseDto accountDepositResponseDto = accountService.depositAccount(accountDepositRequestConvert(accountDepositRequestDto));
 
-        // 응답값들어가야함 (리턴값도 수정)
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 입금 완료", null));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 입금 완료", accountDepositResponseDto));
     }
 
 //
