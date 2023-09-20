@@ -21,7 +21,6 @@ import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.domain.TransactionType;
-import shop.woosung.bank.transaction.infrastructure.TransactionJpaRepository;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
