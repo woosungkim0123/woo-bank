@@ -1,5 +1,6 @@
 package shop.woosung.bank.account.controller.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.transaction.domain.TransactionType;
 
@@ -21,4 +22,12 @@ public class AccountDepositRequestDto {
     @Pattern(regexp = "^[0-9]{11}")
     @NotEmpty
     private String tel;
+
+    @Builder
+    public AccountDepositRequestDto(Long fullnumber, Long amount, TransactionType transactionType, String tel) {
+        this.fullnumber = fullnumber;
+        this.amount = amount;
+        this.transactionType = transactionType;
+        this.tel = tel;
+    }
 }

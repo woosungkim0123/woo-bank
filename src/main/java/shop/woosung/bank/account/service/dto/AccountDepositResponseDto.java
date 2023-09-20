@@ -11,13 +11,13 @@ import shop.woosung.bank.transaction.domain.Transaction;
 @Builder(access = lombok.AccessLevel.PRIVATE)
 public class AccountDepositResponseDto {
     private final Long id;
-    private final Long number;
+    private final Long fullnumber;
     private final TransactionDto transaction;
 
     public static AccountDepositResponseDto from(Account depositAccount, Transaction depositTransaction) {
         return AccountDepositResponseDto.builder()
                 .id(depositAccount.getId())
-                .number(depositAccount.getNumber())
+                .fullnumber(depositAccount.getFullnumber())
                 .transaction(new TransactionDto(depositTransaction))
                 .build();
     }
