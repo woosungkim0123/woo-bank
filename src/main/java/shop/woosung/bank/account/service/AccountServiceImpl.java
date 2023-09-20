@@ -74,10 +74,7 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public AccountDepositResponseDto depositAccount(AccountDepositRequestServiceDto accountDepositRequestServiceDto) {
-        Account depositAccount = accountRepository.findByFullnumber(accountDepositRequestServiceDto.getFullnumber())
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountDepositRequestServiceDto.getFullnumber()));
-
-        accountLockService.depositAccountWithLock(depositAccount.getFullnumber(), accountDepositRequestServiceDto.getAmount());
+        Account depositAccount = accountLockService.depositAccountWithLock(accountDepositRequestServiceDto.getFullnumber(), accountDepositRequestServiceDto.getAmount());
 
         Transaction transaction = Transaction.builder()
                 .depositAccount(depositAccount)
