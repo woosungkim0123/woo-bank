@@ -54,12 +54,13 @@ public class FakeAccountRepository implements AccountRepository {
 
     @Override
     public Optional<Account> findByFullnumberWithPessimisticLock(Long fullnumber) {
-        return Optional.empty();
+        return data.stream().filter(item -> Objects.equals(item.getFullnumber(), fullnumber)).findFirst();
     }
 
     @Override
     public void update(Account account) {
-
+        data.removeIf(item -> Objects.equals(item.getId(), account.getId()));
+        data.add(account);
     }
 
     public void deleteAll() {

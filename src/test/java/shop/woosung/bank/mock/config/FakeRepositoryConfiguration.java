@@ -4,16 +4,13 @@ import org.springframework.context.annotation.Bean;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
-import shop.woosung.bank.mock.repository.FakeAccountRepository;
-import shop.woosung.bank.mock.repository.FakeAccountSequenceRepository;
-import shop.woosung.bank.mock.repository.FakeAccountTypeNumberRepository;
-import shop.woosung.bank.mock.repository.FakeUserRepository;
-import shop.woosung.bank.user.service.port.UserRepository;
+import shop.woosung.bank.mock.repository.*;
+import shop.woosung.bank.transaction.service.port.TransactionRepository;
 
 public class FakeRepositoryConfiguration {
 
     @Bean
-    public UserRepository userRepository() {
+    public FakeUserRepository userRepository() {
         return new FakeUserRepository();
     }
 
@@ -30,5 +27,10 @@ public class FakeRepositoryConfiguration {
     @Bean
     public AccountTypeNumberRepository accountTypeNumberRepository() {
         return new FakeAccountTypeNumberRepository();
+    }
+
+    @Bean
+    public TransactionRepository transactionRepository() {
+        return new FakeTransactionRepository();
     }
 }

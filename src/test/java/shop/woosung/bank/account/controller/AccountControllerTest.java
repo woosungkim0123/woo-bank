@@ -14,12 +14,15 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
+import shop.woosung.bank.mock.repository.FakeTransactionRepository;
 import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
+import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.user.domain.User;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -43,6 +46,9 @@ class AccountControllerTest {
 
     @Autowired
     private FakeAccountRepository accountRepository;
+
+//    @Autowired
+//    private FakeTransactionRepository transactionRepository;
 
     @BeforeEach
     public void init() {
@@ -140,6 +146,58 @@ class AccountControllerTest {
 
         // then
         resultActions.andExpect(status().isForbidden());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 번호"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("계좌에 입금 입금할 수 있다.")
+    @Test
+    public void deposit_account() throws Exception {
+        // given
+        User user = userRepository.findByEmail("test2@test.com").get();
+        accountRepository.save(Account.builder().fullnumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user).build());
+        AccountDepositRequestDto accountDepositRequestDto = AccountDepositRequestDto.builder().amount(1000L).fullnumber(2321111111111L).tel("01012345678").transactionType(TransactionType.DEPOSIT).build();
+        String requestBody = om.writeValueAsString(accountDepositRequestDto);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/account/deposit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isCreated());
+        resultActions.andExpect(jsonPath("$.status").value("success"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 입금 완료"));
+        resultActions.andExpect(jsonPath("$.data.id").value(1L));
+        resultActions.andExpect(jsonPath("$.data.fullnumber").value(2321111111111L));
+        resultActions.andExpect(jsonPath("$.data.transaction.id").value(1L));
+        resultActions.andExpect(jsonPath("$.data.transaction.type").value("DEPOSIT"));
+        resultActions.andExpect(jsonPath("$.data.transaction.sender").value("ATM"));
+        resultActions.andExpect(jsonPath("$.data.transaction.receiver").value("2321111111111"));
+        resultActions.andExpect(jsonPath("$.data.transaction.amount").value(1000L));
+        resultActions.andExpect(jsonPath("$.data.transaction.tel").value("01012345678"));
+        resultActions.andExpect(jsonPath("$.data.transaction.createdAt").value("2023-08-11T15:30"));
+    }
+
+    @DisplayName("계좌번호를 찾지 못하면 입금을 할 수 없다.")
+    @Test
+    public void fail_deposit_account_if_account_not_exist() throws Exception {
+        // given
+        User user = userRepository.findByEmail("test2@test.com").get();
+        accountRepository.save(Account.builder().fullnumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user).build());
+        AccountDepositRequestDto accountDepositRequestDto = AccountDepositRequestDto.builder().amount(1000L).fullnumber(2321111111112L).tel("01012345678").transactionType(TransactionType.DEPOSIT).build();
+        String requestBody = om.writeValueAsString(accountDepositRequestDto);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/account/deposit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
         resultActions.andExpect(jsonPath("$.status").value("error"));
         resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 번호"));
         resultActions.andExpect(jsonPath("$.data").isEmpty());
