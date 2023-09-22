@@ -20,14 +20,13 @@ import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
-import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
 
-import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.accountRegisterConvert;
+import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.*;
 
 @Builder
 @RequiredArgsConstructor
@@ -61,9 +60,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional
-    public void deleteAccount(Long accountFullnumber, Long userId) {
-        Account account = accountRepository.findByFullnumber(accountFullnumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullnumber));
+    public void deleteAccount(Long accountFullNumber, Long userId) {
+        Account account = accountRepository.findByFullNumber(accountFullNumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullNumber));
 
         account.checkOwner(userId);
 
@@ -72,20 +71,12 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Transactional
-    @Override
     public AccountDepositResponseDto depositAccount(AccountDepositRequestServiceDto accountDepositRequestServiceDto) {
-        Account depositAccount = accountLockService.depositAccountWithLock(accountDepositRequestServiceDto.getFullnumber(), accountDepositRequestServiceDto.getAmount());
+        Account depositAccount = accountLockService.depositAccountWithLock(accountDepositRequestServiceDto.getFullNumber(), accountDepositRequestServiceDto.getAmount());
 
-        Transaction transaction = Transaction.builder()
-                .depositAccount(depositAccount)
-                .depositAccountBalance(depositAccount.getBalance())
-                .amount(accountDepositRequestServiceDto.getAmount())
-                .type(TransactionType.DEPOSIT)
-                .sender("ATM")
-                .receiver(depositAccount.getFullnumber().toString())
-                .tel(accountDepositRequestServiceDto.getTel())
-                .build();
-        Transaction depositTransaction = transactionRepository.save(transaction);
+        Transaction depositTransaction = transactionRepository.save(
+                Transaction.createDepositTransaction(depositTransactionCreateConvert(accountDepositRequestServiceDto, depositAccount))
+        );
         
         return AccountDepositResponseDto.from(depositAccount, depositTransaction);
     }
