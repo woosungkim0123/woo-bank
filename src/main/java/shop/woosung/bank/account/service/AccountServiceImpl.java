@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Transactional
-    public AccountDepositResponseDto depositAccount(AccountDepositRequestServiceDto accountDepositRequestServiceDto) {
+    public AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto) {
         Account depositAccount = accountLockService.depositAccountWithLock(accountDepositRequestServiceDto.getFullNumber(), accountDepositRequestServiceDto.getAmount());
 
         Transaction depositTransaction = transactionRepository.save(

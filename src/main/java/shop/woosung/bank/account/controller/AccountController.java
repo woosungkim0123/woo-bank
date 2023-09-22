@@ -52,7 +52,7 @@ public class AccountController {
 
     @PostMapping("/account/deposit")
     public ResponseEntity<ApiResponse<AccountDepositResponseDto>> depositAccount(@RequestBody @Valid AccountDepositRequestDto accountDepositRequestDto) {
-        AccountDepositResponseDto accountDepositResponseDto = accountService.depositAccount(accountDepositRequestConvert(accountDepositRequestDto));
+        AccountDepositResponseDto accountDepositResponseDto = accountService.deposit(accountDepositRequestConvert(accountDepositRequestDto));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 입금 완료", accountDepositResponseDto));
     }

@@ -10,5 +10,5 @@ public interface AccountService {
 
     void deleteAccount(Long fullNumber, Long userId);
 
-    AccountDepositResponseDto depositAccount(AccountDepositRequestServiceDto accountDepositRequestServiceDto);
+    AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto);
 }
