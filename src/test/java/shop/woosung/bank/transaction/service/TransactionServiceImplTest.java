@@ -34,7 +34,7 @@ class TransactionServiceImplTest {
         User user1 = User.builder().id(1L).name("test1").build();
         Account account = Account.builder()
                         .number(1111L)
-                        .fullnumber(2321111L)
+                        .fullNumber(2321111L)
                         .password("1234")
                         .balance(1000L)
                         .type(AccountType.NORMAL)

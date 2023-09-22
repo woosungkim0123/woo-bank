@@ -15,10 +15,7 @@ import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
-import shop.woosung.bank.mock.repository.FakeAccountRepository;
-import shop.woosung.bank.mock.repository.FakeAccountSequenceRepository;
-import shop.woosung.bank.mock.repository.FakeAccountTypeNumberRepository;
-import shop.woosung.bank.mock.repository.FakeUserRepository;
+import shop.woosung.bank.mock.repository.*;
 import shop.woosung.bank.mock.util.FakePasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
@@ -98,7 +95,7 @@ class AccountServiceImplTest {
         // then
         assertThat(accountRegisterResponseDto.getId()).isEqualTo(1L);
         assertThat(accountRegisterResponseDto.getNumber()).isEqualTo(11111111111L);
-        assertThat(accountRegisterResponseDto.getFullnumber()).isEqualTo(fullNumber);
+        assertThat(accountRegisterResponseDto.getFullNumber()).isEqualTo(fullNumber);
         assertThat(accountRegisterResponseDto.getBalance()).isEqualTo(0L);
     }
 
@@ -120,15 +117,15 @@ class AccountServiceImplTest {
         // then
         assertThat(accountRegisterResponseDto1.getId()).isEqualTo(1L);
         assertThat(accountRegisterResponseDto1.getNumber()).isEqualTo(11111111111L);
-        assertThat(accountRegisterResponseDto1.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto1.getFullNumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111111L));
         assertThat(accountRegisterResponseDto1.getBalance()).isEqualTo(0L);
         assertThat(accountRegisterResponseDto2.getId()).isEqualTo(2L);
         assertThat(accountRegisterResponseDto2.getNumber()).isEqualTo(11111111111L);
-        assertThat(accountRegisterResponseDto2.getFullnumber()).isEqualTo(Long.parseLong(initSavingTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto2.getFullNumber()).isEqualTo(Long.parseLong(initSavingTypeNumber + "" + 11111111111L));
         assertThat(accountRegisterResponseDto2.getBalance()).isEqualTo(1000L);
         assertThat(accountRegisterResponseDto3.getId()).isEqualTo(3L);
         assertThat(accountRegisterResponseDto3.getNumber()).isEqualTo(11111111112L);
-        assertThat(accountRegisterResponseDto3.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111112L));
+        assertThat(accountRegisterResponseDto3.getFullNumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111112L));
         assertThat(accountRegisterResponseDto3.getBalance()).isEqualTo(2000L);
     }
 
@@ -163,13 +160,13 @@ class AccountServiceImplTest {
     public void account_delete_success_test() {
         // given
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        accountRepository.save(Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
+        accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
 
         // when
         accountService.deleteAccount(23211111111L, user.getId());
 
         // then
-        Optional<Account> account = accountRepository.findByFullnumber(23211111111L);
+        Optional<Account> account = accountRepository.findByFullNumber(23211111111L);
         assertThat(account.isPresent()).isFalse();
     }
 
@@ -178,7 +175,7 @@ class AccountServiceImplTest {
     public void account_delete_fail_test1() {
         // given & when
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        accountRepository.save(Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
+        accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
         Long notExistAccount = 23299999999L;
 
         // then

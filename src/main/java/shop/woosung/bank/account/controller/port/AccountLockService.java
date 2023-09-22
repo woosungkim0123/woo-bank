@@ -4,5 +4,5 @@ import shop.woosung.bank.account.domain.Account;
 
 public interface AccountLockService {
 
-    Account depositAccountWithLock(Long fullnumber, Long amount);
+    Account depositAccountWithLock(Long fullNumber, Long amount);
 }

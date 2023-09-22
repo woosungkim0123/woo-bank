@@ -17,11 +17,11 @@ public class AccountLockServiceImpl implements AccountLockService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public Account depositAccountWithLock(Long fullnumber, Long amount) {
-        Account depositAccount = accountRepository.findByFullnumberWithPessimisticLock(fullnumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(fullnumber));
+    public Account depositAccountWithLock(Long fullNumber, Long amount) {
+        Account depositAccount = accountRepository.findByFullNumberWithPessimisticLock(fullNumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
         depositAccount.deposit(amount);
-        accountRepository.update(depositAccount);
+        accountRepository.save(depositAccount);
         return depositAccount;
     }
 }

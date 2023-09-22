@@ -13,14 +13,14 @@ public class AccountRegisterResponseDto {
     private final Long id;
     @JsonIgnore
     private final Long number;
-    private final Long fullnumber;
+    private final Long fullNumber;
     private final Long balance;
 
     public static AccountRegisterResponseDto from(Account account) {
         return AccountRegisterResponseDto.builder()
                 .id(account.getId())
                 .number(account.getNumber())
-                .fullnumber(account.getFullnumber())
+                .fullNumber(account.getFullNumber())
                 .balance(account.getBalance())
                 .build();
     }

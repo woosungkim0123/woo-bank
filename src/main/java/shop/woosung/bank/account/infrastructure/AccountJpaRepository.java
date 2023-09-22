@@ -13,9 +13,9 @@ public interface AccountJpaRepository extends JpaRepository<AccountEntity, Long>
 
     List<AccountEntity> findByUserId(Long userId);
 
-    Optional<AccountEntity> findByFullnumber(Long fullnumber);
+    Optional<AccountEntity> findByFullNumber(Long fullNumber);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT a FROM AccountEntity a WHERE a.fullnumber = :fullnumber")
-    Optional<AccountEntity> findByFullnumberWithPessimisticLock(Long fullnumber);
+    @Query("SELECT a FROM AccountEntity a WHERE a.fullNumber = :fullNumber")
+    Optional<AccountEntity> findByFullNumberWithPessimisticLock(Long fullNumber);
 }

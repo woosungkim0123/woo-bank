@@ -15,7 +15,7 @@ class AccountTest {
     public void account_check_owner_success() {
         // given & when
         User user = User.builder().id(1L).email("test1@tset.com").name("test1").build();
-        Account account = Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build();
+        Account account = Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build();
 
         // then
         assertDoesNotThrow(() -> account.checkOwner(user.getId()));
@@ -27,7 +27,7 @@ class AccountTest {
         // given & when
         User user = User.builder().id(1L).email("test1@tset.com").name("test1").build();
         User anotherUser = User.builder().id(2L).email("test2@tset.com").name("test2").build();
-        Account account = Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build();
+        Account account = Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build();
 
         // then
         assertThatThrownBy(() -> account.checkOwner(anotherUser.getId())).isInstanceOf(NotAccountOwnerException.class);

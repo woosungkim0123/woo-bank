@@ -23,9 +23,9 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     @Transactional(readOnly = true)
-    public TransactionResponseListDto getTransactionList(Long userId, Long accountFullnumber, String type, int page) {
-        Account account = accountRepository.findByFullnumber(accountFullnumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullnumber));
+    public TransactionResponseListDto getTransactionList(Long userId, Long accountFullNumber, String type, int page) {
+        Account account = accountRepository.findByFullNumber(accountFullNumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullNumber));
 
         account.checkOwner(userId);
 

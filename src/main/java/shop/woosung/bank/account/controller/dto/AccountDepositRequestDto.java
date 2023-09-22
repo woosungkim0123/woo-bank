@@ -10,24 +10,28 @@ import javax.validation.constraints.*;
 public class AccountDepositRequestDto {
     @NotNull
     @Digits(integer = 19, fraction = 0)
-    private Long fullnumber;
+    private final Long fullNumber;
 
     @Positive
     @NotNull
-    private Long amount;
+    private final Long amount;
 
     @NotNull
-    private TransactionType transactionType;
+    private final TransactionType transactionType;
+
+    @NotNull
+    private final String sender;
 
     @Pattern(regexp = "^[0-9]{11}")
     @NotEmpty
-    private String tel;
+    private final String tel;
 
     @Builder
-    public AccountDepositRequestDto(Long fullnumber, Long amount, TransactionType transactionType, String tel) {
-        this.fullnumber = fullnumber;
+    public AccountDepositRequestDto(Long fullNumber, Long amount, TransactionType transactionType, String sender, String tel) {
+        this.fullNumber = fullNumber;
         this.amount = amount;
         this.transactionType = transactionType;
+        this.sender = sender;
         this.tel = tel;
     }
 }

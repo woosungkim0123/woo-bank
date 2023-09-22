@@ -17,9 +17,10 @@ public class AccountControllerToServiceConverter {
 
     public static AccountDepositRequestServiceDto accountDepositRequestConvert(AccountDepositRequestDto accountDepositRequestDto){
         return AccountDepositRequestServiceDto.builder()
-                .fullnumber(accountDepositRequestDto.getFullnumber())
+                .fullNumber(accountDepositRequestDto.getFullNumber())
                 .amount(accountDepositRequestDto.getAmount())
                 .transactionType(accountDepositRequestDto.getTransactionType())
+                .sender(accountDepositRequestDto.getSender())
                 .tel(accountDepositRequestDto.getTel())
                 .build();
     }

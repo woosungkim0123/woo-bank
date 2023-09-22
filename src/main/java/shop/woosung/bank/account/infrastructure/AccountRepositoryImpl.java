@@ -28,8 +28,8 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByFullnumber(Long fullnumber) {
-        return accountJpaRepository.findByFullnumber(fullnumber).map(AccountEntity::toModel);
+    public Optional<Account> findByFullNumber(Long fullNumber) {
+        return accountJpaRepository.findByFullNumber(fullNumber).map(AccountEntity::toModel);
     }
 
     @Override
@@ -38,8 +38,8 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByFullnumberWithPessimisticLock(Long fullnumber) {
-        return accountJpaRepository.findByFullnumberWithPessimisticLock(fullnumber).map(AccountEntity::toModel);
+    public Optional<Account> findByFullNumberWithPessimisticLock(Long fullNumber) {
+        return accountJpaRepository.findByFullNumberWithPessimisticLock(fullNumber).map(AccountEntity::toModel);
     }
 
     @Override

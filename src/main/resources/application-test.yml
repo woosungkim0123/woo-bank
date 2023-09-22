@@ -31,3 +31,6 @@ spring:
     level:
       shop.woosung.bank: DEBUG
       org.hibernate.type: TRACE
+  sql:
+    init:
+      mode: never
