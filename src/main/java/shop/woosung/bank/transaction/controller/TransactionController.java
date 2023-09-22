@@ -19,12 +19,12 @@ public class TransactionController {
 
     @GetMapping("/s/account/{number}/transaction")
     public ResponseEntity<ApiResponse<TransactionResponseListDto>> findTransactionList(
-            @PathVariable Long accountFullnumber,
+            @PathVariable Long accountFullNumber,
             @RequestParam(value = "type", defaultValue = "ALL") String type,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @AuthenticationPrincipal LoginUser loginUser) {
 
-        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(loginUser.getUser().getId(), accountFullnumber, type, page);
+        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(loginUser.getUser().getId(), accountFullNumber, type, page);
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("입출금 목록보기 성공", transactionResponseListDto));
     }

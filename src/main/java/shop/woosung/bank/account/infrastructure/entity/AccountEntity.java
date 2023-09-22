@@ -27,7 +27,7 @@ public class AccountEntity extends BaseTimeEntity {
     private Long number;
 
     @Column(unique = true, nullable = false, length = 20)
-    private Long fullnumber;
+    private Long fullNumber;
 
     @Column(nullable = false)
     private String password;
@@ -46,7 +46,7 @@ public class AccountEntity extends BaseTimeEntity {
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.id = account.getId();
         accountEntity.number = account.getNumber();
-        accountEntity.fullnumber = account.getFullnumber();
+        accountEntity.fullNumber = account.getFullNumber();
         accountEntity.password = account.getPassword();
         accountEntity.balance = account.getBalance();
         accountEntity.type = account.getType();
@@ -58,7 +58,7 @@ public class AccountEntity extends BaseTimeEntity {
         return Account.builder()
                 .id(id)
                 .number(number)
-                .fullnumber(fullnumber)
+                .fullNumber(fullNumber)
                 .password(password)
                 .balance(balance)
                 .type(type)

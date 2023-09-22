@@ -10,8 +10,11 @@ public interface AccountRepository {
 
     Account save(Account account);
 
-    Optional<Account> findByFullnumber(Long fullnumber);
+    Optional<Account> findByFullNumber(Long fullNumber);
 
     void deleteById(Long id);
 
+    Optional<Account> findByFullNumberWithPessimisticLock(Long fullNumber);
+
+    void update(Account account);
 }

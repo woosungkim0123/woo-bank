@@ -14,7 +14,7 @@ public class TransactionResponseListDto {
 
     public TransactionResponseListDto(Account account, List<Transaction> transactions) {
         this.transactions = transactions.stream()
-                .map(transaction -> new TransactionDto(transaction, account.getFullnumber()))
+                .map(transaction -> new TransactionDto(transaction, account.getFullNumber()))
                 .collect(Collectors.toList());
     }
 
@@ -29,7 +29,7 @@ public class TransactionResponseListDto {
         private final String createdAt;
         private final Long balance;
 
-        public TransactionDto(Transaction transaction, Long accountFullnumber) {
+        public TransactionDto(Transaction transaction, Long accountFullNumber) {
             this.id = transaction.getId();
             this.type = transaction.getType().getValue();
             this.amount = transaction.getAmount();
@@ -43,7 +43,7 @@ public class TransactionResponseListDto {
             } else if (transaction.getWithdrawAccount() == null) {
                 this.balance = transaction.getDepositAccountBalance();
             } else {
-                if (transaction.getDepositAccount().getNumber() == accountFullnumber.longValue()) {
+                if (transaction.getDepositAccount().getNumber() == accountFullNumber.longValue()) {
                     this.balance = transaction.getDepositAccountBalance();
                 } else {
                     this.balance = transaction.getWithdrawAccountBalance();

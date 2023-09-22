@@ -57,7 +57,7 @@ class AccountEntityConcurrencyServiceTest {
                 try {
                     AccountRegisterRequestServiceDto selectedDto = (threadIndex % 2 == 0) ? normalAccountRegisterServiceDto : savingAccountRegisterServiceDto;
                     AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(selectedDto, sharedUser);
-                    accountFullNumbers.add(accountRegisterResponseDto.getFullnumber());
+                    accountFullNumbers.add(accountRegisterResponseDto.getFullNumber());
                 } finally{
                     latch.countDown();
                 }

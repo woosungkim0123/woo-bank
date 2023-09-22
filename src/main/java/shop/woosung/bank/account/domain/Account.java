@@ -13,7 +13,7 @@ public class Account {
 
     private Long id;
     private Long number;
-    private Long fullnumber;
+    private Long fullNumber;
     private String password;
     private Long balance;
     private AccountType type;
@@ -22,10 +22,10 @@ public class Account {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Account(Long id, Long number, Long fullnumber, String password, Long balance, AccountType type, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Account(Long id, Long number, Long fullNumber, String password, Long balance, AccountType type, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.number = number;
-        this.fullnumber = fullnumber;
+        this.fullNumber = fullNumber;
         this.password = password;
         this.balance = balance;
         this.type = type;
@@ -37,7 +37,7 @@ public class Account {
     public static Account register(AccountRegister accountRegister, PasswordEncoder passwordEncoder) {
         return Account.builder()
                 .number(accountRegister.getNewNumber())
-                .fullnumber(concatNumbers(accountRegister.getTypeNumber(), accountRegister.getNewNumber()))
+                .fullNumber(concatNumbers(accountRegister.getTypeNumber(), accountRegister.getNewNumber()))
                 .password(passwordEncoder.encode(accountRegister.getPassword()))
                 .balance(accountRegister.getBalance())
                 .type(accountRegister.getAccountType())
@@ -51,9 +51,9 @@ public class Account {
         }
     }
 
-//    public void deposit(Long amount) {
-//        this.balance = this.balance + amount;
-//    }
+    public void deposit(Long amount) {
+        this.balance = this.balance + amount;
+    }
 //
 //    public void checkSamePassword(Long password) {
 //        if(!this.password.equals(password)) {

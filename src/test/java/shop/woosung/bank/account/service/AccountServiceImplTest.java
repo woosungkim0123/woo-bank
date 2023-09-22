@@ -11,15 +11,11 @@ import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
-import shop.woosung.bank.account.service.dto.AccountListResponseDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
+import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
-import shop.woosung.bank.mock.repository.FakeAccountRepository;
-import shop.woosung.bank.mock.repository.FakeAccountSequenceRepository;
-import shop.woosung.bank.mock.repository.FakeAccountTypeNumberRepository;
-import shop.woosung.bank.mock.repository.FakeUserRepository;
+import shop.woosung.bank.mock.repository.*;
 import shop.woosung.bank.mock.util.FakePasswordEncoder;
+import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -37,13 +33,14 @@ class AccountServiceImplTest {
     private FakeAccountSequenceRepository accountSequenceRepository;
     private FakeAccountTypeNumberRepository accountTypeNumberRepository;
 
-    private final Long initSequenceNumber = 11111111111L;
     private static final Long incrementByNumber = 1L;
     private static final Long initNormalTypeNumber = 232L;
     private static final Long initSavingTypeNumber = 787L;
 
     @BeforeEach
     void init() {
+        Long initSequenceNumber = 11111111111L;
+
         userRepository = new FakeUserRepository();
         accountRepository = new FakeAccountRepository();
         accountSequenceRepository = new FakeAccountSequenceRepository();
@@ -55,7 +52,10 @@ class AccountServiceImplTest {
                 .accountRepository(accountRepository)
                 .accountSequenceRepository(accountSequenceRepository)
                 .accountTypeNumberRepository(accountTypeNumberRepository)
+                .accountLockService(new AccountLockServiceImpl(accountRepository))
+                .transactionRepository(new FakeTransactionRepository())
                 .build();
+
 
         accountSequenceRepository.save(AccountSequence.builder().sequenceName(AccountType.NORMAL).nextValue(initSequenceNumber).incrementBy(incrementByNumber).build());
         accountSequenceRepository.save(AccountSequence.builder().sequenceName(AccountType.SAVING).nextValue(initSequenceNumber).incrementBy(incrementByNumber).build());
@@ -63,9 +63,9 @@ class AccountServiceImplTest {
         accountTypeNumberRepository.save(AccountTypeNumber.builder().accountType(AccountType.SAVING).number(initSavingTypeNumber).build());
     }
 
-    @DisplayName("자신이 가진 모든 계좌 리스트를 조회할 수 있다.")
+    @DisplayName("자신의 모든 계좌 목록을 가져온다")
     @Test
-    public void account_list_success_test() {
+    public void get_my_all_account() {
         // given
         User user1 = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
         User user2 = userRepository.save(User.builder().email("test2@tset.com").name("test2").build());
@@ -98,7 +98,7 @@ class AccountServiceImplTest {
         // then
         assertThat(accountRegisterResponseDto.getId()).isEqualTo(1L);
         assertThat(accountRegisterResponseDto.getNumber()).isEqualTo(11111111111L);
-        assertThat(accountRegisterResponseDto.getFullnumber()).isEqualTo(fullNumber);
+        assertThat(accountRegisterResponseDto.getFullNumber()).isEqualTo(fullNumber);
         assertThat(accountRegisterResponseDto.getBalance()).isEqualTo(0L);
     }
 
@@ -120,15 +120,15 @@ class AccountServiceImplTest {
         // then
         assertThat(accountRegisterResponseDto1.getId()).isEqualTo(1L);
         assertThat(accountRegisterResponseDto1.getNumber()).isEqualTo(11111111111L);
-        assertThat(accountRegisterResponseDto1.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto1.getFullNumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111111L));
         assertThat(accountRegisterResponseDto1.getBalance()).isEqualTo(0L);
         assertThat(accountRegisterResponseDto2.getId()).isEqualTo(2L);
         assertThat(accountRegisterResponseDto2.getNumber()).isEqualTo(11111111111L);
-        assertThat(accountRegisterResponseDto2.getFullnumber()).isEqualTo(Long.parseLong(initSavingTypeNumber + "" + 11111111111L));
+        assertThat(accountRegisterResponseDto2.getFullNumber()).isEqualTo(Long.parseLong(initSavingTypeNumber + "" + 11111111111L));
         assertThat(accountRegisterResponseDto2.getBalance()).isEqualTo(1000L);
         assertThat(accountRegisterResponseDto3.getId()).isEqualTo(3L);
         assertThat(accountRegisterResponseDto3.getNumber()).isEqualTo(11111111112L);
-        assertThat(accountRegisterResponseDto3.getFullnumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111112L));
+        assertThat(accountRegisterResponseDto3.getFullNumber()).isEqualTo(Long.parseLong(initNormalTypeNumber + "" + 11111111112L));
         assertThat(accountRegisterResponseDto3.getBalance()).isEqualTo(2000L);
     }
 
@@ -163,13 +163,13 @@ class AccountServiceImplTest {
     public void account_delete_success_test() {
         // given
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        accountRepository.save(Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
+        accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
 
         // when
         accountService.deleteAccount(23211111111L, user.getId());
 
         // then
-        Optional<Account> account = accountRepository.findByFullnumber(23211111111L);
+        Optional<Account> account = accountRepository.findByFullNumber(23211111111L);
         assertThat(account.isPresent()).isFalse();
     }
 
@@ -178,11 +178,32 @@ class AccountServiceImplTest {
     public void account_delete_fail_test1() {
         // given & when
         User user = userRepository.save(User.builder().email("test1@tset.com").name("test1").build());
-        accountRepository.save(Account.builder().number(11111111L).fullnumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
+        accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
         Long notExistAccount = 23299999999L;
 
         // then
         assertThatThrownBy(() -> accountService.deleteAccount(notExistAccount, user.getId()))
                 .isInstanceOf(NotFoundAccountFullNumberException.class);
+    }
+
+    @Test
+    void account_deposit_success_test() {
+        // given
+        accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).build());
+        AccountDepositRequestServiceDto accountDepositRequestServiceDto = AccountDepositRequestServiceDto.builder().fullNumber(23211111111L).amount(1000L).transactionType(TransactionType.DEPOSIT).sender("ATM").tel("010-1234-1234").build();
+
+        // when
+        AccountDepositResponseDto result = accountService.deposit(accountDepositRequestServiceDto);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getFullNumber()).isEqualTo(23211111111L);
+        assertThat(result.getTransaction().getId()).isEqualTo(1L);
+        assertThat(result.getTransaction().getType()).isEqualTo(TransactionType.DEPOSIT.name());
+        assertThat(result.getTransaction().getSender()).isEqualTo("ATM");
+        assertThat(result.getTransaction().getAmount()).isEqualTo(1000L);
+        assertThat(result.getTransaction().getDepositAccountBalance()).isEqualTo(2000L);
+        assertThat(result.getTransaction().getTel()).isEqualTo("010-1234-1234");
+        assertThat(result.getTransaction().getCreatedAt()).isEqualTo("2023-08-11T15:30");
     }
 }

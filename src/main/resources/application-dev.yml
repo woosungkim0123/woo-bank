@@ -9,13 +9,16 @@ server:
     include-exception: false
     include-message: never
     include-stacktrace: never
-
 spring:
   datasource:
+#    url: jdbc:mysql://localhost:3306/test
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: root
+#    password: "0000"
     url: jdbc:h2:mem:test;MODE=MySQL
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
+    password:
   h2:
     console:
       enabled: true
@@ -28,10 +31,13 @@ spring:
         default_batch_fetch_size: 100
         format_sql: true
     show-sql: true
+    defer-datasource-initialization: true
   output:
     ansi:
       enabled: always
-
+  sql:
+    init:
+      mode: always
 logging:
   level:
     shop.woosung.bank: DEBUG

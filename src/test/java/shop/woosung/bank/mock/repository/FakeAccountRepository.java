@@ -25,7 +25,7 @@ public class FakeAccountRepository implements AccountRepository {
             Account newAccount = Account.builder()
                     .id(++autoIncrementId)
                     .number(account.getNumber())
-                    .fullnumber(account.getFullnumber())
+                    .fullNumber(account.getFullNumber())
                     .password(account.getPassword())
                     .user(account.getUser())
                     .balance(account.getBalance())
@@ -43,13 +43,24 @@ public class FakeAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByFullnumber(Long fullnumber) {
-        return data.stream().filter(item -> Objects.equals(item.getFullnumber(), fullnumber)).findFirst();
+    public Optional<Account> findByFullNumber(Long fullNumber) {
+        return data.stream().filter(item -> Objects.equals(item.getFullNumber(), fullNumber)).findFirst();
     }
 
     @Override
     public void deleteById(Long id) {
         data.removeIf(item -> Objects.equals(item.getId(), id));
+    }
+
+    @Override
+    public Optional<Account> findByFullNumberWithPessimisticLock(Long fullNumber) {
+        return data.stream().filter(item -> Objects.equals(item.getFullNumber(), fullNumber)).findFirst();
+    }
+
+    @Override
+    public void update(Account account) {
+        data.removeIf(item -> Objects.equals(item.getId(), account.getId()));
+        data.add(account);
     }
 
     public void deleteAll() {

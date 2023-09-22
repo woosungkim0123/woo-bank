@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import shop.woosung.bank.account.controller.port.AccountLockService;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
@@ -13,28 +14,26 @@ import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
-import shop.woosung.bank.account.service.dto.AccountListResponseDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
+import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
-import shop.woosung.bank.transaction.infrastructure.TransactionJpaRepository;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
 import java.util.List;
 
-import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.accountRegisterConvert;
+import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.*;
 
 @Builder
 @RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService {
 
+    private final AccountLockService accountLockService;
     private final AccountRepository accountRepository;
     private final AccountSequenceRepository accountSequenceRepository;
     private final AccountTypeNumberRepository accountTypeNumberRepository;
@@ -61,9 +60,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional
-    public void deleteAccount(Long accountFullnumber, Long userId) {
-        Account account = accountRepository.findByFullnumber(accountFullnumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullnumber));
+    public void deleteAccount(Long accountFullNumber, Long userId) {
+        Account account = accountRepository.findByFullNumber(accountFullNumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullNumber));
 
         account.checkOwner(userId);
 
@@ -71,30 +70,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-//
-//    @Transactional
-//    public AccountDepositResDto depositAccount(AccountDepositReqDto accountDepositReqDto) { // ATM -> 누군가의 계좌
-//        AccountEntity depositAccountPSEntity = accountJpaRepository.findByNumber(accountDepositReqDto.getNumber())
-//                .orElseThrow(() -> new CustomApiException("계좌를 찾을 수 없습니다."));
-//
-//        depositAccountPSEntity.deposit(accountDepositReqDto.getAmount());
-//
-//        TransactionEntity transaction = TransactionEntity.builder()
-//                        .depositAccount(depositAccountPSEntity)
-//                        .withdrawAccount(null)
-//                        .depositAccountBalance(depositAccountPSEntity.getBalance())
-//                        .withdrawAccountBalance(null)
-//                        .amount(accountDepositReqDto.getAmount())
-//                        .gubun(TransactionType.DEPOSIT)
-//                        .sender("ATM")
-//                        .receiver(accountDepositReqDto.getNumber() + "")
-//                        .tel(accountDepositReqDto.getTel())
-//                        .build();
-//
-//        TransactionEntity transactionPS = transactionRepository.save(transaction);
-//
-//        return new AccountDepositResDto(depositAccountPSEntity, transactionPS);
-//    }
+    @Transactional
+    public AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto) {
+        Account depositAccount = accountLockService.depositAccountWithLock(accountDepositRequestServiceDto.getFullNumber(), accountDepositRequestServiceDto.getAmount());
+
+        Transaction depositTransaction = transactionRepository.save(
+                Transaction.createDepositTransaction(depositTransactionCreateConvert(accountDepositRequestServiceDto, depositAccount))
+        );
+        
+        return AccountDepositResponseDto.from(depositAccount, depositTransaction);
+    }
+
 //
 //
 //

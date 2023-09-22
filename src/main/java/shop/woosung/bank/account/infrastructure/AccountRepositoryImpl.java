@@ -28,12 +28,22 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Optional<Account> findByFullnumber(Long fullnumber) {
-        return accountJpaRepository.findByFullnumber(fullnumber).map(AccountEntity::toModel);
+    public Optional<Account> findByFullNumber(Long fullNumber) {
+        return accountJpaRepository.findByFullNumber(fullNumber).map(AccountEntity::toModel);
     }
 
     @Override
     public void deleteById(Long id) {
         accountJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Account> findByFullNumberWithPessimisticLock(Long fullNumber) {
+        return accountJpaRepository.findByFullNumberWithPessimisticLock(fullNumber).map(AccountEntity::toModel);
+    }
+
+    @Override
+    public void update(Account account) {
+        accountJpaRepository.save(AccountEntity.fromModel(account));
     }
 }

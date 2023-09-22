@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Repository
 public class TransactionRepositoryImpl implements TransactionRepository {
 
+    private final TransactionJpaRepository transactionJpaRepository;
     private final EntityManager em;
 
     @Override
@@ -51,5 +52,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         return query.getResultList().stream()
                 .map(TransactionEntity::toModel).collect(Collectors.toList());
+    }
+
+    @Override
+    public Transaction save(Transaction transaction) {
+        return transactionJpaRepository.save(TransactionEntity.fromModel(transaction)).toModel();
     }
 }
