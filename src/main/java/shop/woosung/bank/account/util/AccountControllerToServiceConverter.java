@@ -2,8 +2,10 @@ package shop.woosung.bank.account.util;
 
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
+import shop.woosung.bank.account.controller.dto.AccountWithdrawRequestDto;
 import shop.woosung.bank.account.service.dto.AccountDepositRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
+import shop.woosung.bank.account.service.dto.AccountWithdrawRequestServiceDto;
 
 public class AccountControllerToServiceConverter {
 
@@ -22,6 +24,15 @@ public class AccountControllerToServiceConverter {
                 .transactionType(accountDepositRequestDto.getTransactionType())
                 .sender(accountDepositRequestDto.getSender())
                 .tel(accountDepositRequestDto.getTel())
+                .build();
+    }
+
+    public static AccountWithdrawRequestServiceDto accountWithdrawRequestConvert(AccountWithdrawRequestDto accountWithdrawRequestDto){
+        return AccountWithdrawRequestServiceDto.builder()
+                .fullNumber(accountWithdrawRequestDto.getFullNumber())
+                .password(accountWithdrawRequestDto.getPassword())
+                .amount(accountWithdrawRequestDto.getAmount())
+                .transactionType(accountWithdrawRequestDto.getTransactionType())
                 .build();
     }
 }

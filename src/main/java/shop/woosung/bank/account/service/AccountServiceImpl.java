@@ -14,12 +14,15 @@ import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
+
 import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.domain.TransactionType;
+import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
@@ -27,6 +30,7 @@ import shop.woosung.bank.user.service.port.UserRepository;
 import java.util.List;
 
 import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.*;
+import static shop.woosung.bank.account.util.AccountServiceToServiceConverter.accountWithdrawLockServiceDtoConvert;
 
 @Builder
 @RequiredArgsConstructor
@@ -81,49 +85,19 @@ public class AccountServiceImpl implements AccountService {
         return AccountDepositResponseDto.from(depositAccount, depositTransaction);
     }
 
-//
-//
-//
-//
+    @Transactional
+    public void withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user) {
+        Account withdrawAccount = accountLockService.withdrawWithLock(accountWithdrawLockServiceDtoConvert(accountWithdrawRequestServiceDto, user));
 
-//
-//    @Transactional
-//    public AccountWithdrawResDto withdraw(AccountWithdrawReqDto accountWithdrawReqDto, Long userId) {
-//        AccountEntity withdrawAccountEntity = accountJpaRepository.findByNumber(accountWithdrawReqDto.getNumber())
-//                .orElseThrow(
-//                        () -> new CustomApiException("계좌를 찾을 수 없습니다.")
-//                );
-//
-//        // 출금 소유자 확인
-//        withdrawAccountEntity.checkOwner(userId);
-//
-//        // 비밀번호 확인
-//        withdrawAccountEntity.checkSamePassword(accountWithdrawReqDto.getPassword());
-//
-//        // 잔액 확인
-//        withdrawAccountEntity.checkBalance(accountWithdrawReqDto.getAmount());
-//
-//        // 출금하기
-//        withdrawAccountEntity.withdraw(accountWithdrawReqDto.getAmount());
-//
-//
-//        // 거래내역 남기기
-//        // 내 계좌 -> ATM 출금
-//        TransactionEntity transaction = TransactionEntity.builder()
-//                .withdrawAccount(withdrawAccountEntity)
-//                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
-//                .amount(accountWithdrawReqDto.getAmount())
-//                .gubun(TransactionType.WITHDRAW)
-//                .sender(accountWithdrawReqDto.getNumber() + "")
-//                .receiver("ATM")
-//                .build();
-//
-//        TransactionEntity savedTransaction = transactionRepository.save(transaction);
-//
-//
-//        // DTO 응답
-//        return new AccountWithdrawResDto(withdrawAccountEntity, savedTransaction);
-//    }
+        Transaction transaction = Transaction.createWithdrawTransaction(withdrawTransactionCreateConvert(accountWithdrawRequestServiceDto, withdrawAccount, "ATM"));
+
+
+        Transaction withdrawTransaction = transactionRepository.save(transaction);
+
+
+        // DTO 응답
+        return new AccountWithdrawResDto(withdrawAccountEntity, withdrawTransaction);
+    }
 //
 //
 //    @Transactional
