@@ -32,6 +32,7 @@ class AccountServiceImplTest {
     private AccountRepository accountRepository;
     private FakeAccountSequenceRepository accountSequenceRepository;
     private FakeAccountTypeNumberRepository accountTypeNumberRepository;
+    private FakePasswordEncoder passwordEncoder;
 
     private static final Long incrementByNumber = 1L;
     private static final Long initNormalTypeNumber = 232L;
@@ -45,14 +46,15 @@ class AccountServiceImplTest {
         accountRepository = new FakeAccountRepository();
         accountSequenceRepository = new FakeAccountSequenceRepository();
         accountTypeNumberRepository = new FakeAccountTypeNumberRepository();
+        passwordEncoder = new FakePasswordEncoder("aaaa_bbbb_cccc_dddd");
 
         this.accountService = AccountServiceImpl.builder()
-                .passwordEncoder(new FakePasswordEncoder("aaaa_bbbb_cccc_dddd"))
+                .passwordEncoder(passwordEncoder)
                 .userRepository(userRepository)
                 .accountRepository(accountRepository)
                 .accountSequenceRepository(accountSequenceRepository)
                 .accountTypeNumberRepository(accountTypeNumberRepository)
-                .accountLockService(new AccountLockServiceImpl(accountRepository))
+                .accountLockService(new AccountLockServiceImpl(accountRepository, passwordEncoder))
                 .transactionRepository(new FakeTransactionRepository())
                 .build();
 
@@ -206,4 +208,6 @@ class AccountServiceImplTest {
         assertThat(result.getTransaction().getTel()).isEqualTo("010-1234-1234");
         assertThat(result.getTransaction().getCreatedAt()).isEqualTo("2023-08-11T15:30");
     }
+    
+    // 출금 테스트 만들어야함
 }
