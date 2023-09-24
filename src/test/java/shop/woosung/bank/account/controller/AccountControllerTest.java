@@ -147,7 +147,7 @@ class AccountControllerTest {
         // then
         resultActions.andExpect(status().isForbidden());
         resultActions.andExpect(jsonPath("$.status").value("error"));
-        resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 번호"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 소유자가 아닙니다."));
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
