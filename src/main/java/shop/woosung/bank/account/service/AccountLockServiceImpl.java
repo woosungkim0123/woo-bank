@@ -42,6 +42,7 @@ public class AccountLockServiceImpl implements AccountLockService {
 
         withdrawAccount.withdraw(accountWithdrawLockServiceDto.getAmount());
 
+        accountRepository.update(withdrawAccount);
 
         return withdrawAccount;
     }

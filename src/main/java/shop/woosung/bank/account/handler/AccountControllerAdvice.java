@@ -32,7 +32,7 @@ public class AccountControllerAdvice {
     public ResponseEntity<ApiResponse<Object>> handleNotAccountOwnerException(HttpServletRequest request, NotAccountOwnerException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("NotAccountOwnerException = {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("잘못된 계좌 번호"));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("계좌 소유자가 아닙니다."));
     }
 
     @ExceptionHandler(NotFoundAccountFullNumberException.class)

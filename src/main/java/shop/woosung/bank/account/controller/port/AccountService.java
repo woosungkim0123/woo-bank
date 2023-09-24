@@ -12,5 +12,5 @@ public interface AccountService {
 
     AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto);
 
-    void withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user);
+    AccountWithdrawResponseDto withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user);
 }

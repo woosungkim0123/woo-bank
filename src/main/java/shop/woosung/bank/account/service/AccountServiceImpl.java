@@ -21,8 +21,6 @@ import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
-import shop.woosung.bank.transaction.domain.TransactionType;
-import shop.woosung.bank.transaction.infrastructure.entity.TransactionEntity;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
@@ -86,17 +84,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional
-    public void withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user) {
+    public AccountWithdrawResponseDto withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user) {
         Account withdrawAccount = accountLockService.withdrawWithLock(accountWithdrawLockServiceDtoConvert(accountWithdrawRequestServiceDto, user));
 
+        // TODO 추후 트랜잭션 서비스로 이동 고려
         Transaction transaction = Transaction.createWithdrawTransaction(withdrawTransactionCreateConvert(accountWithdrawRequestServiceDto, withdrawAccount, "ATM"));
-
 
         Transaction withdrawTransaction = transactionRepository.save(transaction);
 
-
-        // DTO 응답
-        return new AccountWithdrawResDto(withdrawAccountEntity, withdrawTransaction);
+        return AccountWithdrawResponseDto.from(withdrawAccount, withdrawTransaction);
     }
 //
 //
