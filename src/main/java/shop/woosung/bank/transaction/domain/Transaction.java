@@ -49,4 +49,15 @@ public class Transaction {
                 .tel(depositTransactionCreate.getTel())
                 .build();
     }
+
+    public static Transaction createWithdrawTransaction(WithdrawTransactionCreate withdrawTransactionCreate) {
+        return Transaction.builder()
+                .withdrawAccount(withdrawTransactionCreate.getWithdrawAccount())
+                .withdrawAccountBalance(withdrawTransactionCreate.getWithdrawAccountBalance())
+                .amount(withdrawTransactionCreate.getAmount())
+                .type(withdrawTransactionCreate.getType())
+                .sender(withdrawTransactionCreate.getSender())
+                .receiver(withdrawTransactionCreate.getReceiver())
+                .build();
+    }
 }

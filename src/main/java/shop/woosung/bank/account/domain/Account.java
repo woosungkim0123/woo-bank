@@ -3,6 +3,7 @@ package shop.woosung.bank.account.domain;
 import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
+import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 
@@ -54,18 +55,17 @@ public class Account {
     public void deposit(Long amount) {
         this.balance = this.balance + amount;
     }
-//
-//    public void checkSamePassword(Long password) {
-//        if(!this.password.equals(password)) {
-//            throw new CustomApiException("비밀번호가 일치하지 않습니다.");
-//        }
-//    }
-//
-//    public void checkBalance(Long amount) {
-//        if(this.balance < amount) {
-//            throw new CustomApiException("계좌 잔액이 부족합니다.");
-//        }
-//    }
+
+    public void checkPasswordMatch(Long password, PasswordEncoder passwordEncoder) {
+        if(!passwordEncoder.matches(password.toString(), this.password)) {
+            throw new NotAccountOwnerException();
+        }
+    }
+    public void checkEnoughBalance(Long amount) {
+        if(this.balance < amount) {
+            throw new NotEnoughBalanceException("계좌 잔액이 부족합니다. 출금 가능한 금액: " + this.balance + " 출금 요청 금액: " + amount);
+        }
+    }
 
     public void withdraw(Long amount) {
         balance = balance - amount;

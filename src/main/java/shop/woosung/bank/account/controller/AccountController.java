@@ -4,19 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
+import shop.woosung.bank.account.controller.dto.AccountWithdrawRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
+import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
 
 import javax.validation.Valid;
-import static shop.woosung.bank.account.util.AccountControllerToServiceConverter.accountDepositRequestConvert;
-import static shop.woosung.bank.account.util.AccountControllerToServiceConverter.accountRegisterRequestConvert;
+
+import static shop.woosung.bank.account.util.AccountControllerToServiceConverter.*;
 
 
 @RequiredArgsConstructor
@@ -57,15 +60,14 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 입금 완료", accountDepositResponseDto));
     }
 
-//
-//
-//    @PostMapping("/s/account/withdraw")
-//    public ResponseEntity<?> withdrawAccount(@RequestBody @Valid AccountWithdrawReqDto accountWithdrawReqDto, BindingResult bindingResult,
-//                                             @AuthenticationPrincipal LoginUser loginUser) {
-//        AccountWithdrawResDto accountWithdrawResDto = accountService.withdraw(accountWithdrawReqDto, loginUser.getUser().getId());
-//
-//        return new ResponseEntity<>(new ResponseDto<>(1, "계좌 출금 완료", accountWithdrawResDto), HttpStatus.CREATED);
-//    }
+    @PostMapping("/s/account/withdraw")
+    public ResponseEntity<ApiResponse<AccountWithdrawResponseDto>> withdrawAccount(@RequestBody @Valid AccountWithdrawRequestDto accountWithdrawRequestDto,
+                                             @AuthenticationPrincipal LoginUser loginUser) {
+
+        AccountWithdrawResponseDto accountWithdrawResponseDto = accountService.withdraw(accountWithdrawRequestConvert(accountWithdrawRequestDto), loginUser.getUser());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 출금 완료", accountWithdrawResponseDto));
+    }
 //
 //    @PostMapping("/s/account/transfer")
 //    public ResponseEntity<?> transferAccount(@RequestBody @Valid AccountTransferReqDto accountTransferReqDto, BindingResult bindingResult,

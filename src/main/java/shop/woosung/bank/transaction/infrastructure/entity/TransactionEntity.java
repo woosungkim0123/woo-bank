@@ -77,8 +77,8 @@ public class TransactionEntity extends BaseTimeEntity {
     public Transaction toModel() {
         return Transaction.builder()
                 .id(id)
-                .withdrawAccount(withdrawAccount.toModel())
-                .depositAccount(depositAccount.toModel())
+                .withdrawAccount(withdrawAccount != null ? withdrawAccount.toModel() : null)
+                .depositAccount(depositAccount != null ? depositAccount.toModel() : null)
                 .amount(amount)
                 .withdrawAccountBalance(withdrawAccountBalance)
                 .depositAccountBalance(depositAccountBalance)
