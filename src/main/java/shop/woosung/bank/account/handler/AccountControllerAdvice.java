@@ -5,12 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
+import shop.woosung.bank.account.handler.exception.*;
 import shop.woosung.bank.common.ApiResponse;
-import shop.woosung.bank.user.handler.exception.EmailAlreadyInUseException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,7 +38,14 @@ public class AccountControllerAdvice {
     @ExceptionHandler(NotFoundAccountFullNumberException.class)
     public ResponseEntity<ApiResponse<Object>> handleNotFoundAccountFullNumberException(HttpServletRequest request, NotFoundAccountFullNumberException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
-        log.error("handleNotFoundAccountFullNumberException = {}", exception.getMessage());
+        log.error("NotFoundAccountFullNumberException = {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("잘못된 계좌 번호"));
+    }
+
+    @ExceptionHandler(NotEnoughBalanceException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNotEnoughBalanceException(HttpServletRequest request, NotEnoughBalanceException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("NotEnoughBalanceException = {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.error("잔액이 부족합니다."));
     }
 }

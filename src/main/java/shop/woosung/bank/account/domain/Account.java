@@ -3,6 +3,7 @@ package shop.woosung.bank.account.domain;
 import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
+import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 
@@ -62,7 +63,7 @@ public class Account {
     }
     public void checkEnoughBalance(Long amount) {
         if(this.balance < amount) {
-            throw new CustomApiException("계좌 잔액이 부족합니다.");
+            throw new NotEnoughBalanceException("계좌 잔액이 부족합니다. 출금 가능한 금액: " + this.balance + " 출금 요청 금액: " + amount);
         }
     }
 

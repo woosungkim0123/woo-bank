@@ -43,6 +43,7 @@ public class AccountEntity extends BaseTimeEntity {
     private UserEntity user;
 
     public static AccountEntity fromModel(Account account) {
+        if (account == null) return null;
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.id = account.getId();
         accountEntity.number = account.getNumber();
@@ -51,6 +52,8 @@ public class AccountEntity extends BaseTimeEntity {
         accountEntity.balance = account.getBalance();
         accountEntity.type = account.getType();
         accountEntity.user = UserEntity.fromModel(account.getUser());
+        accountEntity.createdAt = account.getCreatedAt();
+        accountEntity.updatedAt = account.getUpdatedAt();
         return accountEntity;
     }
 

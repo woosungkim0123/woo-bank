@@ -13,6 +13,7 @@ import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
 import shop.woosung.bank.account.service.dto.AccountListResponseDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
+import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
 
@@ -60,13 +61,12 @@ public class AccountController {
     }
 
     @PostMapping("/s/account/withdraw")
-    public ResponseEntity<?> withdrawAccount(@RequestBody @Valid AccountWithdrawRequestDto accountWithdrawRequestDto,
+    public ResponseEntity<ApiResponse<AccountWithdrawResponseDto>> withdrawAccount(@RequestBody @Valid AccountWithdrawRequestDto accountWithdrawRequestDto,
                                              @AuthenticationPrincipal LoginUser loginUser) {
 
-        accountService.withdraw(accountWithdrawRequestConvert(accountWithdrawRequestDto), loginUser.getUser());
+        AccountWithdrawResponseDto accountWithdrawResponseDto = accountService.withdraw(accountWithdrawRequestConvert(accountWithdrawRequestDto), loginUser.getUser());
 
-        // TODO 리턴값 보내야함
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 출금 완료", null));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 출금 완료", accountWithdrawResponseDto));
     }
 //
 //    @PostMapping("/s/account/transfer")
