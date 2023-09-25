@@ -1,9 +1,12 @@
 package shop.woosung.bank.account.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,17 +17,30 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
+import shop.woosung.bank.account.controller.dto.AccountWithdrawRequestDto;
+import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
 import shop.woosung.bank.mock.repository.FakeTransactionRepository;
 import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
+import shop.woosung.bank.mock.util.FakePasswordEncoder;
+import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.user.domain.User;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import java.time.LocalDateTime;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,10 +52,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AccountControllerTest {
 
     @Autowired
-    private MockMvc mvc;
-
-    @Autowired
     private ObjectMapper om;
+
+    @Mock
+    private AccountService accountService;
+
+    @InjectMocks
+    private AccountController accountController;
+
+    private MockMvc mvc;
 
     @Autowired
     private FakeUserRepository userRepository;
@@ -47,11 +68,10 @@ class AccountControllerTest {
     @Autowired
     private FakeAccountRepository accountRepository;
 
-//    @Autowired
-//    private FakeTransactionRepository transactionRepository;
-
     @BeforeEach
     public void init() {
+        this.mvc = MockMvcBuilders.standaloneSetup(accountController).build();
+
         userRepository.deleteAll();
         accountRepository.deleteAll();
         userRepository.save(User.builder().email("test1@test.com").name("test1").build());
@@ -201,5 +221,39 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.status").value("error"));
         resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 번호"));
         resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("출금 성공시 정상적으로 응답한다.")
+    @Test
+    public void withdraw_account() throws Exception {
+        // given
+        Account account = Account.builder().id(1L).fullNumber(2321111111111L).balance(9000L).build();
+        Transaction transaction = Transaction.builder().id(1L).type(TransactionType.WITHDRAW).sender("2321111111111").receiver("ATM").amount(1000L)
+                .createdAt(LocalDateTime.of(2023, 8, 11, 15, 30)).build();
+
+        when(accountService.withdraw(any(), any())).thenReturn(AccountWithdrawResponseDto.from(account, transaction));
+        
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isCreated());
+        resultActions.andExpect(jsonPath("$.status").value("success"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 출금 완료"));
+        resultActions.andExpect(jsonPath("$.data.id").value(1L));
+        resultActions.andExpect(jsonPath("$.data.fullNumber").value(2321111111111L));
+        resultActions.andExpect(jsonPath("$.data.balance").value(9000L));
+        resultActions.andExpect(jsonPath("$.data.transaction.id").value(1L));
+        resultActions.andExpect(jsonPath("$.data.transaction.type").value("WITHDRAW"));
+        resultActions.andExpect(jsonPath("$.data.transaction.sender").value("2321111111111"));
+        resultActions.andExpect(jsonPath("$.data.transaction.receiver").value("ATM"));
+        resultActions.andExpect(jsonPath("$.data.transaction.amount").value(1000L));
+        resultActions.andExpect(jsonPath("$.data.transaction.createdAt").value("2023-08-11T15:30"));
     }
 }
