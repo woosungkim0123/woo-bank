@@ -1,27 +1,31 @@
 package shop.woosung.bank.account.controller.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import shop.woosung.bank.transaction.domain.TransactionType;
 
 import javax.validation.constraints.*;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class AccountWithdrawRequestDto {
+
     @NotNull
     @Digits(integer = 19, fraction = 0)
-    private final Long fullNumber;
+    private Long fullNumber;
 
     @NotNull
     @Digits(integer = 4, fraction = 4)
-    private final Long password;
+    private Long password;
 
     @Positive
     @NotNull
-    private final Long amount;
+    private Long amount;
 
     @NotNull
-    private final TransactionType transactionType;
+    private TransactionType transactionType;
 
     @Builder
     public AccountWithdrawRequestDto(Long fullNumber, Long password, Long amount, TransactionType transactionType) {
@@ -30,4 +34,5 @@ public class AccountWithdrawRequestDto {
         this.amount = amount;
         this.transactionType = transactionType;
     }
+
 }
