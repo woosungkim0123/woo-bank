@@ -46,7 +46,7 @@ public class AccountControllerAdvice {
     public ResponseEntity<ApiResponse<Object>> handleNotEnoughBalanceException(HttpServletRequest request, NotEnoughBalanceException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("NotEnoughBalanceException = {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.error("잔액이 부족합니다."));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.error("잔액 부족"));
     }
 
     @ExceptionHandler(NotMatchAccountPasswordException.class)

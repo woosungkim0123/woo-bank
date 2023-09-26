@@ -24,6 +24,11 @@ import shop.woosung.bank.account.controller.dto.AccountWithdrawRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.handler.AccountControllerAdvice;
+import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
+import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
+import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
+import shop.woosung.bank.account.handler.exception.NotMatchAccountPasswordException;
 import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
 import shop.woosung.bank.mock.repository.FakeTransactionRepository;
@@ -70,7 +75,7 @@ class AccountControllerTest {
 
     @BeforeEach
     public void init() {
-        this.mvc = MockMvcBuilders.standaloneSetup(accountController).build();
+        this.mvc = MockMvcBuilders.standaloneSetup(accountController).setControllerAdvice(new AccountControllerAdvice()).build();
 
         userRepository.deleteAll();
         accountRepository.deleteAll();
@@ -201,9 +206,9 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.transaction.createdAt").value("2023-08-11T15:30"));
     }
 
-    @DisplayName("계좌번호를 찾지 못하면 입금을 할 수 없다.")
+    @DisplayName("입금시 계좌번호를 찾을 수 없다면 에러를 응답한다.")
     @Test
-    public void fail_deposit_account_if_account_not_exist() throws Exception {
+    void if_not_found_account_number_when_deposit_account_return_error() throws Exception {
         // given
         User user = userRepository.findByEmail("test2@test.com").get();
         accountRepository.save(Account.builder().fullNumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user).build());
@@ -225,16 +230,16 @@ class AccountControllerTest {
 
     @DisplayName("출금 성공시 정상적으로 응답한다.")
     @Test
-    public void withdraw_account() throws Exception {
+    void withdraw_account_success_response() throws Exception {
         // given
         Account account = Account.builder().id(1L).fullNumber(2321111111111L).balance(9000L).build();
         Transaction transaction = Transaction.builder().id(1L).type(TransactionType.WITHDRAW).sender("2321111111111").receiver("ATM").amount(1000L)
                 .createdAt(LocalDateTime.of(2023, 8, 11, 15, 30)).build();
-
-        when(accountService.withdraw(any(), any())).thenReturn(AccountWithdrawResponseDto.from(account, transaction));
-        
         AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
         String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+
+        // stub
+        when(accountService.withdraw(any(), any())).thenReturn(AccountWithdrawResponseDto.from(account, transaction));
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -255,5 +260,97 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.transaction.receiver").value("ATM"));
         resultActions.andExpect(jsonPath("$.data.transaction.amount").value(1000L));
         resultActions.andExpect(jsonPath("$.data.transaction.createdAt").value("2023-08-11T15:30"));
+    }
+
+    @DisplayName("출금시 계좌번호를 찾을 수 없다면 에러를 응답한다.")
+    @Test
+    void if_not_found_account_number_when_withdraw_account_return_error() throws Exception {
+        // given
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+
+        // stub
+        when(accountService.withdraw(any(), any())).thenThrow(NotFoundAccountFullNumberException.class);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 번호"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("출금시 계좌의 주인이 아니라면 에러를 응답한다.")
+    @Test
+    void if_not_account_owner_when_withdraw_account_return_error() throws Exception {
+        // given
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+
+        // stub
+        when(accountService.withdraw(any(), any())).thenThrow(NotAccountOwnerException.class);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isForbidden());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 소유자 불일치"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("출금시 계좌 비밀번호가 일치하지않으면 에러를 응답한다.")
+    @Test
+    void if_not_match_account_password_when_withdraw_account_return_error() throws Exception {
+        // given
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+
+        // stub
+        when(accountService.withdraw(any(), any())).thenThrow(NotMatchAccountPasswordException.class);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isUnauthorized());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 비밀번호 불일치"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("출금시 출금 금액이 부족하면 에러를 응답한다.")
+    @Test
+    void if_not_enough_account_amount_when_withdraw_account_return_error() throws Exception {
+        // given
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
+
+        // stub
+        when(accountService.withdraw(any(), any())).thenThrow(NotEnoughBalanceException.class);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account/withdraw")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody));
+
+        // then
+        resultActions.andExpect(status().isUnprocessableEntity());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("잔액 부족"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 }
