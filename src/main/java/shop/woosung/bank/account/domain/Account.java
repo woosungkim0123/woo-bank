@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
 import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
+import shop.woosung.bank.account.handler.exception.NotMatchAccountPasswordException;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 
@@ -58,7 +59,7 @@ public class Account {
 
     public void checkPasswordMatch(Long password, PasswordEncoder passwordEncoder) {
         if(!passwordEncoder.matches(password.toString(), this.password)) {
-            throw new NotAccountOwnerException();
+            throw new NotMatchAccountPasswordException();
         }
     }
     public void checkEnoughBalance(Long amount) {
