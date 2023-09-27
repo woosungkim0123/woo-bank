@@ -210,10 +210,13 @@ class AccountControllerTest {
     @Test
     void if_not_found_account_number_when_deposit_account_return_error() throws Exception {
         // given
-        User user = userRepository.findByEmail("test2@test.com").get();
-        accountRepository.save(Account.builder().fullNumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user).build());
-        AccountDepositRequestDto accountDepositRequestDto = AccountDepositRequestDto.builder().amount(1000L).fullNumber(2321111111112L).transactionType(TransactionType.DEPOSIT).sender("ATM").tel("01012341234").build();
+        AccountDepositRequestDto accountDepositRequestDto = AccountDepositRequestDto
+                .builder().amount(1000L).fullNumber(2321111111112L)
+                .transactionType(TransactionType.DEPOSIT).sender("ATM").tel("01012341234").build();
+
         String requestBody = om.writeValueAsString(accountDepositRequestDto);
+
+        when(accountService.deposit(any())).thenThrow(NotFoundAccountFullNumberException.class);
 
         // when
         ResultActions resultActions = mvc.perform(
