@@ -29,6 +29,7 @@ import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
 import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
 import shop.woosung.bank.account.handler.exception.NotMatchAccountPasswordException;
+import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
 import shop.woosung.bank.mock.repository.FakeAccountRepository;
 import shop.woosung.bank.mock.repository.FakeTransactionRepository;
@@ -45,6 +46,7 @@ import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -158,12 +160,10 @@ class AccountControllerTest {
     }
 
     @DisplayName("타인의 계좌를 삭제할 수 없다.")
-    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     public void delete_account_test_fail() throws Exception {
-        // given
-        User user2 = userRepository.findByEmail("test2@test.com").get();
-        accountRepository.save(Account.builder().fullNumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user2).build());
+        // stub
+        doThrow(NotAccountOwnerException.class).when(accountService).deleteAccount(any(), any());
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -172,18 +172,23 @@ class AccountControllerTest {
         // then
         resultActions.andExpect(status().isForbidden());
         resultActions.andExpect(jsonPath("$.status").value("error"));
-        resultActions.andExpect(jsonPath("$.message").value("계좌 소유자가 아닙니다."));
+        resultActions.andExpect(jsonPath("$.message").value("계좌 소유자 불일치"));
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
-    @DisplayName("계좌에 입금 입금할 수 있다.")
+    @DisplayName("입금 성공시 정상적으로 응답한다.")
     @Test
-    public void deposit_account() throws Exception {
+    public void deposit_account_success_response() throws Exception {
         // given
-        User user = userRepository.findByEmail("test2@test.com").get();
-        accountRepository.save(Account.builder().fullNumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user).build());
+        Account account = Account.builder().id(1L).fullNumber(2321111111111L).build();
+        Transaction transaction = Transaction.builder().id(1L).type(TransactionType.DEPOSIT).sender("ATM").receiver("2321111111111").amount(1000L).tel("01012341234")
+                .createdAt(LocalDateTime.of(2023, 8, 11, 15, 30)).build();
+
         AccountDepositRequestDto accountDepositRequestDto = AccountDepositRequestDto.builder().amount(1000L).fullNumber(2321111111111L).transactionType(TransactionType.DEPOSIT).sender("ATM").tel("01012341234").build();
         String requestBody = om.writeValueAsString(accountDepositRequestDto);
+
+        // stub
+        when(accountService.deposit(any())).thenReturn(AccountDepositResponseDto.from(account, transaction));
 
         // when
         ResultActions resultActions = mvc.perform(

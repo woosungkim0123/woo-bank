@@ -47,7 +47,7 @@ public class AccountController {
     @DeleteMapping("/s/account/{number}")
     public ResponseEntity<ApiResponse<Object>> deleteAccount(@PathVariable Long number,
                                            @AuthenticationPrincipal LoginUser loginUser) {
-        accountService.deleteAccount(number, loginUser.getUser().getId());
+        accountService.deleteAccount(number, loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("계좌 삭제 성공"));
     }
