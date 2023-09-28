@@ -62,11 +62,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional
-    public void deleteAccount(Long accountFullNumber, Long userId) {
+    public void deleteAccount(Long accountFullNumber, User user) {
         Account account = accountRepository.findByFullNumber(accountFullNumber)
                 .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullNumber));
 
-        account.checkOwner(userId);
+        account.checkOwner(user.getId());
 
         accountRepository.deleteById(account.getId());
     }

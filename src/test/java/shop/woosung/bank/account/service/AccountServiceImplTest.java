@@ -168,7 +168,7 @@ class AccountServiceImplTest {
         accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build());
 
         // when
-        accountService.deleteAccount(23211111111L, user.getId());
+        accountService.deleteAccount(23211111111L, user);
 
         // then
         Optional<Account> account = accountRepository.findByFullNumber(23211111111L);
@@ -184,7 +184,7 @@ class AccountServiceImplTest {
         Long notExistAccount = 23299999999L;
 
         // then
-        assertThatThrownBy(() -> accountService.deleteAccount(notExistAccount, user.getId()))
+        assertThatThrownBy(() -> accountService.deleteAccount(notExistAccount, user))
                 .isInstanceOf(NotFoundAccountFullNumberException.class);
     }
 

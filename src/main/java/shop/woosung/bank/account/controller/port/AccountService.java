@@ -8,7 +8,7 @@ public interface AccountService {
     AccountRegisterResponseDto register(AccountRegisterRequestServiceDto accountRegisterRequestServiceDto, User user);
     AccountListResponseDto getAccountList(User user);
 
-    void deleteAccount(Long fullNumber, Long userId);
+    void deleteAccount(Long fullNumber, User user);
 
     AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto);
 
