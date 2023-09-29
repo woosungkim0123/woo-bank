@@ -1,6 +1,5 @@
 package shop.woosung.bank.account.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.TestExecutionEvent;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -25,25 +22,19 @@ import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.handler.AccountControllerAdvice;
-import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
-import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
-import shop.woosung.bank.account.handler.exception.NotMatchAccountPasswordException;
+import shop.woosung.bank.account.handler.exception.*;
 import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
+import shop.woosung.bank.account.service.dto.AccountListResponseDto;
+import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
-import shop.woosung.bank.mock.repository.FakeAccountRepository;
-import shop.woosung.bank.mock.repository.FakeTransactionRepository;
-import shop.woosung.bank.mock.repository.FakeUserRepository;
 import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
-import shop.woosung.bank.mock.util.FakePasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.user.domain.User;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -53,48 +44,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@Import({ FakeRepositoryConfiguration.class })
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class AccountControllerTest {
-
+    private MockMvc mvc;
     @Autowired
     private ObjectMapper om;
-
     @Mock
     private AccountService accountService;
-
     @InjectMocks
     private AccountController accountController;
-
-    private MockMvc mvc;
-
-    @Autowired
-    private FakeUserRepository userRepository;
-
-    @Autowired
-    private FakeAccountRepository accountRepository;
 
     @BeforeEach
     public void init() {
         this.mvc = MockMvcBuilders.standaloneSetup(accountController).setControllerAdvice(new AccountControllerAdvice()).build();
-
-        userRepository.deleteAll();
-        accountRepository.deleteAll();
-        userRepository.save(User.builder().email("test1@test.com").name("test1").build());
-        userRepository.save(User.builder().email("test2@test.com").name("test2").build());
     }
 
-    @DisplayName("로그인 한 사용자는 자신의 계좌 리스트를 볼 수 있다.")
-    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("자신의 모든 계좌를 조회할 수 있다.")
     @Test
-    public void get_account_list_test_success() throws Exception {
+    public void get_own_account_list_success_response() throws Exception {
         // given
-        User user1 = userRepository.findByEmail("test1@test.com").get();
-        User user2 = userRepository.findByEmail("test2@test.com").get();
-        accountRepository.save(Account.builder().number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user1).build());
-        accountRepository.save(Account.builder().number(1111111112L).balance(2000L).type(AccountType.SAVING).user(user1).build());
-        accountRepository.save(Account.builder().number(1111111113L).balance(3000L).type(AccountType.SAVING).user(user2).build());
+        List<Account> accounts = new ArrayList<>();
+        accounts.add(Account.builder().number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(User.builder().id(1L).build()).build());
+        accounts.add(Account.builder().number(1111111112L).balance(2000L).type(AccountType.SAVING).user(User.builder().id(1L).build()).build());
+        AccountListResponseDto accountListResponseDto = AccountListResponseDto.from(User.builder().name("test1").build(), accounts);
+
+        // stub
+        when(accountService.getAccountList(any())).thenReturn(accountListResponseDto);
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -104,6 +80,7 @@ class AccountControllerTest {
         resultActions.andExpect(status().isOk());
         resultActions.andExpect(jsonPath("$.status").value("success"));
         resultActions.andExpect(jsonPath("$.message").value("요청 성공"));
+        resultActions.andExpect(jsonPath("$.data.username").value("test1"));
         resultActions.andExpect(jsonPath("$.data.accounts.length()").value(2));
         resultActions.andExpect(jsonPath("$.data.accounts[0].number").value(1111111111L));
         resultActions.andExpect(jsonPath("$.data.accounts[0].balance").value(1000L));
@@ -113,16 +90,19 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.accounts[1].type").value("SAVING"));
     }
 
-    @DisplayName("로그인 한 사용자는 계좌를 생성할 수 있다.")
-    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("계좌 생성 성공시 정상적으로 응답한다.")
     @Test
-    public void register_account_test_success() throws Exception {
+    void register_account_success_response() throws Exception {
         // given
         AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder()
                 .password("1234")
                 .type(AccountType.NORMAL)
                 .build();
         String requestBody = om.writeValueAsString(accountRegisterRequestDto);
+        Account account = Account.builder().id(1L).fullNumber(2321111111111L).number(1111111111L).balance(0L).type(AccountType.NORMAL).user(User.builder().id(1L).build()).build();
+
+        // stub
+        when(accountService.register(any(), any())).thenReturn(AccountRegisterResponseDto.from(account));
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -140,14 +120,61 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.balance").value(0L));
     }
 
-    @DisplayName("자신의 계좌를 삭제할 수 있다.")
-    @WithUserDetails(value = "test1@test.com", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("계좌 생성시 계좌 종류에 맞는 계좌 type 번호가 없으면 에러를 응답한다.")
     @Test
-    public void delete_account_test_success() throws Exception {
+    void if_not_found_account_type_when_register_account_return_error() throws Exception {
         // given
-        User user1 = userRepository.findByEmail("test1@test.com").get();
-        accountRepository.save(Account.builder().fullNumber(2321111111111L).number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(user1).build());
+        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder()
+                .password("1234")
+                .type(AccountType.NORMAL)
+                .build();
+        String requestBody = om.writeValueAsString(accountRegisterRequestDto);
 
+        // stub
+        when(accountService.register(any(), any())).thenThrow(NotFoundAccountTypeNumberException.class);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 종류"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("계좌 생성시 계좌 종류에 맞는 계좌 sequence 번호가 없으면 에러를 응답한다.")
+    @Test
+    void if_not_found_account_sequence_when_register_account_return_error() throws Exception {
+        // given
+        AccountRegisterRequestDto accountRegisterRequestDto = AccountRegisterRequestDto.builder()
+                .password("1234")
+                .type(AccountType.NORMAL)
+                .build();
+        String requestBody = om.writeValueAsString(accountRegisterRequestDto);
+
+        // stub
+        when(accountService.register(any(), any())).thenThrow(NotFoundAccountSequenceException.class);
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                post("/api/s/account")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andExpect(status().isBadRequest());
+        resultActions.andExpect(jsonPath("$.status").value("error"));
+        resultActions.andExpect(jsonPath("$.message").value("잘못된 계좌 종류"));
+        resultActions.andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("계좌 삭제 성공시 정상적으로 응답한다.")
+    @Test
+    void delete_account_success_response() throws Exception {
         // when
         ResultActions resultActions = mvc.perform(
                 delete("/api/s/account/" + 2321111111111L));
@@ -161,7 +188,7 @@ class AccountControllerTest {
 
     @DisplayName("타인의 계좌를 삭제할 수 없다.")
     @Test
-    public void delete_account_test_fail() throws Exception {
+    void not_delete_others_account() throws Exception {
         // stub
         doThrow(NotAccountOwnerException.class).when(accountService).deleteAccount(any(), any());
 
@@ -176,9 +203,9 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
-    @DisplayName("입금 성공시 정상적으로 응답한다.")
+    @DisplayName("계좌 입금 성공시 정상적으로 응답한다.")
     @Test
-    public void deposit_account_success_response() throws Exception {
+    void deposit_account_success_response() throws Exception {
         // given
         Account account = Account.builder().id(1L).fullNumber(2321111111111L).build();
         Transaction transaction = Transaction.builder().id(1L).type(TransactionType.DEPOSIT).sender("ATM").receiver("2321111111111").amount(1000L).tel("01012341234")
@@ -211,7 +238,7 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.transaction.createdAt").value("2023-08-11T15:30"));
     }
 
-    @DisplayName("입금시 계좌번호를 찾을 수 없다면 에러를 응답한다.")
+    @DisplayName("계좌 입금시 계좌번호를 찾을 수 없다면 에러를 응답한다.")
     @Test
     void if_not_found_account_number_when_deposit_account_return_error() throws Exception {
         // given
@@ -236,7 +263,7 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
-    @DisplayName("출금 성공시 정상적으로 응답한다.")
+    @DisplayName("계좌 출금 성공시 정상적으로 응답한다.")
     @Test
     void withdraw_account_success_response() throws Exception {
         // given
@@ -270,7 +297,7 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data.transaction.createdAt").value("2023-08-11T15:30"));
     }
 
-    @DisplayName("출금시 계좌번호를 찾을 수 없다면 에러를 응답한다.")
+    @DisplayName("계좌 출금시 계좌번호를 찾을 수 없다면 에러를 응답한다.")
     @Test
     void if_not_found_account_number_when_withdraw_account_return_error() throws Exception {
         // given
@@ -293,7 +320,7 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
-    @DisplayName("출금시 계좌의 주인이 아니라면 에러를 응답한다.")
+    @DisplayName("계좌 출금시 계좌의 주인이 아니라면 에러를 응답한다.")
     @Test
     void if_not_account_owner_when_withdraw_account_return_error() throws Exception {
         // given
@@ -316,7 +343,7 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
-    @DisplayName("출금시 계좌 비밀번호가 일치하지않으면 에러를 응답한다.")
+    @DisplayName("계좌 출금시 계좌 비밀번호가 일치하지않으면 에러를 응답한다.")
     @Test
     void if_not_match_account_password_when_withdraw_account_return_error() throws Exception {
         // given
@@ -339,7 +366,7 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.data").isEmpty());
     }
 
-    @DisplayName("출금시 출금 금액이 부족하면 에러를 응답한다.")
+    @DisplayName("계좌 출금시 출금 금액이 부족하면 에러를 응답한다.")
     @Test
     void if_not_enough_account_amount_when_withdraw_account_return_error() throws Exception {
         // given
