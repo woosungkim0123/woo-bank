@@ -28,20 +28,20 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/s/account")
-    public ResponseEntity<ApiResponse<AccountRegisterResponseDto>> register(@RequestBody @Valid AccountRegisterRequestDto accountRegisterRequestDto,
-                                           @AuthenticationPrincipal LoginUser loginUser) {
-        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestConvert(accountRegisterRequestDto), loginUser.getUser());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌등록 성공", accountRegisterResponseDto));
-    }
-
     @GetMapping("/s/accounts")
     public ResponseEntity<ApiResponse<AccountListResponseDto>> findUserAccounts(@AuthenticationPrincipal LoginUser loginUser) {
 
         AccountListResponseDto accountListResponseDto = accountService.getAccountList(loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(accountListResponseDto));
+    }
+
+    @PostMapping("/s/account")
+    public ResponseEntity<ApiResponse<AccountRegisterResponseDto>> register(@RequestBody @Valid AccountRegisterRequestDto accountRegisterRequestDto,
+                                           @AuthenticationPrincipal LoginUser loginUser) {
+        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestConvert(accountRegisterRequestDto), loginUser.getUser());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌등록 성공", accountRegisterResponseDto));
     }
 
     @DeleteMapping("/s/account/{number}")

@@ -50,11 +50,9 @@ class AccountServiceImplTest {
 
         this.accountService = AccountServiceImpl.builder()
                 .passwordEncoder(passwordEncoder)
-                .userRepository(userRepository)
                 .accountRepository(accountRepository)
-                .accountSequenceRepository(accountSequenceRepository)
                 .accountTypeNumberRepository(accountTypeNumberRepository)
-                .accountLockService(new AccountLockServiceImpl(accountRepository, passwordEncoder))
+                .accountLockService(new AccountLockServiceImpl(accountRepository, passwordEncoder, null))
                 .transactionRepository(new FakeTransactionRepository())
                 .build();
 

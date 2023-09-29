@@ -18,7 +18,7 @@ public class AccountControllerAdvice {
     public ResponseEntity<ApiResponse<Object>> handleNotFoundAccountTypeNumberException(HttpServletRequest request, NotFoundAccountTypeNumberException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("NotFoundAccountTypeNumberException = {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("잘못된 계좌 종류 입니다."));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("잘못된 계좌 종류"));
     }
 
     @ExceptionHandler(NotFoundAccountSequenceException.class)
