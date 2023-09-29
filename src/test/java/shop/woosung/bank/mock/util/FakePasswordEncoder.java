@@ -17,6 +17,6 @@ public class FakePasswordEncoder implements PasswordEncoder {
 
     @Override
     public boolean matches(String password, String encodedPassword) {
-        return false;
+        return this.encodedPassword.equals(encodedPassword);
     }
 }

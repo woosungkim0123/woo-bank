@@ -62,6 +62,7 @@ public class Account {
             throw new NotMatchAccountPasswordException();
         }
     }
+
     public void checkEnoughBalance(Long amount) {
         if(this.balance < amount) {
             throw new NotEnoughBalanceException("계좌 잔액이 부족합니다. 출금 가능한 금액: " + this.balance + " 출금 요청 금액: " + amount);
