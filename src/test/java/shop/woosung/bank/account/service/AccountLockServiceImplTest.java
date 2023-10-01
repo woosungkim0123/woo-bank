@@ -7,27 +7,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import shop.woosung.bank.account.controller.port.AccountLockService;
 import shop.woosung.bank.account.domain.Account;
-import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
-import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
-import shop.woosung.bank.account.handler.exception.NotMatchAccountPasswordException;
+import shop.woosung.bank.account.domain.AccountSequence;
+import shop.woosung.bank.account.domain.AccountType;
+import shop.woosung.bank.account.handler.exception.*;
 import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
-import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.mock.util.FakePasswordEncoder;
-import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,6 +36,34 @@ class AccountLockServiceImplTest {
     private AccountSequenceRepository accountSequenceRepository;
     @Spy
     private PasswordEncoder passwordEncoder = new FakePasswordEncoder("aaaa-bbbb-cccc");
+
+    @DisplayName("새로운 계좌 번호를 가져오는 것에 성공한다.")
+    @Test
+    void get_account_new_number() {
+        // given
+        AccountSequence accountSequence = AccountSequence.builder().sequenceName(AccountType.NORMAL).nextValue(1000000L).incrementBy(1L).build();
+
+        // stub
+        when(accountSequenceRepository.findById(anyString())).thenReturn(Optional.of(accountSequence));
+
+        // when
+        Long result = accountLockService.getNewAccountNumber(AccountType.NORMAL);
+
+        // then
+        assertThat(result).isEqualTo(1000000L);
+        assertThat(accountSequence.getNextValue()).isEqualTo(1000001L);
+    }
+
+    @DisplayName("새로운 계좌 번호를 가져올 때 존재하지 않는 타입이면 예외를 발생시킨다.")
+    @Test
+    void if_not_found_account_type_when_get_account_sequence_number_throw_exception() {
+        // stub
+        when(accountSequenceRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> accountLockService.getNewAccountNumber(AccountType.NORMAL))
+                .isInstanceOf(NotFoundAccountSequenceException.class);
+    }
 
     @DisplayName("계좌 입금에 성공한다.")
     @Test
