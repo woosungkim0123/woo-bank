@@ -25,9 +25,20 @@ public class AccountLockServiceImpl implements AccountLockService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Long getNewAccountNumber(AccountType accountType) {
+        AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
+                .orElseThrow(() -> new NotFoundAccountSequenceException(accountType));
+
+        Long nextValue = accountSequence.getNextValue();
+        accountSequence.incrementNextValue();
+        accountSequenceRepository.save(accountSequence);
+        return nextValue;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Account depositAccountWithLock(Long fullNumber, Long amount) {
-        Account depositAccount = accountRepository.findByFullNumberWithPessimisticLock(fullNumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
+        Account depositAccount = getAccountWithLock(fullNumber);
         depositAccount.deposit(amount);
         accountRepository.save(depositAccount);
         return depositAccount;
@@ -36,8 +47,7 @@ public class AccountLockServiceImpl implements AccountLockService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Account withdrawWithLock(AccountWithdrawLockServiceDto accountWithdrawLockServiceDto) {
-        Account withdrawAccount = accountRepository.findByFullNumberWithPessimisticLock(accountWithdrawLockServiceDto.getFullNumber())
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountWithdrawLockServiceDto.getFullNumber()));
+        Account withdrawAccount = getAccountWithLock(accountWithdrawLockServiceDto.getFullNumber());
 
         withdrawAccount.checkOwner(accountWithdrawLockServiceDto.getUser().getId());
 
@@ -52,15 +62,8 @@ public class AccountLockServiceImpl implements AccountLockService {
         return withdrawAccount;
     }
 
-    @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long getNewAccountNumber(AccountType accountType) {
-        AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
-                .orElseThrow(() -> new NotFoundAccountSequenceException(accountType));
-
-        Long nextValue = accountSequence.getNextValue();
-        accountSequence.incrementNextValue();
-        accountSequenceRepository.save(accountSequence);
-        return nextValue;
+    private Account getAccountWithLock(Long fullNumber) {
+        return accountRepository.findByFullNumberWithPessimisticLock(fullNumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
     }
 }
