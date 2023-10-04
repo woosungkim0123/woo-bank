@@ -17,8 +17,7 @@ public class AccountWithdrawRequestDto {
     private Long fullNumber;
 
     @NotNull
-    @Digits(integer = 4, fraction = 4)
-    private Long password;
+    private String password;
 
     @Positive
     @NotNull
@@ -28,7 +27,7 @@ public class AccountWithdrawRequestDto {
     private TransactionType transactionType;
 
     @Builder
-    public AccountWithdrawRequestDto(Long fullNumber, Long password, Long amount, TransactionType transactionType) {
+    public AccountWithdrawRequestDto(Long fullNumber, String password, Long amount, TransactionType transactionType) {
         this.fullNumber = fullNumber;
         this.password = password;
         this.amount = amount;

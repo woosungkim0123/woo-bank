@@ -52,7 +52,7 @@ public class AccountLockServiceImpl implements AccountLockService {
         withdrawAccount.checkOwner(accountWithdrawLockServiceDto.getUser().getId());
 
         withdrawAccount.checkPasswordMatch(accountWithdrawLockServiceDto.getPassword(), passwordEncoder);
-
+        
         withdrawAccount.checkEnoughBalance(accountWithdrawLockServiceDto.getAmount());
 
         withdrawAccount.withdraw(accountWithdrawLockServiceDto.getAmount());

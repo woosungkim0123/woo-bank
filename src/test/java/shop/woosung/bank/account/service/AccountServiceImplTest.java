@@ -16,6 +16,7 @@ import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberExce
 import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
+import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
@@ -42,6 +43,8 @@ class AccountServiceImplTest {
     private AccountTypeNumberRepository accountTypeNumberRepository;
     @Mock
     private TransactionRepository transactionRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @DisplayName("자신의 모든 계좌 목록을 가져온다.")
     @Test

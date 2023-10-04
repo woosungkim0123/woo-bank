@@ -57,8 +57,8 @@ public class Account {
         this.balance = this.balance + amount;
     }
 
-    public void checkPasswordMatch(Long password, PasswordEncoder passwordEncoder) {
-        if(!passwordEncoder.matches(password.toString(), this.password)) {
+    public void checkPasswordMatch(String password, PasswordEncoder passwordEncoder) {
+        if(!passwordEncoder.matches(password, this.password)) {
             throw new NotMatchAccountPasswordException();
         }
     }

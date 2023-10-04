@@ -85,7 +85,7 @@ class AccountTest {
         Account account = Account.builder().password("aaaa-bbbb-cccc").build();
 
         // when & then
-        assertDoesNotThrow(() -> account.checkPasswordMatch(1234L, new FakePasswordEncoder("aaaa-bbbb-cccc")));
+        assertDoesNotThrow(() -> account.checkPasswordMatch("1234", new FakePasswordEncoder("aaaa-bbbb-cccc")));
     }
 
     @DisplayName("계좌 비밀번호가 일치하지 않으면 예외를 뱉는다.")
@@ -95,7 +95,7 @@ class AccountTest {
         Account account = Account.builder().password("dddd-eeee-ffff").build();
 
         // when & then
-        assertThatThrownBy(() -> account.checkPasswordMatch(1234L, new FakePasswordEncoder("aaaa-bbbb-cccc")))
+        assertThatThrownBy(() -> account.checkPasswordMatch("1234", new FakePasswordEncoder("aaaa-bbbb-cccc")))
                 .isInstanceOf(NotMatchAccountPasswordException.class);
     }
 

@@ -107,7 +107,7 @@ class AccountLockServiceImplTest {
         AccountWithdrawLockServiceDto accountWithdrawLockServiceDto = AccountWithdrawLockServiceDto.builder()
                 .user(user)
                 .fullNumber(123456789L)
-                .password(1234L)
+                .password("1234")
                 .amount(1000L)
                 .build();
         Account account = Account.builder().fullNumber(123456789L).balance(1000L).password("aaaa-bbbb-cccc").user(user).build();
@@ -133,7 +133,7 @@ class AccountLockServiceImplTest {
         AccountWithdrawLockServiceDto accountWithdrawLockServiceDto = AccountWithdrawLockServiceDto.builder()
                 .user(user)
                 .fullNumber(123456789L)
-                .password(1234L)
+                .password("1234")
                 .amount(10000L)
                 .build();
 
@@ -154,7 +154,7 @@ class AccountLockServiceImplTest {
         AccountWithdrawLockServiceDto accountWithdrawLockServiceDto = AccountWithdrawLockServiceDto.builder()
                 .user(user1)
                 .fullNumber(123456789L)
-                .password(1234L)
+                .password("1234")
                 .amount(10000L)
                 .build();
         Account account = Account.builder().fullNumber(123456789L).balance(1000L).user(user2).build();
@@ -175,7 +175,7 @@ class AccountLockServiceImplTest {
         AccountWithdrawLockServiceDto accountWithdrawLockServiceDto = AccountWithdrawLockServiceDto.builder()
                 .user(user)
                 .fullNumber(123456789L)
-                .password(1234L)
+                .password("1234")
                 .amount(10000L)
                 .build();
         Account account = Account.builder().fullNumber(123456789L).balance(1000L).password("dddd-eeee-ffff").user(user).build();
@@ -196,7 +196,7 @@ class AccountLockServiceImplTest {
         AccountWithdrawLockServiceDto accountWithdrawLockServiceDto = AccountWithdrawLockServiceDto.builder()
                 .user(user)
                 .fullNumber(123456789L)
-                .password(1234L)
+                .password("1234")
                 .amount(2000L)
                 .build();
         Account account = Account.builder().fullNumber(123456789L).balance(1000L).password("aaaa-bbbb-cccc").user(user).build();
