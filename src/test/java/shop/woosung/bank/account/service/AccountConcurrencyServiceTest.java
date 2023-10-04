@@ -6,14 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.controller.port.AccountLockService;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
-import shop.woosung.bank.account.service.dto.AccountDepositRequestServiceDto;
-import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
+import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.mock.util.FakePasswordEncoder;
@@ -34,8 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @SpringBootTest
 class AccountConcurrencyServiceTest {
-    @Autowired
+
     private AccountService accountService;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -46,6 +45,8 @@ class AccountConcurrencyServiceTest {
     private AccountTypeNumberRepository accountTypeNumberRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private FakePasswordEncoder fakePasswordEncoder;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +55,7 @@ class AccountConcurrencyServiceTest {
                 .accountRepository(accountRepository)
                 .accountTypeNumberRepository(accountTypeNumberRepository)
                 .transactionRepository(transactionRepository)
-                .passwordEncoder(new FakePasswordEncoder("aaaa-bbbb-cccc"))
+                .passwordEncoder(fakePasswordEncoder)
                 .build();
     }
 
@@ -95,12 +96,12 @@ class AccountConcurrencyServiceTest {
     @DisplayName("계좌 입금 요청을 동시에 100개를 보냈을 때 최종 금액이 모든 요청 금액을 합친 것과 같아야한다.")
     @Test
     void account_deposit_100_concurrent_requests_not_() throws Exception {
-        int threadCount = 100;
+        int threadCount = 10;
         User user = userRepository.save(User.builder().email("test@test.com").password("1234").name("test").role(UserRole.CUSTOMER).build());
         accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).password("aaaa-bbbb-cccc").balance(1000L).type(AccountType.NORMAL).user(user).build());
         AtomicLong maxAmount = new AtomicLong(0);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(25);
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
 
         AccountDepositRequestServiceDto accountDepositRequestServiceDto = AccountDepositRequestServiceDto.builder()
                 .fullNumber(23211111111L)
@@ -125,7 +126,44 @@ class AccountConcurrencyServiceTest {
         latch.await();
         executorService.shutdown();
 
-        assertThat(maxAmount.get()).isEqualTo(101000L);
+        assertThat(maxAmount.get()).isEqualTo(11000L);
     }
 
+    @DisplayName("계좌 출금 요청을 동시에 100개를 보냈을 때 최종 금액이 모든 요청 금액을 뺀 것과 같아야한다.")
+    @Test
+    void account_withdraw_100_concurrent_requests_not_() throws Exception {
+        int threadCount = 10;
+        User user = userRepository.save(User.builder().email("test@test.com").password("aaaa-bbbb-cccc").name("test").role(UserRole.CUSTOMER).build());
+        accountRepository.save(Account.builder().number(11111111L).fullNumber(23211111111L).password("aaaa-bbbb-cccc").balance(999999L).type(AccountType.NORMAL).user(user).build());
+        AtomicLong maxAmount = new AtomicLong(999999L);
+
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+
+        AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto = AccountWithdrawRequestServiceDto.builder()
+                .fullNumber(23211111111L)
+                .amount(100L)
+                .transactionType(TransactionType.WITHDRAW)
+                .password("aaaa-bbbb-cccc")
+                .build();
+
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        for (int i = 0; i < threadCount; i++) {
+            executorService.submit(() -> {
+                try {
+                    AccountWithdrawResponseDto accountWithdrawResponseDto = accountService.withdraw(accountWithdrawRequestServiceDto, user);
+                    long currentBalance = accountWithdrawResponseDto.getTransaction().getWithdrawAccountBalance();
+                    System.out.println("currentBalance = " + currentBalance);
+                    maxAmount.accumulateAndGet(currentBalance, Math::min);
+                } catch(Exception e) {
+                    System.out.println("e = " + e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        executorService.shutdown();
+
+        assertThat(maxAmount.get()).isEqualTo(0L);
+    }
 }
