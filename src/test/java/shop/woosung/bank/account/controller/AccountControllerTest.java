@@ -268,7 +268,7 @@ class AccountControllerTest {
         Account account = Account.builder().id(1L).fullNumber(2321111111111L).balance(9000L).build();
         Transaction transaction = Transaction.builder().id(1L).type(TransactionType.WITHDRAW).sender("2321111111111").receiver("ATM").amount(1000L)
                 .createdAt(LocalDateTime.of(2023, 8, 11, 15, 30)).build();
-        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password("1234").amount(1000L).transactionType(TransactionType.WITHDRAW).build();
         String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
 
         // stub
@@ -299,7 +299,7 @@ class AccountControllerTest {
     @Test
     void if_not_found_account_number_when_withdraw_account_return_error() throws Exception {
         // given
-        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password("1234").amount(1000L).transactionType(TransactionType.WITHDRAW).build();
         String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
 
         // stub
@@ -322,7 +322,7 @@ class AccountControllerTest {
     @Test
     void if_not_account_owner_when_withdraw_account_return_error() throws Exception {
         // given
-        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password("1234").amount(1000L).transactionType(TransactionType.WITHDRAW).build();
         String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
 
         // stub
@@ -345,7 +345,7 @@ class AccountControllerTest {
     @Test
     void if_not_match_account_password_when_withdraw_account_return_error() throws Exception {
         // given
-        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password("1234").amount(1000L).transactionType(TransactionType.WITHDRAW).build();
         String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
 
         // stub
@@ -368,7 +368,7 @@ class AccountControllerTest {
     @Test
     void if_not_enough_account_amount_when_withdraw_account_return_error() throws Exception {
         // given
-        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password(1234L).amount(1000L).transactionType(TransactionType.WITHDRAW).build();
+        AccountWithdrawRequestDto accountWithdrawRequestDto = AccountWithdrawRequestDto.builder().fullNumber(2321111111111L).password("1234").amount(1000L).transactionType(TransactionType.WITHDRAW).build();
         String requestBody = om.writeValueAsString(accountWithdrawRequestDto);
 
         // stub
