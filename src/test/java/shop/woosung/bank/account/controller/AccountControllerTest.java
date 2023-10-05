@@ -63,8 +63,8 @@ class AccountControllerTest {
     public void get_own_account_list_success_response() throws Exception {
         // given
         List<Account> accounts = new ArrayList<>();
-        accounts.add(Account.builder().number(1111111111L).balance(1000L).type(AccountType.NORMAL).user(User.builder().id(1L).build()).build());
-        accounts.add(Account.builder().number(1111111112L).balance(2000L).type(AccountType.SAVING).user(User.builder().id(1L).build()).build());
+        accounts.add(Account.builder().number(1111111111L).fullNumber(2321111111111L).balance(1000L).type(AccountType.NORMAL).user(User.builder().id(1L).build()).build());
+        accounts.add(Account.builder().number(1111111112L).fullNumber(3431111111112L).balance(2000L).type(AccountType.SAVING).user(User.builder().id(1L).build()).build());
         AccountListResponseDto accountListResponseDto = AccountListResponseDto.from(User.builder().name("test1").build(), accounts);
 
         // stub
@@ -80,10 +80,10 @@ class AccountControllerTest {
         resultActions.andExpect(jsonPath("$.message").value("요청 성공"));
         resultActions.andExpect(jsonPath("$.data.username").value("test1"));
         resultActions.andExpect(jsonPath("$.data.accounts.length()").value(2));
-        resultActions.andExpect(jsonPath("$.data.accounts[0].number").value(1111111111L));
+        resultActions.andExpect(jsonPath("$.data.accounts[0].fullNumber").value(2321111111111L));
         resultActions.andExpect(jsonPath("$.data.accounts[0].balance").value(1000L));
         resultActions.andExpect(jsonPath("$.data.accounts[0].type").value("NORMAL"));
-        resultActions.andExpect(jsonPath("$.data.accounts[1].number").value(1111111112L));
+        resultActions.andExpect(jsonPath("$.data.accounts[1].fullNumber").value(3431111111112L));
         resultActions.andExpect(jsonPath("$.data.accounts[1].balance").value(2000L));
         resultActions.andExpect(jsonPath("$.data.accounts[1].type").value("SAVING"));
     }
