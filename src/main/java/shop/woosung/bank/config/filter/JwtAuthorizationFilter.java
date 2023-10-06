@@ -9,10 +9,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import shop.woosung.bank.common.handler.CommonResponseHandler;
 import shop.woosung.bank.config.auth.LoginUser;
+import shop.woosung.bank.config.auth.exception.*;
 import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.config.auth.jwt.JwtProcess;
 import shop.woosung.bank.config.auth.jwt.JwtVO;
-import shop.woosung.bank.config.auth.jwt.exception.*;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
