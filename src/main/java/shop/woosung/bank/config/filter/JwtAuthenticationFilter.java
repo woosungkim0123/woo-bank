@@ -26,15 +26,16 @@ import java.io.IOException;
 
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CommonResponseHandler commonResponseHandler;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, CommonResponseHandler commonResponseHandler) {
         super(authenticationManager);
         setFilterProcessesUrl("/api/login");
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.commonResponseHandler = commonResponseHandler;
     }
 
     @Override
@@ -47,11 +48,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (LoginValidationException exception) {
             log.error("request.getRequestURI = {}", request.getRequestURI());
             log.error("LoginValidationException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "유효하지 않은 요청 입니다.", HttpStatus.BAD_REQUEST);
+            commonResponseHandler.handleException(response, "유효하지 않은 요청 입니다.", HttpStatus.BAD_REQUEST);
         } catch (IOException exception) {
             log.error("request.getRequestURI = {}", request.getRequestURI());
             log.error("IOException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "로그인에 실패 하였습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "로그인에 실패 하였습니다.", HttpStatus.UNAUTHORIZED);
         }
         return null;
     }
@@ -60,7 +61,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("AuthenticationException = {}", exception.getMessage());
-        CommonResponseHandler.handleException(response, "계정 정보를 확인 해주세요.", HttpStatus.UNAUTHORIZED);
+        commonResponseHandler.handleException(response, "계정 정보를 확인 해주세요.", HttpStatus.UNAUTHORIZED);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String jwtToken = JwtProcess.create(jwtTokenProvider, loginUser);
         response.addHeader(JwtVO.HEADER, jwtToken);
         LoginResponseDto loginResponseDto = LoginResponseDto.builder().user(loginUser.getUser()).build();
-        CommonResponseHandler.handleSuccess(response, "로그인 완료", HttpStatus.OK, loginResponseDto);
+        commonResponseHandler.handleSuccess(response, "로그인 완료", HttpStatus.OK, loginResponseDto);
     }
 
     private LoginRequestDto convertLoginRequestDto(HttpServletRequest request) throws IOException {
@@ -90,6 +91,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new LoginValidationException(errorMessage);
         }
     }
+
+    /**
+     * Mysql에서는 공백을 제거하지 않고 저장하기 때문에, 공백이 있는 경우에는 인증에 실패하도록 한다.
+     * h2 mysql 차이 때문에 추가한 로직
+     */
     private void validateWhitespace(String value, String errorMessage) {
         String trimValue = value.trim();
         if (value.length() != trimValue.length()) {

@@ -35,6 +35,7 @@ public class SecurityConfig {
     private final Environment environment;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final CommonResponseHandler commonResponseHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -61,8 +62,8 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = getBuilder().getSharedObject(AuthenticationManager.class);
-            getBuilder().addFilter(new JwtAuthenticationFilter(jwtTokenProvider, authenticationManager));
-            getBuilder().addFilter(new JwtAuthorizationFilter(jwtTokenProvider, authenticationManager, userRepository));
+            getBuilder().addFilter(new JwtAuthenticationFilter(jwtTokenProvider, authenticationManager, commonResponseHandler));
+            getBuilder().addFilter(new JwtAuthorizationFilter(jwtTokenProvider, authenticationManager, userRepository, commonResponseHandler));
             super.configure(http);
         }
     }
@@ -81,13 +82,13 @@ public class SecurityConfig {
     private void authenticationEntryPointResponseHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("AuthenticationException = {}", exception.getMessage());
-        CommonResponseHandler.handleException(response, "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+        commonResponseHandler.handleException(response, "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
     }
 
     private void accessDeniedResponseHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("AccessDeniedException = {}", exception.getMessage());
-        CommonResponseHandler.handleException(response, "권한이 없습니다.", HttpStatus.FORBIDDEN);
+        commonResponseHandler.handleException(response, "권한이 없습니다.", HttpStatus.FORBIDDEN);
     }
 
     private void configureDevSettings(HttpSecurity http) throws Exception {
