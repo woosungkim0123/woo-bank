@@ -82,7 +82,7 @@ public class SecurityConfig {
     private void authenticationEntryPointResponseHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("AuthenticationException = {}", exception.getMessage());
-        commonResponseHandler.handleException(response, "로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+        commonResponseHandler.handleException(response, "로그인 필요", HttpStatus.UNAUTHORIZED);
     }
 
     private void accessDeniedResponseHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
