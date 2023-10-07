@@ -51,6 +51,8 @@ class AccountServiceImplTest {
     void get_my_all_accounts() {
         // given
         User user = User.builder().id(1L).name("test").build();
+
+        // stub
         when(accountRepository.findByUserId(anyLong())).thenReturn(
                 List.of(
                         Account.builder().id(1L).fullNumber(23211111111L).type(AccountType.NORMAL).balance(1000L).user(user).build(),
