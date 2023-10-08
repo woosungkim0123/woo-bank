@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
@@ -15,7 +14,6 @@ import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.mock.util.FakePasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 
 import java.util.Optional;
@@ -34,8 +32,8 @@ class AccountLockServiceImplTest {
     private AccountRepository accountRepository;
     @Mock
     private AccountSequenceRepository accountSequenceRepository;
-    @Spy
-    private PasswordEncoder passwordEncoder = new FakePasswordEncoder("aaaa-bbbb-cccc");
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @DisplayName("새로운 계좌 번호를 가져오는 것에 성공한다.")
     @Test
@@ -114,6 +112,7 @@ class AccountLockServiceImplTest {
 
         // stub
         when(accountRepository.findByFullNumberWithPessimisticLock(anyLong())).thenReturn(Optional.of(account));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
         // when
         Account result = accountLockService.withdrawWithLock(accountWithdrawLockServiceDto);
@@ -202,6 +201,7 @@ class AccountLockServiceImplTest {
         Account account = Account.builder().fullNumber(123456789L).balance(1000L).password("aaaa-bbbb-cccc").user(user).build();
 
         // stub
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(accountRepository.findByFullNumberWithPessimisticLock(anyLong())).thenReturn(Optional.of(account));
 
         // when & then

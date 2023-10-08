@@ -2,19 +2,27 @@ package shop.woosung.bank.account.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
 import shop.woosung.bank.account.handler.exception.NotEnoughBalanceException;
 import shop.woosung.bank.account.handler.exception.NotMatchAccountPasswordException;
-import shop.woosung.bank.mock.util.FakePasswordEncoder;
+import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.user.domain.User;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class AccountTest {
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @DisplayName("등록할 계좌를 만든다.")
     @Test
@@ -27,7 +35,9 @@ class AccountTest {
                 balance(1000L).
                 accountType(AccountType.NORMAL).
                 user(User.builder().id(1L).build()).build();
-        FakePasswordEncoder passwordEncoder = new FakePasswordEncoder("aaaa-bbbb-cccc");
+
+        // stub
+        when(passwordEncoder.encode(anyString())).thenReturn("aaaa-bbbb-cccc");
 
         // when
         Account result = Account.register(accountRegister, passwordEncoder);
@@ -84,8 +94,11 @@ class AccountTest {
         // given
         Account account = Account.builder().password("aaaa-bbbb-cccc").build();
 
+        // stub
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
         // when & then
-        assertDoesNotThrow(() -> account.checkPasswordMatch("1234", new FakePasswordEncoder("aaaa-bbbb-cccc")));
+        assertDoesNotThrow(() -> account.checkPasswordMatch("1234", passwordEncoder));
     }
 
     @DisplayName("계좌 비밀번호가 일치하지 않으면 예외를 뱉는다.")
@@ -94,8 +107,11 @@ class AccountTest {
         // given
         Account account = Account.builder().password("dddd-eeee-ffff").build();
 
+        // stub
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
         // when & then
-        assertThatThrownBy(() -> account.checkPasswordMatch("1234", new FakePasswordEncoder("aaaa-bbbb-cccc")))
+        assertThatThrownBy(() -> account.checkPasswordMatch("1234", passwordEncoder))
                 .isInstanceOf(NotMatchAccountPasswordException.class);
     }
 
