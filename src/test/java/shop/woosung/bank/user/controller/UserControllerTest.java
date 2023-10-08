@@ -1,7 +1,6 @@
 package shop.woosung.bank.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -9,52 +8,44 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import shop.woosung.bank.mock.repository.FakeUserRepository;
-import shop.woosung.bank.mock.config.FakeRepositoryConfiguration;
 import shop.woosung.bank.user.controller.dto.JoinRequestDto;
+import shop.woosung.bank.user.controller.port.UserService;
+import shop.woosung.bank.user.domain.User;
+import shop.woosung.bank.user.service.dto.JoinResponseDto;
 
 import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@Import({ FakeRepositoryConfiguration.class })
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class UserControllerTest {
-
+    @MockBean
+    private UserService userService;
     @Autowired
     private MockMvc mvc;
     @Autowired
     private ObjectMapper om;
 
-    @Autowired
-    private FakeUserRepository userRepository;
-
-    @BeforeEach
-    public void init() {
-        userRepository.deleteAll();
-    }
-
-
-    @DisplayName("/api/join으로 알맞은 형식의 요청을 보내면 회원가입이 성공한다.")
+    @DisplayName("회원가입에 성공한다.")
     @ParameterizedTest
     @MethodSource("validJoinRequests")
-    public void join_test_success(String email, String password, String name) throws Exception {
+    public void join_success(String email, String password, String name) throws Exception {
         // given
-        JoinRequestDto joinRequestDto = JoinRequestDto.builder()
-                .email(email)
-                .password(password)
-                .name(name)
-                .build();
-        String requestBody = om.writeValueAsString(joinRequestDto);
+        String requestBody = om.writeValueAsString(JoinRequestDto.builder().email(email).password(password).name(name).build());
+
+        // stub
+        when(userService.join(any())).thenReturn(JoinResponseDto.from(User.builder().id(1L).password(password).email(email).name(name).build()));
 
         // when
         ResultActions resultActions = mvc.perform(
@@ -71,10 +62,10 @@ class UserControllerTest {
         resultActions.andExpect(jsonPath("$.data.name").value(name));
     }
 
-    @DisplayName("/api/join으로 잘못된 형식의 요청을 보내면 예외가 응답된다.")
+    @DisplayName("회원가입시 입력 데이터가 잘못되거나 누락되면 에러를 응답한다.")
     @ParameterizedTest
     @MethodSource("invalidJoinRequests")
-    public void join_test_fail(String email, String password, String name) throws Exception {
+    public void if_wrong_request_data_when_join_throw_exception(String email, String password, String name) throws Exception {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email(email)
