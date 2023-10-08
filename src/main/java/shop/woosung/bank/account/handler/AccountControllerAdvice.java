@@ -18,7 +18,7 @@ public class AccountControllerAdvice {
     public ResponseEntity<ApiResponse<Object>> handleNotFoundAccountTypeNumberException(HttpServletRequest request, NotFoundAccountTypeNumberException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("NotFoundAccountTypeNumberException = {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("잘못된 계좌 종류 입니다."));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("잘못된 계좌 종류"));
     }
 
     @ExceptionHandler(NotFoundAccountSequenceException.class)
@@ -32,7 +32,7 @@ public class AccountControllerAdvice {
     public ResponseEntity<ApiResponse<Object>> handleNotAccountOwnerException(HttpServletRequest request, NotAccountOwnerException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("NotAccountOwnerException = {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("계좌 소유자가 아닙니다."));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("계좌 소유자 불일치"));
     }
 
     @ExceptionHandler(NotFoundAccountFullNumberException.class)
@@ -46,6 +46,13 @@ public class AccountControllerAdvice {
     public ResponseEntity<ApiResponse<Object>> handleNotEnoughBalanceException(HttpServletRequest request, NotEnoughBalanceException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("NotEnoughBalanceException = {}", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.error("잔액이 부족합니다."));
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.error("잔액 부족"));
+    }
+
+    @ExceptionHandler(NotMatchAccountPasswordException.class)
+    public ResponseEntity<ApiResponse<Object>> handleNotMatchAccountPasswordException(HttpServletRequest request, NotMatchAccountPasswordException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("NotMatchAccountPasswordException = {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("계좌 비밀번호 불일치"));
     }
 }

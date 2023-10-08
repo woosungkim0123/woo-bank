@@ -8,11 +8,11 @@ import shop.woosung.bank.user.domain.User;
 public class AccountWithdrawLockServiceDto {
     private final User user;
     private final Long fullNumber;
-    private final Long password;
+    private final String password;
     private final Long amount;
 
     @Builder
-    public AccountWithdrawLockServiceDto(User user, Long fullNumber, Long password, Long amount) {
+    public AccountWithdrawLockServiceDto(User user, Long fullNumber, String password, Long amount) {
         this.user = user;
         this.fullNumber = fullNumber;
         this.password = password;

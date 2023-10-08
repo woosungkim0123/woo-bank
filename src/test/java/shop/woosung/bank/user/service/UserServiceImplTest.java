@@ -1,38 +1,48 @@
 package shop.woosung.bank.user.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import shop.woosung.bank.common.service.port.PasswordEncoder;
+import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.handler.exception.EmailAlreadyInUseException;
-import shop.woosung.bank.mock.util.FakePasswordEncoder;
-import shop.woosung.bank.mock.repository.FakeUserRepository;
-import shop.woosung.bank.user.controller.port.UserService;
 import shop.woosung.bank.user.service.dto.JoinRequestServiceDto;
 import shop.woosung.bank.user.service.dto.JoinResponseDto;
+import shop.woosung.bank.user.service.port.UserRepository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+    @InjectMocks
+    private UserServiceImpl userService;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
-    private UserService userService;
-
-    @BeforeEach
-    void init() {
-        this.userService = UserServiceImpl.builder()
-                .userRepository(new FakeUserRepository())
-                .passwordEncoder(new FakePasswordEncoder("aaaa_bbbb_cccc_dddd"))
-                .build();
-    }
-
+    @DisplayName("회원가입에 성공한다.")
     @Test
-    void JoinRequestServiceDto_를_이용_하여_유저를_생성_할_수_있다() {
+    void join_success() {
         // given
         JoinRequestServiceDto joinRequestServiceDto = JoinRequestServiceDto.builder()
                 .email("test1@test.com")
                 .password("1234")
                 .name("test1")
                 .build();
+
+        // stub
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("aaaa_bbbb_cccc_dddd");
+        when(userRepository.save(any(User.class))).thenReturn(User.builder().id(1L).email("test1@test.com").name("test1").build());
 
         // when
         JoinResponseDto result = userService.join(joinRequestServiceDto);
@@ -42,22 +52,21 @@ class UserServiceImplTest {
         assertThat(result.getEmail()).isEqualTo("test1@test.com");
         assertThat(result.getName()).isEqualTo("test1");
     }
-    
+
+    @DisplayName("회원가입시 이메일이 중복된다면 예외를 발생시킨다.")
     @Test
-    void 동일한_이메일을_가진_유저가_있다면_예외를_던진다() {
-        // given & when
-        userService.join(JoinRequestServiceDto.builder()
-                .email("test1@test.com")
-                .password("1234")
-                .name("test1")
-                .build());
+    void duplicate_email_when_join_throw_exception() {
+        // given
         JoinRequestServiceDto joinRequestServiceDto = JoinRequestServiceDto.builder()
                 .email("test1@test.com")
                 .password("1234")
                 .name("test1")
                 .build();
 
-        // then
+        // stub
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(User.builder().build()));
+
+        // when & then
         assertThatThrownBy(() -> userService.join(joinRequestServiceDto))
                 .isInstanceOf(EmailAlreadyInUseException.class);
     }

@@ -14,12 +14,12 @@ public class AccountWithdrawResponseDto {
     private final Long balance;
     private final TransactionDto transaction;
 
-    public static AccountWithdrawResponseDto from(Account withdrawAccount, Transaction depositTransaction) {
+    public static AccountWithdrawResponseDto from(Account withdrawAccount, Transaction withdrawTransaction) {
         return AccountWithdrawResponseDto.builder()
                 .id(withdrawAccount.getId())
                 .fullNumber(withdrawAccount.getFullNumber())
                 .balance(withdrawAccount.getBalance())
-                .transaction(new TransactionDto(depositTransaction))
+                .transaction(new TransactionDto(withdrawTransaction))
                 .build();
     }
 
@@ -31,7 +31,7 @@ public class AccountWithdrawResponseDto {
         private final String receiver;
         private final Long amount;
         @JsonIgnore
-        private final Long depositAccountBalance;
+        private final Long withdrawAccountBalance;
         private final String createdAt;
 
         public TransactionDto(Transaction transaction) {
@@ -40,7 +40,7 @@ public class AccountWithdrawResponseDto {
             this.sender = transaction.getSender();
             this.receiver = transaction.getReceiver();
             this.amount = transaction.getAmount();
-            this.depositAccountBalance = transaction.getDepositAccountBalance();
+            this.withdrawAccountBalance = transaction.getWithdrawAccountBalance();
             this.createdAt = transaction.getCreatedAt().toString();
         }
     }

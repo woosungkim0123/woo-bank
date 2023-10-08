@@ -29,13 +29,13 @@ public class AccountListResponseDto {
     @Getter
     public static class AccountDto {
         private final Long id;
-        private final Long number;
+        private final Long fullNumber;
         private final Long balance;
         private final AccountType type;
 
         public AccountDto(Account account) {
             this.id = account.getId();
-            this.number = account.getNumber();
+            this.fullNumber = account.getFullNumber();
             this.balance = account.getBalance();
             this.type = account.getType();
         }

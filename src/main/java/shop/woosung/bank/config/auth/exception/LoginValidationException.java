@@ -1,4 +1,4 @@
-package shop.woosung.bank.config.auth.jwt.exception;
+package shop.woosung.bank.config.auth.exception;
 
 public class LoginValidationException extends RuntimeException {
     public LoginValidationException(String message) {

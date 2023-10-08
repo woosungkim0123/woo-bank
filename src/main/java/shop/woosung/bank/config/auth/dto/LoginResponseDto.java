@@ -2,12 +2,8 @@ package shop.woosung.bank.config.auth.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import shop.woosung.bank.common.util.CustomDateUtil;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.domain.UserRole;
-
-import java.time.LocalDateTime;
 
 @Getter
 public class LoginResponseDto {
