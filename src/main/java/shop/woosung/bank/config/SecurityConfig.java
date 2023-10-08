@@ -88,7 +88,7 @@ public class SecurityConfig {
     private void accessDeniedResponseHandler(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("AccessDeniedException = {}", exception.getMessage());
-        commonResponseHandler.handleException(response, "권한이 없습니다.", HttpStatus.FORBIDDEN);
+        commonResponseHandler.handleException(response, "권한 없는 접근", HttpStatus.FORBIDDEN);
     }
 
     private void configureDevSettings(HttpSecurity http) throws Exception {
