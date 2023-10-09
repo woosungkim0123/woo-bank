@@ -8,12 +8,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
+import shop.woosung.bank.account.controller.dto.AccountTransferRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountWithdrawRequestDto;
 import shop.woosung.bank.account.controller.port.AccountService;
-import shop.woosung.bank.account.service.dto.AccountDepositResponseDto;
-import shop.woosung.bank.account.service.dto.AccountListResponseDto;
-import shop.woosung.bank.account.service.dto.AccountRegisterResponseDto;
-import shop.woosung.bank.account.service.dto.AccountWithdrawResponseDto;
+import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.common.ApiResponse;
 import shop.woosung.bank.config.auth.LoginUser;
 
@@ -68,15 +66,16 @@ public class AccountController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 출금 완료", accountWithdrawResponseDto));
     }
-//
-//    @PostMapping("/s/account/transfer")
-//    public ResponseEntity<?> transferAccount(@RequestBody @Valid AccountTransferReqDto accountTransferReqDto, BindingResult bindingResult,
-//                                             @AuthenticationPrincipal LoginUser loginUser) {
-//        AccountTransferResDto accountTransferResDto = accountService.transfer(accountTransferReqDto, loginUser.getUser().getId());
-//
-//        return new ResponseEntity<>(new ResponseDto<>(1, "계좌 이체 완료", accountTransferResDto), HttpStatus.CREATED);
-//    }
-//
+
+    @PostMapping("/s/account/transfer")
+    public ResponseEntity<ApiResponse<AccountTransferResponseDto>> transferAccount(@RequestBody @Valid AccountTransferRequestDto accountTransferRequestDto,
+                                             @AuthenticationPrincipal LoginUser loginUser) {
+
+        AccountTransferResponseDto accountTransferResponseDto = accountService.transfer(accountTransferRequestConvert(accountTransferRequestDto), loginUser.getUser().getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 이체 완료", accountTransferResponseDto));
+    }
+
 //    @GetMapping("/s/account/{number}")
 //    public ResponseEntity<?> getDetailAccount(@PathVariable Long number,
 //                                             @RequestParam(value = "page", defaultValue = "0") Integer page,

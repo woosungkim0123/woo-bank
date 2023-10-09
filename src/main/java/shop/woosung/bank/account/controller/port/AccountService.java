@@ -13,4 +13,6 @@ public interface AccountService {
     AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto);
 
     AccountWithdrawResponseDto withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user);
+
+    AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, Long userId);
 }
