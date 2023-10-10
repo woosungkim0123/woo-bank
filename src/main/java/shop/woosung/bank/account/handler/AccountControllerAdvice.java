@@ -48,4 +48,12 @@ public class AccountControllerAdvice {
         log.error("NotEnoughBalanceException = {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.error("잔액이 부족합니다."));
     }
+
+    @ExceptionHandler(SameAccountTransferException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSameAccountTransferException(HttpServletRequest request, SameAccountTransferException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("SameAccountTransferException = {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("동일 계좌 이체"));
+    }
+
 }

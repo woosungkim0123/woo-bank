@@ -15,6 +15,7 @@ import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberExce
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
 
+import shop.woosung.bank.account.handler.exception.SameAccountTransferException;
 import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
@@ -94,8 +95,25 @@ public class AccountServiceImpl implements AccountService {
 
         return AccountWithdrawResponseDto.from(withdrawAccount, withdrawTransaction);
     }
-//
-//
+
+    @Transactional
+    public AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, Long userId) {
+
+        checkSameAccount(accountTransferRequestServiceDto.getWithdrawFullNumber(), accountTransferRequestServiceDto.getDepositFullNumber());
+
+        Account withdrawAccount = findAccountByFullNumber(accountTransferRequestServiceDto.getWithdrawFullNumber());
+
+        Account depositAccount = findAccountByFullNumber(accountTransferRequestServiceDto.getDepositFullNumber());
+
+        return null;
+    }
+
+    private Account findAccountByFullNumber(Long fullNumber) {
+        return accountRepository.findByFullNumber(fullNumber)
+                .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
+    }
+
+
 //    @Transactional
 //    public AccountTransferResDto transfer(AccountTransferReqDto accountTransferReqDto, Long userId) {
 //
@@ -178,5 +196,11 @@ public class AccountServiceImpl implements AccountService {
         accountSequence.incrementNextValue();
         accountSequenceRepository.save(accountSequence);
         return nextValue;
+    }
+
+    private void checkSameAccount(Long withdrawFullNumber, Long depositFullNumber) {
+        if(withdrawFullNumber.equals(depositFullNumber)) {
+            throw new SameAccountTransferException(withdrawFullNumber);
+        }
     }
 }
