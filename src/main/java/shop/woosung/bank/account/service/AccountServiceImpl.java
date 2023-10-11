@@ -22,6 +22,7 @@ import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
+import shop.woosung.bank.transaction.domain.TransactionType;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
@@ -35,7 +36,6 @@ import static shop.woosung.bank.account.util.AccountServiceToServiceConverter.ac
 @RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService {
-
     private final AccountLockService accountLockService;
     private final AccountRepository accountRepository;
     private final AccountSequenceRepository accountSequenceRepository;
@@ -105,7 +105,26 @@ public class AccountServiceImpl implements AccountService {
 
         Account depositAccount = findAccountByFullNumber(accountTransferRequestServiceDto.getDepositFullNumber());
 
-        return null;
+        withdrawAccount.checkOwner(userId);
+        withdrawAccount.checkPasswordMatch(accountTransferRequestServiceDto.getWithdrawPassword(), passwordEncoder);
+
+        withdrawAccount.withdraw(accountTransferRequestServiceDto.getAmount());
+        depositAccount.deposit(accountTransferRequestServiceDto.getAmount());
+
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(depositAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(depositAccount.getBalance())
+                .amount(accountTransferRequestServiceDto.getAmount())
+                .type(TransactionType.TRANSFER)
+                .sender(accountTransferRequestServiceDto.getWithdrawFullNumber() + "")
+                .receiver(accountTransferRequestServiceDto.getDepositFullNumber() + "")
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return AccountTransferResponseDto.from(withdrawAccount, savedTransaction);
     }
 
     private Account findAccountByFullNumber(Long fullNumber) {
@@ -113,53 +132,6 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
     }
 
-
-//    @Transactional
-//    public AccountTransferResDto transfer(AccountTransferReqDto accountTransferReqDto, Long userId) {
-//
-//        // 출금 계좌와 입금계좌가 동일하면 안됨
-//        if(accountTransferReqDto.getWithdrawNumber().longValue() == accountTransferReqDto.getDepositNumber().longValue()) {
-//            throw new CustomApiException("입출금계좌가 동일할 수 없습니다.");
-//        }
-//
-//        AccountEntity withdrawAccountEntity = accountJpaRepository.findByNumber(accountTransferReqDto.getWithdrawNumber())
-//                .orElseThrow(
-//                        () -> new CustomApiException("출금계좌를 찾을 수 없습니다."));
-//
-//        AccountEntity depositAccountEntity = accountJpaRepository.findByNumber(accountTransferReqDto.getDepositNumber())
-//                .orElseThrow(
-//                        () -> new CustomApiException("출금계좌를 찾을 수 없습니다."));
-//
-//        // 출금 소유자 확인
-//        withdrawAccountEntity.checkOwner(userId);
-//
-//        // 비밀번호 확인
-//        withdrawAccountEntity.checkSamePassword(accountTransferReqDto.getWithdrawPassword());
-//
-//        // 잔액 확인
-//        withdrawAccountEntity.checkBalance(accountTransferReqDto.getAmount());
-//
-//        // 이체하기
-//        withdrawAccountEntity.withdraw(accountTransferReqDto.getAmount());
-//        depositAccountEntity.deposit(accountTransferReqDto.getAmount());
-//
-//        // 거래내역 남기기
-//        TransactionEntity transaction = TransactionEntity.builder()
-//                .withdrawAccount(withdrawAccountEntity)
-//                .depositAccount(depositAccountEntity)
-//                .withdrawAccountBalance(withdrawAccountEntity.getBalance())
-//                .depositAccountBalance(depositAccountEntity.getBalance())
-//                .amount(accountTransferReqDto.getAmount())
-//                .gubun(TransactionType.TRANSFER)
-//                .sender(accountTransferReqDto.getWithdrawNumber() + "")
-//                .receiver(accountTransferReqDto.getDepositNumber() + "")
-//                .build();
-//
-//        TransactionEntity savedTransaction = transactionRepository.save(transaction);
-//
-//        // DTO 응답
-//        return new AccountTransferResDto(withdrawAccountEntity, savedTransaction);
-//    }
 //
 //    @Transactional(readOnly = true)
 //    public AccountDetailResDto getAccountDetail(Long number, Long userId, Integer page) {

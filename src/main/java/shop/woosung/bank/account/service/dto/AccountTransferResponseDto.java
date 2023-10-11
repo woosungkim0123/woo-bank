@@ -14,7 +14,7 @@ public class AccountTransferResponseDto {
     private Long balance;
     private TransactionDto transaction;
 
-    public AccountTransferResponseDto from(Account account, Transaction transaction) {
+    public static AccountTransferResponseDto from(Account account, Transaction transaction) {
         return AccountTransferResponseDto.builder()
                 .id(account.getId())
                 .fullNumber(account.getFullNumber())
@@ -23,7 +23,7 @@ public class AccountTransferResponseDto {
                 .build();
     }
 
-    public class TransactionDto {
+    public static class TransactionDto {
         private final Long id;
         private final String type;
         private final String sender;
