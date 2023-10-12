@@ -55,4 +55,12 @@ public class AccountControllerAdvice {
         log.error("NotMatchAccountPasswordException = {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("계좌 비밀번호 불일치"));
     }
+
+    @ExceptionHandler(SameAccountTransferException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSameAccountTransferException(HttpServletRequest request, SameAccountTransferException exception) {
+        log.error("request.getRequestURI() = {}, ", request.getRequestURI());
+        log.error("SameAccountTransferException = {}", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("동일 계좌 이체"));
+    }
+
 }

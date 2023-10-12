@@ -2,9 +2,11 @@ package shop.woosung.bank.account.util;
 
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
+import shop.woosung.bank.account.controller.dto.AccountTransferRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountWithdrawRequestDto;
 import shop.woosung.bank.account.service.dto.AccountDepositRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountRegisterRequestServiceDto;
+import shop.woosung.bank.account.service.dto.AccountTransferRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawRequestServiceDto;
 
 public class AccountControllerToServiceConverter {
@@ -33,6 +35,16 @@ public class AccountControllerToServiceConverter {
                 .password(accountWithdrawRequestDto.getPassword())
                 .amount(accountWithdrawRequestDto.getAmount())
                 .transactionType(accountWithdrawRequestDto.getTransactionType())
+                .build();
+    }
+
+    public static AccountTransferRequestServiceDto accountTransferRequestConvert(AccountTransferRequestDto accountTransferRequestDto){
+        return AccountTransferRequestServiceDto.builder()
+                .withdrawFullNumber(accountTransferRequestDto.getWithdrawFullNumber())
+                .depositFullNumber(accountTransferRequestDto.getDepositFullNumber())
+                .withdrawPassword(accountTransferRequestDto.getWithdrawPassword())
+                .amount(accountTransferRequestDto.getAmount())
+                .transactionType(accountTransferRequestDto.getTransactionType())
                 .build();
     }
 }
