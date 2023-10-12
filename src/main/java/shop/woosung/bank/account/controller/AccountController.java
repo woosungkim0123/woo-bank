@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import shop.woosung.bank.account.controller.dto.AccountDepositRequestDto;
 import shop.woosung.bank.account.controller.dto.AccountRegisterRequestDto;
@@ -27,14 +26,6 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/s/account")
-    public ResponseEntity<ApiResponse<AccountRegisterResponseDto>> register(@RequestBody @Valid AccountRegisterRequestDto accountRegisterRequestDto,
-                                           @AuthenticationPrincipal LoginUser loginUser) {
-        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestConvert(accountRegisterRequestDto), loginUser.getUser());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌등록 성공", accountRegisterResponseDto));
-    }
-
     @GetMapping("/s/accounts")
     public ResponseEntity<ApiResponse<AccountListResponseDto>> findUserAccounts(@AuthenticationPrincipal LoginUser loginUser) {
 
@@ -43,10 +34,18 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(accountListResponseDto));
     }
 
+    @PostMapping("/s/account")
+    public ResponseEntity<ApiResponse<AccountRegisterResponseDto>> register(@RequestBody @Valid AccountRegisterRequestDto accountRegisterRequestDto,
+                                           @AuthenticationPrincipal LoginUser loginUser) {
+        AccountRegisterResponseDto accountRegisterResponseDto = accountService.register(accountRegisterRequestConvert(accountRegisterRequestDto), loginUser.getUser());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌등록 성공", accountRegisterResponseDto));
+    }
+
     @DeleteMapping("/s/account/{number}")
     public ResponseEntity<ApiResponse<Object>> deleteAccount(@PathVariable Long number,
                                            @AuthenticationPrincipal LoginUser loginUser) {
-        accountService.deleteAccount(number, loginUser.getUser().getId());
+        accountService.deleteAccount(number, loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("계좌 삭제 성공"));
     }

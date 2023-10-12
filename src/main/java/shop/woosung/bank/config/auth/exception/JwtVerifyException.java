@@ -1,4 +1,4 @@
-package shop.woosung.bank.config.auth.jwt.exception;
+package shop.woosung.bank.config.auth.exception;
 
 public class JwtVerifyException extends RuntimeException {
     public JwtVerifyException() {

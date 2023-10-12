@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -13,10 +12,11 @@ import shop.woosung.bank.common.handler.CommonResponseHandler;
 import shop.woosung.bank.config.auth.LoginUser;
 import shop.woosung.bank.config.auth.dto.LoginRequestDto;
 import shop.woosung.bank.config.auth.dto.LoginResponseDto;
+import shop.woosung.bank.config.auth.exception.LoginValidateWhiteSpaceException;
 import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.config.auth.jwt.JwtProcess;
 import shop.woosung.bank.config.auth.jwt.JwtVO;
-import shop.woosung.bank.config.auth.jwt.exception.LoginValidationException;
+import shop.woosung.bank.config.auth.exception.LoginValidationException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -26,15 +26,16 @@ import java.io.IOException;
 
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CommonResponseHandler commonResponseHandler;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, CommonResponseHandler commonResponseHandler) {
         super(authenticationManager);
         setFilterProcessesUrl("/api/login");
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.commonResponseHandler = commonResponseHandler;
     }
 
     @Override
@@ -47,11 +48,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (LoginValidationException exception) {
             log.error("request.getRequestURI = {}", request.getRequestURI());
             log.error("LoginValidationException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "유효하지 않은 요청 입니다.", HttpStatus.BAD_REQUEST);
+            commonResponseHandler.handleException(response, "유효하지 않은 요청", HttpStatus.BAD_REQUEST);
+        } catch (LoginValidateWhiteSpaceException exception) {
+            log.error("request.getRequestURI = {}", request.getRequestURI());
+            log.error("LoginValidateWhiteSpaceException = {}", exception.getMessage());
+            commonResponseHandler.handleException(response, "유효하지 않은 요청", HttpStatus.BAD_REQUEST);
         } catch (IOException exception) {
             log.error("request.getRequestURI = {}", request.getRequestURI());
             log.error("IOException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "로그인에 실패 하였습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "로그인 실패", HttpStatus.UNAUTHORIZED);
         }
         return null;
     }
@@ -60,7 +65,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
         log.error("request.getRequestURI() = {}, ", request.getRequestURI());
         log.error("AuthenticationException = {}", exception.getMessage());
-        CommonResponseHandler.handleException(response, "계정 정보를 확인 해주세요.", HttpStatus.UNAUTHORIZED);
+        commonResponseHandler.handleException(response, "계정 확인 필요", HttpStatus.UNAUTHORIZED);
     }
 
     @Override
@@ -69,7 +74,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String jwtToken = JwtProcess.create(jwtTokenProvider, loginUser);
         response.addHeader(JwtVO.HEADER, jwtToken);
         LoginResponseDto loginResponseDto = LoginResponseDto.builder().user(loginUser.getUser()).build();
-        CommonResponseHandler.handleSuccess(response, "로그인 완료", HttpStatus.OK, loginResponseDto);
+        commonResponseHandler.handleSuccess(response, "로그인 완료", HttpStatus.OK, loginResponseDto);
     }
 
     private LoginRequestDto convertLoginRequestDto(HttpServletRequest request) throws IOException {
@@ -90,10 +95,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new LoginValidationException(errorMessage);
         }
     }
+
+    /**
+     * MySQL에서 VARCHAR 및 CHAR 타입의 문자열을 비교할 때 뒤쪽에 있는 공백은 고려하지 않음. H2의 경우 반대
+     * 로직에서 공백 검증 로직을 추가함
+     */
     private void validateWhitespace(String value, String errorMessage) {
         String trimValue = value.trim();
         if (value.length() != trimValue.length()) {
-            throw new InternalAuthenticationServiceException(errorMessage);
+            throw new LoginValidateWhiteSpaceException(errorMessage);
         }
     }
 }

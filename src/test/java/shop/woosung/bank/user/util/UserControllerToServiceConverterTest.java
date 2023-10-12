@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserControllerToServiceConverterTest {
 
-    @DisplayName("회원가입을 위해 컨트롤러로 전달된 객체를 서비스로 전달하기 위해 알맞게 변환한다.")
+    @DisplayName("회원가입 요청시 컨트롤러를 들어온 객체를 서비스로 전달할 때 알맞게 변환한다.")
     @Test
     void joinRequestDtoConvert() {
         // given

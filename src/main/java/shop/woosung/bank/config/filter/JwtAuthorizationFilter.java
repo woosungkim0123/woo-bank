@@ -9,10 +9,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import shop.woosung.bank.common.handler.CommonResponseHandler;
 import shop.woosung.bank.config.auth.LoginUser;
+import shop.woosung.bank.config.auth.exception.*;
 import shop.woosung.bank.config.auth.jwt.JwtTokenProvider;
 import shop.woosung.bank.config.auth.jwt.JwtProcess;
 import shop.woosung.bank.config.auth.jwt.JwtVO;
-import shop.woosung.bank.config.auth.jwt.exception.*;
 import shop.woosung.bank.user.domain.User;
 import shop.woosung.bank.user.service.port.UserRepository;
 
@@ -24,14 +24,15 @@ import java.io.IOException;
 
 @Slf4j
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final CommonResponseHandler commonResponseHandler;
 
-    public JwtAuthorizationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public JwtAuthorizationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, UserRepository userRepository, CommonResponseHandler commonResponseHandler) {
         super(authenticationManager);
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
+        this.commonResponseHandler = commonResponseHandler;
     }
 
     @Override
@@ -48,27 +49,27 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }  catch (JwtVerifyException exception) {
             log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtVerifyException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "토큰 검증 실패", HttpStatus.UNAUTHORIZED);
         } catch (JwtExpiredException exception) {
             log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("token expired = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "토큰이 만료 되었습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "토큰 만료", HttpStatus.UNAUTHORIZED);
         } catch (JwtNotHaveIdException exception) {
             log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtNotHaveIdException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "토큰 검증 실패", HttpStatus.UNAUTHORIZED);
         } catch (JwtIdConversionException exception) {
             log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtIdConversionException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "토큰 검증 실패", HttpStatus.UNAUTHORIZED);
         } catch (JwtNotFoundUser exception) {
             log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("JwtNotFoundUser = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "토큰 검증에 실패 했습니다.", HttpStatus.UNAUTHORIZED);
+            commonResponseHandler.handleException(response, "토큰 검증 실패", HttpStatus.UNAUTHORIZED);
         } catch (IOException | ServletException exception) {
             log.error("request.getRequestURI() = {}, ", request.getRequestURI());
             log.error("IOException | ServletException = {}", exception.getMessage());
-            CommonResponseHandler.handleException(response, "서버 오류가 발생 했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            commonResponseHandler.handleException(response, "서버 오류", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

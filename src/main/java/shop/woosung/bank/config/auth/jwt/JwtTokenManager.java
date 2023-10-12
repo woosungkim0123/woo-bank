@@ -7,13 +7,12 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import shop.woosung.bank.config.auth.LoginUser;
-import shop.woosung.bank.config.auth.jwt.exception.JwtExpiredException;
-import shop.woosung.bank.config.auth.jwt.exception.JwtIdConversionException;
-import shop.woosung.bank.config.auth.jwt.exception.JwtNotHaveIdException;
-import shop.woosung.bank.config.auth.jwt.exception.JwtVerifyException;
+import shop.woosung.bank.config.auth.exception.JwtExpiredException;
+import shop.woosung.bank.config.auth.exception.JwtIdConversionException;
+import shop.woosung.bank.config.auth.exception.JwtNotHaveIdException;
+import shop.woosung.bank.config.auth.exception.JwtVerifyException;
 
 import java.util.Date;
 
