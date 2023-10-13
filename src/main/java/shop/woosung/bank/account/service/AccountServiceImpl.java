@@ -44,17 +44,6 @@ public class AccountServiceImpl implements AccountService {
     private final TransactionRepository transactionRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public AccountRegisterResponseDto register(AccountRegisterRequestServiceDto accountRegisterRequestServiceDto, User user) {
-        Long typeNumber = getTypeNumber(accountRegisterRequestServiceDto.getType());
-        Long newNumber = getNewNumber(accountRegisterRequestServiceDto.getType());
-
-        Account account = Account.register(accountRegisterConvert(accountRegisterRequestServiceDto, typeNumber, newNumber, user), passwordEncoder);
-        Account newAccount = accountRepository.save(account);
-
-        return AccountRegisterResponseDto.from(newAccount);
-    }
-
     @Transactional(readOnly = true)
     public AccountListResponseDto getAccountList(User user) {
         List<Account> userAccounts = accountRepository.findByUserId(user.getId());
@@ -62,10 +51,20 @@ public class AccountServiceImpl implements AccountService {
         return AccountListResponseDto.from(user, userAccounts);
     }
 
+    @Transactional
+    public AccountRegisterResponseDto register(AccountRegisterRequestServiceDto accountRegisterRequestServiceDto, User user) {
+        Long typeNumber = getTypeNumber(accountRegisterRequestServiceDto.getType());
+        Long newNumber = accountLockService.getNewAccountNumber(accountRegisterRequestServiceDto.getType());
+
+        Account account = Account.register(accountRegisterConvert(accountRegisterRequestServiceDto, typeNumber, newNumber, user), passwordEncoder);
+        Account newAccount = accountRepository.save(account);
+
+        return AccountRegisterResponseDto.from(newAccount);
+    }
+
     @Override
     public void deleteAccount(Long fullNumber, User user) {
-        Account account = accountRepository.findByFullNumber(fullNumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
+        Account account = findAccountByFullNumber(fullNumber);
 
         account.checkOwner(user.getId());
 
@@ -156,17 +155,6 @@ public class AccountServiceImpl implements AccountService {
         AccountTypeNumber accountTypeNumber = accountTypeNumberRepository.findById(accountType.name())
                 .orElseThrow(() -> new NotFoundAccountTypeNumberException(accountType));
         return accountTypeNumber.getNumber();
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long getNewNumber (AccountType accountType) {
-        AccountSequence accountSequence = accountSequenceRepository.findById(accountType.name())
-                .orElseThrow(() -> new NotFoundAccountSequenceException(accountType));
-
-        Long nextValue = accountSequence.getNextValue();
-        accountSequence.incrementNextValue();
-        accountSequenceRepository.save(accountSequence);
-        return nextValue;
     }
 
     private void checkSameAccount(Long withdrawFullNumber, Long depositFullNumber) {
