@@ -15,6 +15,7 @@ import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberExce
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
 import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
+import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
