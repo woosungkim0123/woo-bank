@@ -70,7 +70,7 @@ public class AccountController {
     public ResponseEntity<ApiResponse<AccountTransferResponseDto>> transferAccount(@RequestBody @Valid AccountTransferRequestDto accountTransferRequestDto,
                                              @AuthenticationPrincipal LoginUser loginUser) {
 
-        AccountTransferResponseDto accountTransferResponseDto = accountService.transfer(accountTransferRequestConvert(accountTransferRequestDto), loginUser.getUser().getId());
+        AccountTransferResponseDto accountTransferResponseDto = accountService.transfer(accountTransferRequestConvert(accountTransferRequestDto), loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("계좌 이체 완료", accountTransferResponseDto));
     }

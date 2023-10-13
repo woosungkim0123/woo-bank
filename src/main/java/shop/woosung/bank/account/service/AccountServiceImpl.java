@@ -95,7 +95,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional
-    public AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, Long userId) {
+    public AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, User user) {
 
         checkSameAccount(accountTransferRequestServiceDto.getWithdrawFullNumber(), accountTransferRequestServiceDto.getDepositFullNumber());
 
@@ -103,7 +103,7 @@ public class AccountServiceImpl implements AccountService {
 
         Account depositAccount = findAccountByFullNumber(accountTransferRequestServiceDto.getDepositFullNumber());
 
-        withdrawAccount.checkOwner(userId);
+        withdrawAccount.checkOwner(user.getId());
         withdrawAccount.checkPasswordMatch(String.valueOf(accountTransferRequestServiceDto.getWithdrawPassword()), passwordEncoder);
 
         withdrawAccount.withdraw(accountTransferRequestServiceDto.getAmount());

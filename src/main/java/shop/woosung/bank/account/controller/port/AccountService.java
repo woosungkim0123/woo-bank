@@ -15,5 +15,5 @@ public interface AccountService {
 
     AccountWithdrawResponseDto withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user);
 
-    AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, Long userId);
+    AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, User user);
 }
