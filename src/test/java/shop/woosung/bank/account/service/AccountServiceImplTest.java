@@ -10,12 +10,9 @@ import shop.woosung.bank.account.controller.port.AccountLockService;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.domain.AccountTypeNumber;
-import shop.woosung.bank.account.handler.exception.NotAccountOwnerException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
+import shop.woosung.bank.account.handler.exception.*;
 import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
-import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.account.service.port.AccountTypeNumberRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
 import shop.woosung.bank.transaction.domain.Transaction;
@@ -216,5 +213,49 @@ class AccountServiceImplTest {
         assertThat(result.getTransaction().getAmount()).isEqualTo(1000L);
         assertThat(result.getTransaction().getWithdrawAccountBalance()).isEqualTo(2000L);
         assertThat(result.getTransaction().getCreatedAt()).isEqualTo("2023-08-11T15:30");
+    }
+
+    @DisplayName("계좌에서 돈을 이체한다.")
+    @Test
+    void transfer_account() {
+        // given
+        AccountTransferRequestServiceDto accountTransferRequestServiceDto = AccountTransferRequestServiceDto.builder().withdrawFullNumber(23211111111L).depositFullNumber(23211111112L).withdrawPassword(1234L).amount(1000L).transactionType(TransactionType.TRANSFER).build();
+        User user = User.builder().id(1L).build();
+
+        // stub
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(23211111111L).type(AccountType.NORMAL).user(user).balance(9000L).build();
+        Account depositAccount = Account.builder().id(2L).fullNumber(23211111112L).type(AccountType.NORMAL).balance(11000L).build();
+        AccountTransferLockResponseDto accountTransferLockResponseDto = AccountTransferLockResponseDto.from(withdrawAccount, depositAccount);
+        Transaction transaction = Transaction.builder().id(1L).type(TransactionType.TRANSFER).amount(1000L).withdrawAccountBalance(9000L).depositAccountBalance(11000L).sender(withdrawAccount.getFullNumber() + "").receiver(depositAccount.getFullNumber() + "").createdAt(LocalDateTime.of(2023, 8, 11, 15, 30, 00)).build();
+
+        when(accountLockService.transferWithLock(any(AccountTransferLockServiceDto.class), any(User.class))).thenReturn(accountTransferLockResponseDto);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+
+        // when
+        AccountTransferResponseDto result = accountService.transfer(accountTransferRequestServiceDto, user);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getFullNumber()).isEqualTo(23211111111L);
+        assertThat(result.getBalance()).isEqualTo(9000L);
+        assertThat(result.getTransaction().getId()).isEqualTo(1L);
+        assertThat(result.getTransaction().getAmount()).isEqualTo(1000L);
+        assertThat(result.getTransaction().getDepositAccountBalance()).isEqualTo(11000L);
+        assertThat(result.getTransaction().getType()).isEqualTo(TransactionType.TRANSFER.name());
+        assertThat(result.getTransaction().getSender()).isEqualTo("23211111111");
+        assertThat(result.getTransaction().getReceiver()).isEqualTo("23211111112");
+        assertThat(result.getTransaction().getCreatedAt()).isEqualTo("2023-08-11 15:30:00");
+    }
+
+    @DisplayName("같은 계좌에 이체를 시도하면 예외를 발생시킨다.")
+    @Test
+    void not_transfer_same_account_when_transfer_throw_exception() {
+        // given
+        AccountTransferRequestServiceDto accountTransferRequestServiceDto = AccountTransferRequestServiceDto.builder().withdrawFullNumber(23211111111L).depositFullNumber(23211111111L).build();
+        User user = User.builder().id(1L).build();
+
+        // when & then
+        assertThatThrownBy(() -> accountService.transfer(accountTransferRequestServiceDto, user))
+                .isInstanceOf(SameAccountTransferException.class);
     }
 }
