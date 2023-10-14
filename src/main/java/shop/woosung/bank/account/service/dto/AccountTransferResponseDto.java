@@ -3,10 +3,12 @@ package shop.woosung.bank.account.service.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.common.util.CustomDateUtil;
 import shop.woosung.bank.transaction.domain.Transaction;
 
+@Getter
 @Builder(access = AccessLevel.PRIVATE)
 public class AccountTransferResponseDto {
     private Long id;
@@ -23,6 +25,7 @@ public class AccountTransferResponseDto {
                 .build();
     }
 
+    @Getter
     public static class TransactionDto {
         private final Long id;
         private final String type;

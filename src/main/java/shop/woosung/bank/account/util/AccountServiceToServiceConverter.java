@@ -1,5 +1,7 @@
 package shop.woosung.bank.account.util;
 
+import shop.woosung.bank.account.service.dto.AccountTransferLockServiceDto;
+import shop.woosung.bank.account.service.dto.AccountTransferRequestServiceDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawRequestServiceDto;
 import shop.woosung.bank.user.domain.User;
@@ -12,6 +14,15 @@ public class AccountServiceToServiceConverter {
                 .fullNumber(accountWithdrawRequestServiceDto.getFullNumber())
                 .password(accountWithdrawRequestServiceDto.getPassword())
                 .amount(accountWithdrawRequestServiceDto.getAmount())
+                .build();
+    }
+
+    public static AccountTransferLockServiceDto accountTransferLockServiceDtoConvert(AccountTransferRequestServiceDto accountTransferRequestServiceDto){
+        return AccountTransferLockServiceDto.builder()
+                .withdrawFullNumber(accountTransferRequestServiceDto.getWithdrawFullNumber())
+                .withdrawPassword(accountTransferRequestServiceDto.getWithdrawPassword())
+                .depositFullNumber(accountTransferRequestServiceDto.getDepositFullNumber())
+                .amount(accountTransferRequestServiceDto.getAmount())
                 .build();
     }
 }

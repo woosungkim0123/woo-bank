@@ -10,15 +10,18 @@ import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
+import shop.woosung.bank.account.service.dto.AccountTransferLockResponseDto;
+import shop.woosung.bank.account.service.dto.AccountTransferLockServiceDto;
+import shop.woosung.bank.account.service.dto.AccountTransferResponseDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
+import shop.woosung.bank.user.domain.User;
 
 @RequiredArgsConstructor
 @Service
 public class AccountLockServiceImpl implements AccountLockService {
-
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountSequenceRepository accountSequenceRepository;
@@ -60,6 +63,23 @@ public class AccountLockServiceImpl implements AccountLockService {
         accountRepository.update(withdrawAccount);
 
         return withdrawAccount;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public AccountTransferLockResponseDto transferWithLock(AccountTransferLockServiceDto accountTransferLockServiceDto, User user) {
+        Account withdrawAccount = getAccountWithLock(accountTransferLockServiceDto.getWithdrawFullNumber());
+        Account depositAccount = getAccountWithLock(accountTransferLockServiceDto.getDepositFullNumber());
+
+        withdrawAccount.checkOwner(user.getId());
+        withdrawAccount.checkPasswordMatch(String.valueOf(accountTransferLockServiceDto.getWithdrawPassword()), passwordEncoder);
+
+        withdrawAccount.checkEnoughBalance(accountTransferLockServiceDto.getAmount());
+        withdrawAccount.withdraw(accountTransferLockServiceDto.getAmount());
+
+        depositAccount.deposit(accountTransferLockServiceDto.getAmount());
+
+        return AccountTransferLockResponseDto.from(withdrawAccount, depositAccount);
     }
 
     private Account getAccountWithLock(Long fullNumber) {

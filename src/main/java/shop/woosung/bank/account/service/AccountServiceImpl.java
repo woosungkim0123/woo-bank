@@ -3,16 +3,13 @@ package shop.woosung.bank.account.service;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.controller.port.AccountLockService;
 import shop.woosung.bank.account.controller.port.AccountService;
 import shop.woosung.bank.account.domain.Account;
-import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
 
 import shop.woosung.bank.account.handler.exception.SameAccountTransferException;
@@ -30,6 +27,7 @@ import shop.woosung.bank.user.service.port.UserRepository;
 import java.util.List;
 
 import static shop.woosung.bank.account.util.AccountServiceToDomainConverter.*;
+import static shop.woosung.bank.account.util.AccountServiceToServiceConverter.accountTransferLockServiceDtoConvert;
 import static shop.woosung.bank.account.util.AccountServiceToServiceConverter.accountWithdrawLockServiceDtoConvert;
 
 @Builder
@@ -96,33 +94,24 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     public AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, User user) {
-
         checkSameAccount(accountTransferRequestServiceDto.getWithdrawFullNumber(), accountTransferRequestServiceDto.getDepositFullNumber());
 
-        Account withdrawAccount = findAccountByFullNumber(accountTransferRequestServiceDto.getWithdrawFullNumber());
-
-        Account depositAccount = findAccountByFullNumber(accountTransferRequestServiceDto.getDepositFullNumber());
-
-        withdrawAccount.checkOwner(user.getId());
-        withdrawAccount.checkPasswordMatch(String.valueOf(accountTransferRequestServiceDto.getWithdrawPassword()), passwordEncoder);
-
-        withdrawAccount.withdraw(accountTransferRequestServiceDto.getAmount());
-        depositAccount.deposit(accountTransferRequestServiceDto.getAmount());
+        AccountTransferLockResponseDto accountTransferLockResponseDto = accountLockService.transferWithLock(accountTransferLockServiceDtoConvert(accountTransferRequestServiceDto), user);
 
         Transaction transaction = Transaction.builder()
-                .withdrawAccount(withdrawAccount)
-                .depositAccount(depositAccount)
-                .withdrawAccountBalance(withdrawAccount.getBalance())
-                .depositAccountBalance(depositAccount.getBalance())
+                .withdrawAccount(accountTransferLockResponseDto.getWithdrawAccount())
+                .depositAccount(accountTransferLockResponseDto.getDepositAccount())
+                .withdrawAccountBalance(accountTransferLockResponseDto.getWithdrawAccount().getBalance())
+                .depositAccountBalance(accountTransferLockResponseDto.getDepositAccount().getBalance())
                 .amount(accountTransferRequestServiceDto.getAmount())
                 .type(TransactionType.TRANSFER)
-                .sender(accountTransferRequestServiceDto.getWithdrawFullNumber() + "")
-                .receiver(accountTransferRequestServiceDto.getDepositFullNumber() + "")
+                .sender(accountTransferLockResponseDto.getWithdrawAccount().getFullNumber() + "")
+                .receiver(accountTransferLockResponseDto.getDepositAccount().getFullNumber() + "")
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return AccountTransferResponseDto.from(withdrawAccount, savedTransaction);
+        return AccountTransferResponseDto.from(accountTransferLockResponseDto.getWithdrawAccount(), savedTransaction);
     }
 
     private Account findAccountByFullNumber(Long fullNumber) {
