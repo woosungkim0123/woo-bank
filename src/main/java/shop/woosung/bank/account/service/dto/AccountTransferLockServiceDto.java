@@ -10,6 +10,7 @@ public class AccountTransferLockServiceDto {
     private final Long depositFullNumber;
     private final Long withdrawPassword;
     private final Long amount;
+    private final User user;
 
     @Builder
     public AccountTransferLockServiceDto(Long withdrawFullNumber, Long depositFullNumber, Long withdrawPassword, Long amount, User user) {
@@ -17,5 +18,6 @@ public class AccountTransferLockServiceDto {
         this.depositFullNumber = depositFullNumber;
         this.withdrawPassword = withdrawPassword;
         this.amount = amount;
+        this.user = user;
     }
 }

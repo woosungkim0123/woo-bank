@@ -17,12 +17,13 @@ public class AccountServiceToServiceConverter {
                 .build();
     }
 
-    public static AccountTransferLockServiceDto accountTransferLockServiceDtoConvert(AccountTransferRequestServiceDto accountTransferRequestServiceDto){
+    public static AccountTransferLockServiceDto accountTransferLockServiceDtoConvert(AccountTransferRequestServiceDto accountTransferRequestServiceDto, User user){
         return AccountTransferLockServiceDto.builder()
                 .withdrawFullNumber(accountTransferRequestServiceDto.getWithdrawFullNumber())
                 .withdrawPassword(accountTransferRequestServiceDto.getWithdrawPassword())
                 .depositFullNumber(accountTransferRequestServiceDto.getDepositFullNumber())
                 .amount(accountTransferRequestServiceDto.getAmount())
+                .user(user)
                 .build();
     }
 }

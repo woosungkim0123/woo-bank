@@ -12,12 +12,10 @@ import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberExce
 import shop.woosung.bank.account.handler.exception.NotFoundAccountSequenceException;
 import shop.woosung.bank.account.service.dto.AccountTransferLockResponseDto;
 import shop.woosung.bank.account.service.dto.AccountTransferLockServiceDto;
-import shop.woosung.bank.account.service.dto.AccountTransferResponseDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
 import shop.woosung.bank.common.service.port.PasswordEncoder;
-import shop.woosung.bank.user.domain.User;
 
 @RequiredArgsConstructor
 @Service
@@ -67,11 +65,11 @@ public class AccountLockServiceImpl implements AccountLockService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public AccountTransferLockResponseDto transferWithLock(AccountTransferLockServiceDto accountTransferLockServiceDto, User user) {
+    public AccountTransferLockResponseDto transferWithLock(AccountTransferLockServiceDto accountTransferLockServiceDto) {
         Account withdrawAccount = getAccountWithLock(accountTransferLockServiceDto.getWithdrawFullNumber());
         Account depositAccount = getAccountWithLock(accountTransferLockServiceDto.getDepositFullNumber());
 
-        withdrawAccount.checkOwner(user.getId());
+        withdrawAccount.checkOwner(accountTransferLockServiceDto.getUser().getId());
         withdrawAccount.checkPasswordMatch(String.valueOf(accountTransferLockServiceDto.getWithdrawPassword()), passwordEncoder);
 
         withdrawAccount.checkEnoughBalance(accountTransferLockServiceDto.getAmount());

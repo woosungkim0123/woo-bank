@@ -17,4 +17,6 @@ public class AccountTransferLockResponseDto {
                 .depositAccount(depositAccount)
                 .build();
     }
+    // 여기 domain이 아니라 dto로 바꿔줘야할듯?
+
 }

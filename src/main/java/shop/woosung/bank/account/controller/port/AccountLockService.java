@@ -5,7 +5,6 @@ import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.service.dto.AccountTransferLockResponseDto;
 import shop.woosung.bank.account.service.dto.AccountTransferLockServiceDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
-import shop.woosung.bank.user.domain.User;
 
 public interface AccountLockService {
 
@@ -15,5 +14,5 @@ public interface AccountLockService {
 
     Long getNewAccountNumber (AccountType accountType);
 
-    AccountTransferLockResponseDto transferWithLock(AccountTransferLockServiceDto accountTransferLockServiceDto, User user);
+    AccountTransferLockResponseDto transferWithLock(AccountTransferLockServiceDto accountTransferLockServiceDto);
 }

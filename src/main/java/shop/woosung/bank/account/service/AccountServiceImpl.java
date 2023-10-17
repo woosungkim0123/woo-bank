@@ -96,7 +96,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, User user) {
         checkSameAccount(accountTransferRequestServiceDto.getWithdrawFullNumber(), accountTransferRequestServiceDto.getDepositFullNumber());
 
-        AccountTransferLockResponseDto accountTransferLockResponseDto = accountLockService.transferWithLock(accountTransferLockServiceDtoConvert(accountTransferRequestServiceDto), user);
+        AccountTransferLockResponseDto accountTransferLockResponseDto = accountLockService.transferWithLock(accountTransferLockServiceDtoConvert(accountTransferRequestServiceDto, user));
 
         Transaction transaction = Transaction.builder()
                 .withdrawAccount(accountTransferLockResponseDto.getWithdrawAccount())
