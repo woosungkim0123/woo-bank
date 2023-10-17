@@ -10,6 +10,8 @@ import shop.woosung.bank.account.domain.Account;
 import shop.woosung.bank.account.domain.AccountSequence;
 import shop.woosung.bank.account.domain.AccountType;
 import shop.woosung.bank.account.handler.exception.*;
+import shop.woosung.bank.account.service.dto.AccountTransferLockResponseDto;
+import shop.woosung.bank.account.service.dto.AccountTransferLockServiceDto;
 import shop.woosung.bank.account.service.dto.AccountWithdrawLockServiceDto;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
@@ -20,8 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -206,6 +207,116 @@ class AccountLockServiceImplTest {
 
         // when & then
         assertThatThrownBy(() -> accountLockService.withdrawWithLock(accountWithdrawLockServiceDto))
+                .isInstanceOf(NotEnoughBalanceException.class);
+    }
+
+    @DisplayName("계좌 이체에 성공한다.")
+    @Test
+    void transfer_account_success() {
+        // given
+        User user = User.builder().id(1L).build();
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).withdrawPassword(1234L).amount(10000L).depositFullNumber(123456789L).user(user).build();
+
+        // stub
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(999999999L).balance(10000L).password("1234").user(user).build();
+        Account depositAccount = Account.builder().id(2L).fullNumber(123456789L).balance(0L).build();
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.of(depositAccount));
+        when(passwordEncoder.matches(eq("1234"), eq("1234"))).thenReturn(true);
+
+        // when
+        AccountTransferLockResponseDto result = accountLockService.transferWithLock(accountTransferLockServiceDto);
+
+        // then
+        assertThat(result.getWithdrawAccount().getId()).isEqualTo(1L);
+        assertThat(result.getDepositAccount().getId()).isEqualTo(2L);
+        assertThat(result.getWithdrawAccount().getBalance()).isEqualTo(0L);
+        assertThat(result.getDepositAccount().getBalance()).isEqualTo(10000L);
+    }
+
+    @DisplayName("계좌 이체시 출금 계좌가 존재하지 않으면 예외를 발생시킨다.")
+    @Test
+    void if_not_exist_withdraw_account_when_account_transfer_throw_exception() {
+        // given
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).build();
+
+        // stub
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
+                .isInstanceOf(NotFoundAccountFullNumberException.class);
+    }
+
+    @DisplayName("계좌 이체시 입금 계좌가 존재하지 않으면 예외를 발생시킨다.")
+    @Test
+    void if_not_exist_deposit_account_when_account_transfer_throw_exception() {
+        // given
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).depositFullNumber(123456789L).build();
+
+        // stub
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(999999999L).build();
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.empty());
+        // when & then
+        assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
+                .isInstanceOf(NotFoundAccountFullNumberException.class);
+    }
+
+    @DisplayName("계좌 이체시 출금 계좌의 소유자가 아니라면 예외를 발생시킨다.")
+    @Test
+    void if_not_owner_withdraw_account_when_account_transfer_throw_exception() {
+        // given
+        User user = User.builder().id(1L).build();
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).depositFullNumber(123456789L).user(user).build();
+
+        // stub
+        User anotherUser = User.builder().id(2L).build();
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(999999999L).user(anotherUser).build();
+        Account depositAccount = Account.builder().id(2L).fullNumber(123456789L).build();
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.of(depositAccount));
+
+        // when & then
+        assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
+                .isInstanceOf(NotAccountOwnerException.class);
+    }
+
+    @DisplayName("계좌 이체시 출금 계좌의 비밀번호가 일치하지않으면 예외를 발생시킨다.")
+    @Test
+    void if_not_match_password_when_account_transfer_throw_exception() {
+        // given
+        User user = User.builder().id(1L).build();
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).withdrawPassword(1235L).depositFullNumber(123456789L).user(user).build();
+
+        // stub
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(999999999L).password("1234").user(user).build();
+        Account depositAccount = Account.builder().id(2L).fullNumber(123456789L).build();
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.of(depositAccount));
+        when(passwordEncoder.matches(eq("1235"), eq("1234"))).thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
+                .isInstanceOf(NotMatchAccountPasswordException.class);
+    }
+
+    @DisplayName("계좌 이체시 출금 계좌의 금액이 부족하면 예외를 발생시킨다.")
+    @Test
+    void if_not_enough_balance_when_account_transfer_throw_exception() {
+        // given
+        User user = User.builder().id(1L).build();
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).withdrawPassword(1234L).amount(10000L).depositFullNumber(123456789L).user(user).build();
+
+        // stub
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(999999999L).balance(9000L).password("1234").user(user).build();
+        Account depositAccount = Account.builder().id(2L).fullNumber(123456789L).build();
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.of(depositAccount));
+        when(passwordEncoder.matches(eq("1234"), eq("1234"))).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
                 .isInstanceOf(NotEnoughBalanceException.class);
     }
 }

@@ -219,8 +219,8 @@ class AccountServiceImplTest {
     @Test
     void transfer_account() {
         // given
-        AccountTransferRequestServiceDto accountTransferRequestServiceDto = AccountTransferRequestServiceDto.builder().withdrawFullNumber(23211111111L).depositFullNumber(23211111112L).withdrawPassword(1234L).amount(1000L).transactionType(TransactionType.TRANSFER).build();
         User user = User.builder().id(1L).build();
+        AccountTransferRequestServiceDto accountTransferRequestServiceDto = AccountTransferRequestServiceDto.builder().withdrawFullNumber(23211111111L).depositFullNumber(23211111112L).withdrawPassword(1234L).amount(1000L).transactionType(TransactionType.TRANSFER).build();
 
         // stub
         Account withdrawAccount = Account.builder().id(1L).fullNumber(23211111111L).type(AccountType.NORMAL).user(user).balance(9000L).build();
@@ -228,7 +228,7 @@ class AccountServiceImplTest {
         AccountTransferLockResponseDto accountTransferLockResponseDto = AccountTransferLockResponseDto.from(withdrawAccount, depositAccount);
         Transaction transaction = Transaction.builder().id(1L).type(TransactionType.TRANSFER).amount(1000L).withdrawAccountBalance(9000L).depositAccountBalance(11000L).sender(withdrawAccount.getFullNumber() + "").receiver(depositAccount.getFullNumber() + "").createdAt(LocalDateTime.of(2023, 8, 11, 15, 30, 00)).build();
 
-        when(accountLockService.transferWithLock(any(AccountTransferLockServiceDto.class), any(User.class))).thenReturn(accountTransferLockResponseDto);
+        when(accountLockService.transferWithLock(any(AccountTransferLockServiceDto.class))).thenReturn(accountTransferLockResponseDto);
         when(transactionRepository.save(any())).thenReturn(transaction);
 
         // when
