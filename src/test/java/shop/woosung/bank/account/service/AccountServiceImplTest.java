@@ -246,16 +246,4 @@ class AccountServiceImplTest {
         assertThat(result.getTransaction().getReceiver()).isEqualTo("23211111112");
         assertThat(result.getTransaction().getCreatedAt()).isEqualTo("2023-08-11 15:30:00");
     }
-
-    @DisplayName("같은 계좌에 이체를 시도하면 예외를 발생시킨다.")
-    @Test
-    void not_transfer_same_account_when_transfer_throw_exception() {
-        // given
-        AccountTransferRequestServiceDto accountTransferRequestServiceDto = AccountTransferRequestServiceDto.builder().withdrawFullNumber(23211111111L).depositFullNumber(23211111111L).build();
-        User user = User.builder().id(1L).build();
-
-        // when & then
-        assertThatThrownBy(() -> accountService.transfer(accountTransferRequestServiceDto, user))
-                .isInstanceOf(SameAccountTransferException.class);
-    }
 }

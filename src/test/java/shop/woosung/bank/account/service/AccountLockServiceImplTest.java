@@ -228,10 +228,23 @@ class AccountLockServiceImplTest {
         AccountTransferLockResponseDto result = accountLockService.transferWithLock(accountTransferLockServiceDto);
 
         // then
-        assertThat(result.getWithdrawAccount().getId()).isEqualTo(1L);
-        assertThat(result.getDepositAccount().getId()).isEqualTo(2L);
-        assertThat(result.getWithdrawAccount().getBalance()).isEqualTo(0L);
-        assertThat(result.getDepositAccount().getBalance()).isEqualTo(10000L);
+        assertThat(result.getWithdrawAccountDto().getId()).isEqualTo(1L);
+        assertThat(result.getWithdrawAccountDto().getFullNumber()).isEqualTo(999999999L);
+        assertThat(result.getWithdrawAccountDto().getBalance()).isEqualTo(0L);
+        assertThat(result.getDepositAccountDto().getId()).isEqualTo(2L);
+        assertThat(result.getDepositAccountDto().getFullNumber()).isEqualTo(123456789L);
+        assertThat(result.getDepositAccountDto().getBalance()).isEqualTo(10000L);
+    }
+
+    @DisplayName("같은 계좌에 이체를 시도하면 예외를 발생시킨다.")
+    @Test
+    void not_transfer_same_account_when_transfer_throw_exception() {
+        // given
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).depositFullNumber(999999999L).build();
+
+        // when & then
+        assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
+                .isInstanceOf(SameAccountTransferException.class);
     }
 
     @DisplayName("계좌 이체시 출금 계좌가 존재하지 않으면 예외를 발생시킨다.")
