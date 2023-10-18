@@ -251,10 +251,10 @@ class AccountLockServiceImplTest {
     @Test
     void if_not_exist_withdraw_account_when_account_transfer_throw_exception() {
         // given
-        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).build();
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(123456789L).depositFullNumber(999999999L).build();
 
         // stub
-        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.empty());
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
@@ -265,12 +265,13 @@ class AccountLockServiceImplTest {
     @Test
     void if_not_exist_deposit_account_when_account_transfer_throw_exception() {
         // given
-        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(999999999L).depositFullNumber(123456789L).build();
+        AccountTransferLockServiceDto accountTransferLockServiceDto = AccountTransferLockServiceDto.builder().withdrawFullNumber(123456789L).depositFullNumber(999999999L).build();
 
         // stub
-        Account withdrawAccount = Account.builder().id(1L).fullNumber(999999999L).build();
-        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.of(withdrawAccount));
-        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.empty());
+        Account withdrawAccount = Account.builder().id(1L).fullNumber(123456789L).build();
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(123456789L))).thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByFullNumberWithPessimisticLock(eq(999999999L))).thenReturn(Optional.empty());
+
         // when & then
         assertThatThrownBy(() -> accountLockService.transferWithLock(accountTransferLockServiceDto))
                 .isInstanceOf(NotFoundAccountFullNumberException.class);
