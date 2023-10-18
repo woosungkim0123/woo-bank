@@ -12,7 +12,6 @@ import shop.woosung.bank.account.domain.AccountTypeNumber;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
 import shop.woosung.bank.account.handler.exception.NotFoundAccountTypeNumberException;
 
-import shop.woosung.bank.account.handler.exception.SameAccountTransferException;
 import shop.woosung.bank.account.service.dto.*;
 import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.account.service.port.AccountSequenceRepository;
@@ -94,24 +93,22 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     public AccountTransferResponseDto transfer(AccountTransferRequestServiceDto accountTransferRequestServiceDto, User user) {
-        checkSameAccount(accountTransferRequestServiceDto.getWithdrawFullNumber(), accountTransferRequestServiceDto.getDepositFullNumber());
-
         AccountTransferLockResponseDto accountTransferLockResponseDto = accountLockService.transferWithLock(accountTransferLockServiceDtoConvert(accountTransferRequestServiceDto, user));
 
         Transaction transaction = Transaction.builder()
-                .withdrawAccount(accountTransferLockResponseDto.getWithdrawAccount())
-                .depositAccount(accountTransferLockResponseDto.getDepositAccount())
-                .withdrawAccountBalance(accountTransferLockResponseDto.getWithdrawAccount().getBalance())
-                .depositAccountBalance(accountTransferLockResponseDto.getDepositAccount().getBalance())
+                .withdrawAccount(accountTransferLockResponseDto.getWithdrawAccountDto().toDomain())
+                .depositAccount(accountTransferLockResponseDto.getDepositAccountDto().toDomain())
+                .withdrawAccountBalance(accountTransferLockResponseDto.getWithdrawAccountDto().getBalance())
+                .depositAccountBalance(accountTransferLockResponseDto.getDepositAccountDto().getBalance())
                 .amount(accountTransferRequestServiceDto.getAmount())
                 .type(TransactionType.TRANSFER)
-                .sender(accountTransferLockResponseDto.getWithdrawAccount().getFullNumber() + "")
-                .receiver(accountTransferLockResponseDto.getDepositAccount().getFullNumber() + "")
+                .sender(accountTransferLockResponseDto.getWithdrawAccountDto().getFullNumber() + "")
+                .receiver(accountTransferLockResponseDto.getDepositAccountDto().getFullNumber() + "")
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return AccountTransferResponseDto.from(accountTransferLockResponseDto.getWithdrawAccount(), savedTransaction);
+        return AccountTransferResponseDto.from(accountTransferLockResponseDto, savedTransaction);
     }
 
     private Account findAccountByFullNumber(Long fullNumber) {
@@ -134,21 +131,10 @@ public class AccountServiceImpl implements AccountService {
 //        // DTO 응답
 //        return new AccountDetailResDto(accountEntityPS, transactionList);
 //    }
-//    private Long getNewNumber() {
-//        return accountRepository.findLastNumberWithPessimisticLock()
-//                .map(account -> account.getNumber() + 1L)
-//                .orElse(11111111111L);
-//    }
 
     private Long getTypeNumber(AccountType accountType) {
         AccountTypeNumber accountTypeNumber = accountTypeNumberRepository.findById(accountType.name())
                 .orElseThrow(() -> new NotFoundAccountTypeNumberException(accountType));
         return accountTypeNumber.getNumber();
-    }
-
-    private void checkSameAccount(Long withdrawFullNumber, Long depositFullNumber) {
-        if(withdrawFullNumber.equals(depositFullNumber)) {
-            throw new SameAccountTransferException(withdrawFullNumber);
-        }
     }
 }
