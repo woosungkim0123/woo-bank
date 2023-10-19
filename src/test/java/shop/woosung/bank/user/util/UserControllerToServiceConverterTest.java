@@ -12,7 +12,7 @@ class UserControllerToServiceConverterTest {
 
     @DisplayName("회원가입 요청시 컨트롤러를 들어온 객체를 서비스로 전달할 때 알맞게 변환한다.")
     @Test
-    void joinRequestDtoConvert() {
+    void user_join_request_dto_convert() {
         // given
         JoinRequestDto joinRequestDto = JoinRequestDto.builder()
                 .email("test1@test.com")

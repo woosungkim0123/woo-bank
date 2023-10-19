@@ -12,7 +12,7 @@ class UserServiceToDomainConverterTest {
 
     @DisplayName("회원가입을 위해 서비스의 데이터를 회원가입 도메인 전용 객체로 변환한다.")
     @Test
-    public void userCreateConvert_test() {
+    public void user_join_domain_dto_convert() {
         // given
         JoinRequestServiceDto joinRequestServiceDto = JoinRequestServiceDto.builder()
                 .email("test1@test.com")

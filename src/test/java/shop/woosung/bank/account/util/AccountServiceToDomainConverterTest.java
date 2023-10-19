@@ -13,7 +13,7 @@ class AccountServiceToDomainConverterTest {
 
     @DisplayName("계좌 등록을 위해 서비스의 데이터를 회원가입 도메인 전용 객체로 변환한다.")
     @Test
-    public void userCreateConvert_test() {
+    void account_register_domain_dto_convert() {
         // given
         AccountRegisterRequestServiceDto accountRegisterRequestServiceDto = AccountRegisterRequestServiceDto.builder()
                 .password("1234")
