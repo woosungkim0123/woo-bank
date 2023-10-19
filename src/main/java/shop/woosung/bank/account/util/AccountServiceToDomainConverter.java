@@ -22,6 +22,7 @@ public class AccountServiceToDomainConverter {
                 .build();
     }
 
+    // TODO 여기있는게 맞을까?
     static public DepositTransactionCreate depositTransactionCreateConvert(AccountDepositRequestServiceDto accountDepositRequestServiceDto, Account depositAccount) {
         return DepositTransactionCreate.builder()
                 .depositAccount(depositAccount)
@@ -34,6 +35,7 @@ public class AccountServiceToDomainConverter {
                 .build();
     }
 
+    // TODO 여기있는게 맞을까?
     static public WithdrawTransactionCreate withdrawTransactionCreateConvert(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, Account withdrawAccount, String receiver) {
         return WithdrawTransactionCreate.builder()
                 .withdrawAccount(withdrawAccount)
@@ -44,5 +46,4 @@ public class AccountServiceToDomainConverter {
                 .receiver(receiver)
                 .build();
     }
-
 }
