@@ -1,7 +1,7 @@
 package shop.woosung.bank.transaction.service.dto;
 
 import lombok.Getter;
-import shop.woosung.bank.account.domain.Account;
+import shop.woosung.bank.account.service.dto.AccountDto;
 import shop.woosung.bank.common.util.CustomDateUtil;
 import shop.woosung.bank.transaction.domain.Transaction;
 
@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 public class TransactionResponseListDto {
     private final List<TransactionDto> transactions;
 
-    public TransactionResponseListDto(Account account, List<Transaction> transactions) {
+    public TransactionResponseListDto(AccountDto accountDto, List<Transaction> transactions) {
         this.transactions = transactions.stream()
-                .map(transaction -> new TransactionDto(transaction, account.getFullNumber()))
+                .map(transaction -> new TransactionDto(transaction, accountDto.getFullNumber()))
                 .collect(Collectors.toList());
     }
 
@@ -51,5 +51,4 @@ public class TransactionResponseListDto {
             }
         }
     }
-
 }

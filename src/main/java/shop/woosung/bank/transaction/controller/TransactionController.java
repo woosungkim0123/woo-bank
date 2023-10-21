@@ -24,7 +24,7 @@ public class TransactionController {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @AuthenticationPrincipal LoginUser loginUser) {
 
-        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(loginUser.getUser().getId(), accountFullNumber, type, page);
+        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(accountFullNumber, type, page, loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("입출금 목록보기 성공", transactionResponseListDto));
     }

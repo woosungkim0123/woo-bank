@@ -111,6 +111,14 @@ public class AccountServiceImpl implements AccountService {
         return AccountTransferResponseDto.from(accountTransferLockResponseDto, savedTransaction);
     }
 
+    @Transactional(readOnly = true)
+    public AccountDto checkAccountOwner(Long fullNumber, User user) {
+        Account account = findAccountByFullNumber(fullNumber);
+        account.checkOwner(user.getId());
+        return AccountDto.from(account);
+    }
+
+
     private Account findAccountByFullNumber(Long fullNumber) {
         return accountRepository.findByFullNumber(fullNumber)
                 .orElseThrow(() -> new NotFoundAccountFullNumberException(fullNumber));
