@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Getter
 public class Transaction {
-
     private final Long id;
     private final Account withdrawAccount;
     private final Account depositAccount;

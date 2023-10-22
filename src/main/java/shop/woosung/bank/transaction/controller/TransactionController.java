@@ -17,7 +17,7 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    @GetMapping("/s/account/{number}/transaction")
+    @GetMapping("/s/account/{accountFullNumber}/transaction")
     public ResponseEntity<ApiResponse<TransactionResponseListDto>> findTransactionList(
             @PathVariable Long accountFullNumber,
             @RequestParam(value = "type", defaultValue = "ALL") String type,

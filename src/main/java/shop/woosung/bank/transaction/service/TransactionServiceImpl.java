@@ -1,12 +1,10 @@
 package shop.woosung.bank.transaction.service;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.woosung.bank.account.service.AccountServiceImpl;
 import shop.woosung.bank.account.service.dto.AccountDto;
-import shop.woosung.bank.account.service.port.AccountRepository;
 import shop.woosung.bank.transaction.controller.port.TransactionService;
 import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.service.dto.TransactionResponseListDto;
@@ -27,6 +25,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<Transaction> transactionList = transactionRepository.findTransactionList(accountDto.getId(), type, page);
 
-        return new TransactionResponseListDto(accountDto, transactionList);
+        return TransactionResponseListDto.from(accountDto, transactionList);
     }
 }
