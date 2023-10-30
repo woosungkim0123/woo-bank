@@ -14,7 +14,7 @@ public class WithdrawTransactionCreate {
     private final String receiver;
 
     @Builder
-    public WithdrawTransactionCreate(Account withdrawAccount, Long withdrawAccountBalance, Long amount, TransactionType type, String sender, String receiver, String tel) {
+    public WithdrawTransactionCreate(Account withdrawAccount, Long withdrawAccountBalance, Long amount, TransactionType type, String sender, String receiver) {
         this.withdrawAccount = withdrawAccount;
         this.withdrawAccountBalance = withdrawAccountBalance;
         this.amount = amount;

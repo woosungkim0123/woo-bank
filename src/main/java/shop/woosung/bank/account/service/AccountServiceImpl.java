@@ -70,6 +70,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     public AccountDepositResponseDto deposit(AccountDepositRequestServiceDto accountDepositRequestServiceDto) {
+        // TODO dto로 변경
         Account depositAccount = accountLockService.depositAccountWithLock(accountDepositRequestServiceDto.getFullNumber(), accountDepositRequestServiceDto.getAmount());
 
         Transaction depositTransaction = transactionRepository.save(
@@ -81,6 +82,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     public AccountWithdrawResponseDto withdraw(AccountWithdrawRequestServiceDto accountWithdrawRequestServiceDto, User user) {
+        // TODO dto로 변경
         Account withdrawAccount = accountLockService.withdrawWithLock(accountWithdrawLockServiceDtoConvert(accountWithdrawRequestServiceDto, user));
 
         // TODO 추후 트랜잭션 서비스로 이동 고려
@@ -110,6 +112,14 @@ public class AccountServiceImpl implements AccountService {
 
         return AccountTransferResponseDto.from(accountTransferLockResponseDto, savedTransaction);
     }
+
+    @Transactional(readOnly = true)
+    public AccountDto checkAccountOwner(Long fullNumber, User user) {
+        Account account = findAccountByFullNumber(fullNumber);
+        account.checkOwner(user.getId());
+        return AccountDto.from(account);
+    }
+
 
     private Account findAccountByFullNumber(Long fullNumber) {
         return accountRepository.findByFullNumber(fullNumber)

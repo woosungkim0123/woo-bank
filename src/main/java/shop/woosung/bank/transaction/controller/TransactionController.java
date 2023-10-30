@@ -17,14 +17,14 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
-    @GetMapping("/s/account/{number}/transaction")
+    @GetMapping("/s/account/{accountFullNumber}/transaction")
     public ResponseEntity<ApiResponse<TransactionResponseListDto>> findTransactionList(
             @PathVariable Long accountFullNumber,
             @RequestParam(value = "type", defaultValue = "ALL") String type,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @AuthenticationPrincipal LoginUser loginUser) {
 
-        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(loginUser.getUser().getId(), accountFullNumber, type, page);
+        TransactionResponseListDto transactionResponseListDto = transactionService.getTransactionList(accountFullNumber, type, page, loginUser.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("입출금 목록보기 성공", transactionResponseListDto));
     }

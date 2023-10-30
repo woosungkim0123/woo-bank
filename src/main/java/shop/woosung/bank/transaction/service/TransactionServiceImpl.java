@@ -1,36 +1,30 @@
 package shop.woosung.bank.transaction.service;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.woosung.bank.account.domain.Account;
-import shop.woosung.bank.account.handler.exception.NotFoundAccountFullNumberException;
-import shop.woosung.bank.account.service.port.AccountRepository;
+import shop.woosung.bank.account.service.AccountServiceImpl;
+import shop.woosung.bank.account.service.dto.AccountDto;
 import shop.woosung.bank.transaction.controller.port.TransactionService;
 import shop.woosung.bank.transaction.domain.Transaction;
 import shop.woosung.bank.transaction.service.dto.TransactionResponseListDto;
 import shop.woosung.bank.transaction.service.port.TransactionRepository;
+import shop.woosung.bank.user.domain.User;
 
 import java.util.List;
 
-@Builder
 @RequiredArgsConstructor
 @Service
 public class TransactionServiceImpl implements TransactionService {
-
-    private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final AccountServiceImpl accountService;
 
     @Transactional(readOnly = true)
-    public TransactionResponseListDto getTransactionList(Long userId, Long accountFullNumber, String type, int page) {
-        Account account = accountRepository.findByFullNumber(accountFullNumber)
-                .orElseThrow(() -> new NotFoundAccountFullNumberException(accountFullNumber));
+    public TransactionResponseListDto getTransactionList(Long accountFullNumber, String type, int page, User user) {
+        AccountDto accountDto = accountService.checkAccountOwner(accountFullNumber, user);
 
-        account.checkOwner(userId);
+        List<Transaction> transactionList = transactionRepository.findTransactionList(accountDto.getId(), type, page);
 
-        List<Transaction> transactionList = transactionRepository.findTransactionList(account.getId(), type, page);
-
-        return new TransactionResponseListDto(account, transactionList);
+        return TransactionResponseListDto.from(accountDto, transactionList);
     }
 }
